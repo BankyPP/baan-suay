@@ -205,6 +205,8 @@ ul.plain{list-style:none;margin:0;padding:0}
 .seg button:disabled{opacity:.4;cursor:not-allowed}
 .mini{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
 .mini input{width:92px;padding:8px 10px}
+.mini span{white-space:nowrap}
+.qedit .mini{justify-self:start}
 .clock{font:600 1rem/1 var(--f-head);font-variant-numeric:tabular-nums;padding:8px 12px;border-radius:999px;background:var(--sunk);min-width:4.2em;text-align:center}
 .clock.warn{background:var(--bad-bg);color:var(--bad)}
 .meq-box{min-height:170px;font-size:1.05rem}
@@ -344,7 +346,12 @@ textarea{min-height:110px;resize:vertical;line-height:1.55}
 .check{display:flex;gap:8px;align-items:center;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--ink)}
 .qedit{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;margin:0;min-width:0}
-.qedit legend{font:600 .9rem var(--f-head);padding:0 6px}
+.qedit legend{font:600 .9rem var(--f-head);padding:0 6px;display:flex;align-items:center;gap:6px}
+.qedit{transition:transform .15s ease;background:var(--surface)}
+.qedit.dragging{transition:none;position:relative;z-index:5;box-shadow:var(--shadow);border-color:var(--ink)}
+.grip{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:-4px;border:0;border-radius:8px;background:var(--sunk);color:var(--muted);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;padding:0}
+.grip svg{width:11px;height:17px;fill:currentColor}
+.grip:active{cursor:grabbing;color:var(--ink)}
 .crow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:center}
 .crow input[type=radio]{width:20px;height:20px;accent-color:var(--good)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--btn);color:var(--btn-ink);font:500 .95rem var(--f-head);padding:12px 18px;border-radius:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
@@ -1301,9 +1308,9 @@ function paintLessonForm(){
     <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น เคมีไฟฟ้า"></label></div>
     <div class="field"><span>เหมาะกับช่วงชั้น (ไม่เลือก = ทุกระดับ)</span><div class="pick">${BANDS.map(([v,n])=>`<label class="opt"><input type="checkbox" name="lfLv" value="${v}" ${d.levels.includes(v)?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
     <h3>หัวข้อ ${d.topics.length} หัวข้อ</h3>
-    ${d.topics.map((t,i)=>`<fieldset class="qedit"><legend>หัวข้อ ${i+1}</legend>
+    ${d.topics.map((t,i)=>`<fieldset class="qedit" data-drag="t"><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>หัวข้อ ${i+1}</legend>
       <input type="text" id="t${i}_name" value="${esc(t.name)}" placeholder="ชื่อหัวข้อ เช่น เลขออกซิเดชันและปฏิกิริยารีดอกซ์" aria-label="ชื่อหัวข้อ ${i+1}">
-      <div class="trow"><span class="small muted">ความยาก</span>${starPick(i,t.stars)}<div class="btns" style="margin-left:auto"><button class="btn sm ghost" data-act="tUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm danger" data-act="tDel" data-id="${i}">ลบหัวข้อ</button></div></div>
+      <div class="trow"><span class="small muted">ความยาก</span>${starPick(i,t.stars)}<div class="btns" style="margin-left:auto"><button class="btn sm ghost" data-act="tUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="tDown" data-id="${i}" ${i<d.topics.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="tDel" data-id="${i}">ลบหัวข้อ</button></div></div>
       <textarea id="t${i}_goals" style="min-height:96px" placeholder="จุดประสงค์ บรรทัดละ 1 ข้อ เช่น&#10;หาเลขออกซิเดชันของธาตุในสารประกอบได้&#10;บอกได้ว่าสารใดเป็นตัวรีดิวซ์และตัวออกซิไดซ์" aria-label="จุดประสงค์ของหัวข้อ ${i+1}">${esc(t.goals)}</textarea>
     </fieldset>`).join('')}
     <div class="btns"><button class="btn" data-act="tAdd">เพิ่มหัวข้อ</button></div>
@@ -1311,9 +1318,9 @@ function paintLessonForm(){
       <label class="field" style="margin-top:10px"><textarea id="lfContent" style="min-height:120px" aria-label="เนื้อหาเพิ่มเติม">${esc(d.content)}</textarea>
       <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
     <h3>โจทย์ · MCQ ${nm} ข้อ · MEQ ${ne} ข้อ</h3>
-    ${d.questions.map((q,i)=>`<fieldset class="qedit"><legend>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
+    ${d.questions.map((q,i)=>`<fieldset class="qedit" data-drag="q"><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
       <div class="row2"><select id="q${i}_type" data-change="qtype" aria-label="แบบโจทย์"><option value="mcq" ${q.type!=='meq'?'selected':''}>MCQ ตัวเลือก</option><option value="meq" ${q.type==='meq'?'selected':''}>MEQ เขียนตอบ</option></select>
-      <div class="btns" style="justify-content:flex-end"><button class="btn sm ghost" data-act="qUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm danger" data-act="qDel" data-id="${i}">ลบข้อนี้</button></div></div>
+      <div class="btns" style="justify-content:flex-end"><button class="btn sm ghost" data-act="qUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="qDown" data-id="${i}" ${i<d.questions.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="qDel" data-id="${i}">ลบข้อนี้</button></div></div>
       <textarea id="q${i}_q" style="min-height:70px" placeholder="โจทย์" aria-label="โจทย์ข้อ ${i+1}">${esc(q.q)}</textarea>
       ${q.type==='meq'?`<textarea id="q${i}_k" style="min-height:80px" placeholder="แนวคำตอบ / เกณฑ์ให้คะแนน" aria-label="แนวคำตอบ">${esc(q.key)}</textarea>
         <label class="mini"><span>คะแนนเต็ม</span><input type="number" id="q${i}_m" min="1" max="20" value="${esc(q.max)}"></label>`
@@ -1467,9 +1474,11 @@ const ACT={
   tAdd(){syncDraft();S.draft.topics.push(blankT());paintLessonForm()},
   tDel(t){syncDraft();S.draft.topics.splice(+t.dataset.id,1);paintLessonForm()},
   tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
+  tDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
   qAdd(t){syncDraft();S.draft.questions.push(blankQ(t.dataset.id));paintLessonForm()},
   qDel(t){syncDraft();S.draft.questions.splice(+t.dataset.id,1);paintLessonForm()},
   qUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
+  qDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
   cAdd(t){syncDraft();S.draft.questions[+t.dataset.id].choices.push('');paintLessonForm()},
   cDel(t){syncDraft();const q=S.draft.questions[+t.dataset.id];q.choices.pop();if(q.answer>=q.choices.length)q.answer=0;paintLessonForm()},
   bulkAdd(){syncDraft();const got=parseBulk(val('bulkQ'));if(!got.length){toast('ไม่พบโจทย์ ตรวจรูปแบบอีกครั้ง');return}
@@ -1620,6 +1629,31 @@ document.addEventListener('click',e=>{
   if(!t){if(e.target.id==='sheet')closeSheet();return}
   const fn=ACT[t.dataset.act];if(fn){e.preventDefault();fn(t,e)}
 });
+/* drag a topic or question box by its grip to reorder it */
+function startDrag(e,grip){
+  const item=grip.closest('[data-drag]');const list=item&&item.parentElement;if(!item||!list||!S.draft)return;
+  const kind=item.dataset.drag;const items=Array.from(list.children).filter(el=>el.dataset&&el.dataset.drag===kind);
+  const from=items.indexOf(item);if(from<0||items.length<2)return;
+  const sc=$('#sheetCard');const s0=sc.scrollTop;const y0=e.clientY;
+  const rs=items.map(el=>{const r=el.getBoundingClientRect();return {top:r.top+s0,h:r.height}});
+  const gap=rs.length>1?Math.max(0,rs[1].top-(rs[0].top+rs[0].h)):12;const H=rs[from].h+gap;
+  let to=from,lastY=y0,raf=0;
+  item.classList.add('dragging');try{grip.setPointerCapture(e.pointerId)}catch(_){}
+  const layout=()=>{
+    const dy=(lastY-y0)+(sc.scrollTop-s0);item.style.transform=`translateY(${dy}px)`;
+    const c=rs[from].top+rs[from].h/2+dy;to=from;
+    for(let i=0;i<rs.length;i++){if(i===from)continue;const mid=rs[i].top+rs[i].h/2;if(i>from&&c>mid)to=i;if(i<from&&c<mid&&to>=from)to=i}
+    items.forEach((el,i)=>{if(i===from)return;let off=0;if(from<to&&i>from&&i<=to)off=-H;if(to<from&&i>=to&&i<from)off=H;el.style.transform=off?`translateY(${off}px)`:''});
+  };
+  const edge=()=>{const r=sc.getBoundingClientRect();let v=0;if(lastY<r.top+70)v=-12;else if(lastY>r.bottom-70)v=12;if(v){sc.scrollTop+=v;layout()}raf=requestAnimationFrame(edge)};
+  raf=requestAnimationFrame(edge);
+  const move=ev=>{lastY=ev.clientY;layout();ev.preventDefault()};
+  const up=()=>{cancelAnimationFrame(raf);grip.removeEventListener('pointermove',move);grip.removeEventListener('pointerup',up);grip.removeEventListener('pointercancel',up);
+    items.forEach(el=>{el.style.transform='';el.classList.remove('dragging')});
+    if(to!==from){syncDraft();const a=kind==='t'?S.draft.topics:S.draft.questions;const [x]=a.splice(from,1);a.splice(to,0,x);paintLessonForm()}};
+  grip.addEventListener('pointermove',move);grip.addEventListener('pointerup',up);grip.addEventListener('pointercancel',up);
+}
+document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('[data-grip]');if(g&&(e.button===0||e.pointerType!=='mouse')){e.preventDefault();startDrag(e,g)}});
 document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz)S.quiz.typed=e.target.value});
 document.addEventListener('change',e=>{
   const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
