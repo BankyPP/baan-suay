@@ -60,9 +60,9 @@ button{font:inherit;color:inherit}
 .modebtn[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
 .modebtn[aria-pressed="true"] .dot{background:#38D38E}
 
-.tabs{display:flex;gap:2px;overflow-x:auto;margin-block:14px 20px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs{display:flex;gap:2px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin-block:14px 20px;box-shadow:inset 0 -1px 0 var(--line);scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs button{font:500 1rem/1 var(--f-head);background:none;border:0;color:var(--muted);padding:12px 14px 13px;white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button{font:500 1rem/1 var(--f-head);background:none;border:0;color:var(--muted);padding:12px 14px 13px;white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent;flex:none}
 .tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
 .tabs button:hover{color:var(--ink)}
 
@@ -615,7 +615,10 @@ function render(){
   if(S.tab==='admin'&&!S.bro)S.tab='home';
   $('#houseName').textContent=houseName();
   const mb=$('#modeBtn');mb.setAttribute('aria-pressed',S.bro?'true':'false');$('.mlabel',mb).textContent=S.bro?'โหมดพี่ เปิดอยู่':'โหมดพี่';
+  const tb=$('#tabs');const sl=tb.scrollLeft;
   $('#tabs').innerHTML=TABS.filter(t=>!t[2]||S.bro).map(([id,n])=>`<button type="button" data-act="tab" data-id="${id}" ${S.tab===id?'aria-current="page"':''}>${n}</button>`).join('');
+  tb.scrollLeft=sl;const at=tb.querySelector('[aria-current="page"]');
+  if(at){const l=at.offsetLeft-tb.offsetLeft,r=l+at.offsetWidth;if(l<tb.scrollLeft)tb.scrollLeft=l-16;else if(r>tb.scrollLeft+tb.clientWidth)tb.scrollLeft=r-tb.clientWidth+16}
   $('#banner').innerHTML=Store.err?`<div class="banner">${esc(Store.err)}</div>`:Store.mode==='local'?`<div class="banner">เปิดแบบเครื่องเดียว: ข้อมูลบ้านเก็บไว้ในเบราว์เซอร์ของเครื่องนี้ ใช้ “สำรองข้อมูล” ในจัดการบ้านเพื่อย้ายไปเครื่องอื่น</div>`:'';
   const v=$('#view');
   if(Store.mode==='loading'){v.innerHTML='<div class="panel muted">กำลังเปิดประตูบ้าน…</div>';return}
