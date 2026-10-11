@@ -23,7 +23,7 @@ img{max-width:100%}
 :root{
   --paper:#ECF0F3; --surface:#FFFFFF; --sunk:#DFE6EC; --ink:#17212B; --muted:#55626E; --line:#CDD6DE;
   --btn:#17212B; --btn-ink:#FFFFFF; --good:#16825A; --good-bg:#DCF1E7; --bad:#BE3A2A; --bad-bg:#F8E0DC;
-  --focus:#2F5BD3; --scrim:rgba(12,18,24,.48);
+  --focus:#2F5BD3; --scrim:rgba(12,18,24,.48); --star:#E2A00C;
   --shadow:0 1px 2px rgba(23,33,43,.06),0 6px 20px rgba(23,33,43,.08);
   --f-head:"Kanit","Sarabun",system-ui,sans-serif;
   --f-body:"Sarabun","Kanit",system-ui,sans-serif;
@@ -31,12 +31,12 @@ img{max-width:100%}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#10161C; --surface:#18212A; --sunk:#222C37; --ink:#E6ECF1; --muted:#98A5B1; --line:#2D3844;
   --btn:#E6ECF1; --btn-ink:#10161C; --good:#4CC18C; --good-bg:#16352A; --bad:#F2806E; --bad-bg:#3B201C;
-  --focus:#86A6FF; --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3);
+  --focus:#86A6FF; --scrim:rgba(0,0,0,.6); --star:#F5B931; --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3);
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#10161C; --surface:#18212A; --sunk:#222C37; --ink:#E6ECF1; --muted:#98A5B1; --line:#2D3844;
   --btn:#E6ECF1; --btn-ink:#10161C; --good:#4CC18C; --good-bg:#16352A; --bad:#F2806E; --bad-bg:#3B201C;
-  --focus:#86A6FF; --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3);
+  --focus:#86A6FF; --scrim:rgba(0,0,0,.6); --star:#F5B931; --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3);
   color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -177,6 +177,51 @@ ul.plain{list-style:none;margin:0;padding:0}
 .explain b{font-family:var(--f-head);font-weight:600}
 .result{text-align:center;display:grid;gap:10px;justify-items:center;padding:24px 16px}
 .result .score{font:700 3.6rem/1 var(--f-head);font-variant-numeric:tabular-nums}
+
+/* lesson topics, stars, quiz setup */
+.stars{display:inline-flex;gap:1px;align-items:center;flex:none}
+.stars i{display:inline-flex}
+.stars svg{width:19px;height:19px;fill:var(--line)}
+.stars i.on svg{fill:var(--star)}
+.stars.sm svg{width:14px;height:14px}
+.ltitle{font-size:clamp(1.6rem,4.4vw,2.2rem);font-weight:600}
+.topics{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.topic{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:14px;row-gap:8px;align-items:start}
+.tno{grid-row:1/span 2;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--sunk);font:600 1.05rem/1 var(--f-head);font-variant-numeric:tabular-nums}
+.topic-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap;min-height:38px}
+.topic-head h3{font-size:1.1rem;font-weight:600}
+.goalwrap{display:grid;gap:6px;min-width:0}
+.goals{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.goals li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;line-height:1.5;overflow-wrap:anywhere}
+.goals li::before{content:"";width:12px;height:12px;margin-top:.42em;border:1.6px solid var(--muted);border-radius:3px}
+@media (max-width:480px){.topic{grid-template-columns:30px minmax(0,1fr);column-gap:10px;padding:12px}.tno{width:30px;height:30px;font-size:.95rem}}
+.qpanel{display:grid;gap:18px}
+.qgroup{display:grid;gap:8px;min-width:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:520px}
+.seg button{display:grid;gap:2px;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer}
+.seg button b{font:600 1.15rem/1.1 var(--f-head)}
+.seg button span{font-size:.84rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{border-color:var(--ink);background:var(--sunk);box-shadow:inset 0 0 0 1px var(--ink)}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.mini{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.mini input{width:92px;padding:8px 10px}
+.clock{font:600 1rem/1 var(--f-head);font-variant-numeric:tabular-nums;padding:8px 12px;border-radius:999px;background:var(--sunk);min-width:4.2em;text-align:center}
+.clock.warn{background:var(--bad-bg);color:var(--bad)}
+.meq-box{min-height:170px;font-size:1.05rem}
+.meq-yours{border:1px dashed var(--line);border-radius:14px;padding:12px 16px;display:grid;gap:6px}
+.review{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px;width:100%;max-width:560px;text-align:left}
+.review li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:var(--sunk);font-size:.92rem}
+.review .rv{font:600 .82rem/1 var(--f-head);padding:5px 8px;border-radius:6px;min-width:3.4em;text-align:center;font-variant-numeric:tabular-nums}
+.review li.ok .rv{background:var(--good-bg);color:var(--good)}
+.review li.no .rv{background:var(--bad-bg);color:var(--bad)}
+.review .rq{overflow-wrap:anywhere}
+.trow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.starpick{display:inline-flex;flex-direction:row-reverse;justify-content:flex-end;gap:2px}
+.starpick input{position:absolute;opacity:0;width:1px;height:1px}
+.starpick label{cursor:pointer;padding:2px;display:inline-flex}
+.starpick svg{width:26px;height:26px;fill:var(--line);transition:fill .1s}
+.starpick input:checked~label svg,.starpick label:hover svg,.starpick label:hover~label svg{fill:var(--star)}
+.starpick input:focus-visible+label{outline:3px solid var(--focus);outline-offset:1px;border-radius:6px}
 
 /* tools */
 .stage{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,28px);display:grid;gap:18px;min-width:0}
@@ -347,7 +392,7 @@ window.FIREBASE_CONFIG = {
 <!-- ===== จบส่วนตั้งค่า ===== -->
 <script>
 /* ข้อมูลตั้งต้นของบ้าน ใส่ให้ครั้งเดียวตอนฐานข้อมูลยังว่าง */
-window.HOUSE_SEED = {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}};
+window.HOUSE_SEED = {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -579,7 +624,7 @@ function emptyHouse(){
 }
 function logText(e){
   switch(e.kind){
-    case 'quiz':return `ควิซ${subjName(e.subject)} “${esc(e.title||'')}” ได้ ${e.score}/${e.total}`;
+    case 'quiz':return `ควิซ${subjName(e.subject)} ${e.mode==='meq'?'MEQ':'MCQ'} “${esc(e.title||'')}” ได้ ${e.score}/${e.total}`;
     case 'game':return e.coop?`เล่น ${esc(e.game||'เกม')} แบบช่วยกัน${e.win?' · ผ่านด่าน':''}`:`เล่น ${esc(e.game||'เกม')}${e.win?' · ชนะ':''}${e.correct?` · ตอบถูก ${e.correct} ข้อ`:''}`;
     case 'award':return esc(e.note||'แต้มพิเศษจากพี่');
     case 'sticker':return `ได้สติกเกอร์ “${esc(stickerName(e.sticker))}”${e.note?' · '+esc(e.note):''}`;
@@ -618,6 +663,15 @@ function vHome(){
 }
 
 /* ---------- learn ---------- */
+const isMEQ=q=>q&&(q.type==='meq'||q.type==='open');
+const qMax=q=>Math.max(1,Math.round(+q.max||1));
+const qsOf=(l,mode)=>(l.questions||[]).map((q,i)=>({q,i})).filter(x=>mode==='meq'?isMEQ(x.q):!isMEQ(x.q)).map(x=>x.i);
+const STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.85 6.03 6.6.8-4.88 4.53 1.27 6.54L12 17.27 6.16 20.5l1.27-6.54L2.55 9.43l6.6-.8z"/></svg>';
+function stars(n,cls){n=Math.max(0,Math.min(5,Math.round(+n||0)));return `<span class="stars ${cls||''}" role="img" aria-label="ความยาก ${n} จาก 5">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}">${STAR}</i>`).join('')}</span>`}
+const fmtTime=s=>{s=Math.max(0,Math.ceil(s));const m=Math.floor(s/60);return m+':'+String(s%60).padStart(2,'0')};
+const fmtDur=s=>{s=Math.round(s);if(s<60)return s+' วินาที';const m=Math.floor(s/60),r=s%60;return m+' นาที'+(r?' '+r+' วินาที':'')};
+const lv=l=>(l.levels&&l.levels.length)?l.levels.map(bandName).join(' · '):'ทุกระดับ';
+
 function vLearn(){
   if(S.quiz)return vQuiz();
   if(S.learn.open&&Store.d.lessons[S.learn.open])return vLesson(Store.d.lessons[S.learn.open]);
@@ -625,68 +679,162 @@ function vLearn(){
   const list=all.filter(l=>(S.learn.subj==='all'||l.subject===S.learn.subj)&&(!fk||bandFits(l.levels,fk.band)));
   const cnt=id=>all.filter(l=>l.subject===id).length;
   const doneBy=l=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
+  const card=l=>{const tp=l.topics||[];const mx=tp.length?Math.max(...tp.map(t=>+t.stars||0)):0;const nm=qsOf(l,'mcq').length,ne=qsOf(l,'meq').length;
+    const blurb=tp.length?tp.slice(0,3).map(t=>t.name).filter(Boolean).join(' · ')+(tp.length>3?' …':''):plain(l.content).slice(0,96)+(plain(l.content).length>96?'…':'');
+    return `<button class="lcard" data-act="openLesson" data-id="${esc(l.id)}">
+      <div class="meta"><span class="subj">${subjName(l.subject)}</span><span class="tag">${lv(l)}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
+      <h3>${esc(l.title)}</h3>${blurb?`<p>${esc(blurb)}</p>`:'<p>ยังไม่มีหัวข้อ</p>'}
+      <div class="foot"><span class="muted small">${tp.length?tp.length+' หัวข้อ · ':''}${nm?'MCQ '+nm:''}${nm&&ne?' · ':''}${ne?'MEQ '+ne:''}${!nm&&!ne?'ยังไม่มีโจทย์':''}</span>${mx?stars(mx,'sm'):''}<span class="stack">${doneBy(l).map(k=>pawn(k,'sm')).join('')}</span></div></button>`};
   return `<section class="sec">
-    <div class="sec-head"><div><h2>ห้องเรียน</h2><p>บทเรียนสั้นๆ พร้อมควิซ ทำครั้งแรกได้แต้มเท่ากับข้อที่ตอบถูก</p></div>${S.bro?'<button class="btn primary" data-act="lessonForm">เพิ่มบทเรียน</button>':''}</div>
+    <div class="sec-head"><div><h2>ห้องเรียน</h2><p>แต่ละบทแบ่งเป็นหัวข้อ พร้อมจุดประสงค์และระดับความยาก ท้ายบทมีควิซ MCQ และ MEQ</p></div>${S.bro?'<button class="btn primary" data-act="lessonForm">เพิ่มบทเรียน</button>':''}</div>
     <div class="chips"><button class="chip" data-act="subj" data-id="all" aria-pressed="${S.learn.subj==='all'}">ทุกวิชา<span class="n">${all.length}</span></button>${SUBJECTS.filter(s=>s[0]!=='other'||cnt('other')).map(([id,n])=>`<button class="chip" data-act="subj" data-id="${id}" aria-pressed="${S.learn.subj===id}">${n}<span class="n">${cnt(id)}</span></button>`).join('')}</div>
     <div class="chips"><span class="label">เหมาะกับ</span><button class="chip" data-act="lkid" data-id="all" aria-pressed="${S.learn.kid==='all'}">ทุกคน</button>${kids().map(k=>pawnBtn(k,'lkid',S.learn.kid===k.id,'sm')).join('')}</div>
-    ${list.length?`<div class="grid">${list.map(l=>`<button class="lcard" data-act="openLesson" data-id="${esc(l.id)}">
-      <div class="meta"><span class="subj">${subjName(l.subject)}</span><span class="tag">${(l.levels&&l.levels.length)?l.levels.map(bandName).join(' · '):'ทุกระดับ'}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
-      <h3>${esc(l.title)}</h3><p>${esc(plain(l.content).slice(0,96))}${plain(l.content).length>96?'…':''}</p>
-      <div class="foot"><span class="muted small">${(l.questions||[]).length} ข้อ</span><span class="stack">${doneBy(l).map(k=>pawn(k,'sm')).join('')}</span></div></button>`).join('')}</div>`
-      :`<div class="empty"><b>${all.length?'ไม่มีบทเรียนที่ตรงกับตัวกรอง':'ยังไม่มีบทเรียน'}</b>${S.bro?'<p>เพิ่มบทเรียนพร้อมโจทย์ได้เลย หรือวางโจทย์ทีละหลายข้อด้วยรูปแบบข้อความ</p><button class="btn primary" data-act="lessonForm">เพิ่มบทเรียน</button>':'<p>ให้พี่เปิดโหมดพี่แล้วเพิ่มบทเรียน</p>'}</div>`}
+    ${list.length?`<div class="grid">${list.map(card).join('')}</div>`
+      :`<div class="empty"><b>${all.length?'ไม่มีบทเรียนที่ตรงกับตัวกรอง':'ยังไม่มีบทเรียน'}</b>${S.bro?'<p>สร้างบทแล้วใส่หัวข้อ จุดประสงค์ ดาวความยาก และโจทย์</p><button class="btn primary" data-act="lessonForm">เพิ่มบทเรียน</button>':'<p>ให้พี่เปิดโหมดพี่แล้วเพิ่มบทเรียน</p>'}</div>`}
   </section>`;
+}
+
+const QSET_DEF={mode:'mcq',timer:'none',qSec:60,setSec:900};
+function qset(){S.learn.qs=Object.assign({},QSET_DEF,LS.get('qset',{}),S.learn.qs||{});return S.learn.qs}
+const Q_PRESETS=[[30,'30 วิ'],[60,'1 นาที'],[120,'2 นาที'],[300,'5 นาที'],[600,'10 นาที']];
+const SET_PRESETS=[[300,'5 นาที'],[600,'10 นาที'],[900,'15 นาที'],[1800,'30 นาที'],[3600,'60 นาที']];
+function timeChips(kind,cur){
+  const P=kind==='q'?Q_PRESETS:SET_PRESETS;const custom=!P.some(p=>p[0]===cur);
+  return `<div class="chips">${P.map(([v,n])=>`<button class="chip" data-act="qsTime" data-id="${v}" aria-pressed="${cur===v}">${n}</button>`).join('')}
+    <label class="mini"><span>หรือ</span><input type="number" id="qsCustom" min="0.25" step="0.25" value="${custom?+(cur/60).toFixed(2):''}" placeholder="กี่นาที" data-change="qsCustom" aria-label="ใส่เวลาเองเป็นนาที"><span>นาที</span></label></div>`;
 }
 function vLesson(l){
-  const qs=l.questions||[];const ck='lesson:'+l.id;
+  const ck='lesson:'+l.id;const tp=l.topics||[];
   const ks=kids();const sel=S.learn.player&&kidById(S.learn.player)?S.learn.player:null;
+  const st=qset();const nm=qsOf(l,'mcq').length,ne=qsOf(l,'meq').length;
+  if(st.mode==='mcq'&&!nm&&ne)st.mode='meq';if(st.mode==='meq'&&!ne&&nm)st.mode='mcq';
+  const n=st.mode==='meq'?ne:nm;
+  const setHint=st.timer==='q'?`จับเวลาข้อละ ${fmtDur(st.qSec)} หมดเวลาแล้วไปเฉลยทันที`:st.timer==='set'?`ทั้งชุด ${n} ข้อ ภายใน ${fmtDur(st.setSec)} หมดเวลาแล้วข้อที่เหลือนับเป็น 0`:'ทำตามสบาย ไม่มีนับถอยหลัง หน้าสรุปจะบอกเวลาที่ใช้';
   return `<section class="sec">
     <button class="back" data-act="closeLesson">← กลับห้องเรียน</button>
-    <div class="sec-head"><div class="chips"><span class="subj">${subjName(l.subject)}</span><span class="tag">${(l.levels&&l.levels.length)?l.levels.map(bandName).join(' · '):'ทุกระดับ'}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
-    ${S.bro?`<div class="btns"><button class="btn sm" data-act="lessonForm" data-id="${esc(l.id)}">แก้ไข</button>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delLesson" data-id="${esc(l.id)}">ยืนยันลบบทเรียน</button><button class="btn sm ghost" data-act="cancelAsk">ไม่ลบ</button>`:`<button class="btn sm danger" data-act="ask" data-id="${ck}">ลบ</button>`}</div>`:''}</div>
-    <h2 style="font-size:1.7rem">${esc(l.title)}</h2>
-    <div class="prose">${md(l.content)}</div>
+    <div class="sec-head"><div class="chips"><span class="subj">${subjName(l.subject)}</span><span class="tag">${lv(l)}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
+    ${S.bro?`<div class="btns"><button class="btn sm" data-act="lessonForm" data-id="${esc(l.id)}">แก้ไขบทเรียน</button>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delLesson" data-id="${esc(l.id)}">ยืนยันลบบทเรียน</button><button class="btn sm ghost" data-act="cancelAsk">ไม่ลบ</button>`:`<button class="btn sm danger" data-act="ask" data-id="${ck}">ลบ</button>`}</div>`:''}</div>
+    <h2 class="ltitle">${esc(l.title)}</h2>
   </section>
-  <section class="sec"><div class="panel" style="display:grid;gap:14px">
-    <div><h3>ควิซท้ายบท · ${qs.length} ข้อ</h3><p class="muted small">เลือกคนที่จะทำ แล้วกดเริ่ม</p></div>
-    ${qs.length?`<div class="pawns">${ks.map(k=>pawnBtn(k,'quizKid',sel===k.id,'lg')).join('')}</div>
-    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel?'':'disabled'}>${sel?'เริ่มควิซของ '+esc(kidById(sel).code):'เลือกคนทำควิซก่อน'}</button></div>`:'<p class="muted">บทนี้ยังไม่มีโจทย์</p>'}
+  <section class="sec">
+    <div class="sec-head"><h3 class="label">หัวข้อในบทนี้${tp.length?' · '+tp.length+' หัวข้อ':''}</h3>${tp.length?'<span class="muted small">ดาว = ความยาก (สูงสุด 5)</span>':''}</div>
+    ${tp.length?`<ol class="topics">${tp.map((t,i)=>{const gs=(t.goals||[]).filter(g=>String(g).trim());return `<li class="topic">
+      <span class="tno">${i+1}</span>
+      <div class="topic-head"><h3>${esc(t.name||'หัวข้อที่ '+(i+1))}</h3>${stars(t.stars)}</div>
+      ${gs.length?`<div class="goalwrap"><span class="label">จุดประสงค์ ต้องรู้ / ทำได้</span><ul class="goals">${gs.map(g=>`<li>${inline(esc(g))}</li>`).join('')}</ul></div>`:'<p class="muted small">ยังไม่ได้ใส่จุดประสงค์</p>'}
+    </li>`}).join('')}</ol>`
+    :`<div class="empty"><b>ยังไม่มีหัวข้อ</b><p>ใส่หัวข้อ จุดประสงค์ และดาวความยากของแต่ละหัวข้อ</p>${S.bro?`<button class="btn primary" data-act="lessonForm" data-id="${esc(l.id)}">เพิ่มหัวข้อ</button>`:'<p class="small">ให้พี่เปิดโหมดพี่แล้วกดแก้ไขบทเรียน</p>'}</div>`}
+  </section>
+  ${plain(l.content)?`<section class="sec"><h3 class="label">เนื้อหาเพิ่มเติม</h3><div class="prose">${md(l.content)}</div></section>`:''}
+  <section class="sec"><div class="panel qpanel">
+    <div><h2>ควิซท้ายบท</h2><p class="muted small">ทำครั้งแรกของแต่ละแบบได้แต้มเข้าบ้าน MCQ ได้แต้มตามข้อที่ถูก MEQ ได้ตามคะแนนที่ได้</p></div>
+    ${nm||ne?`
+    <div class="qgroup"><span class="label">ใครทำ</span><div class="pawns">${ks.map(k=>pawnBtn(k,'quizKid',sel===k.id,'lg')).join('')}</div></div>
+    <div class="qgroup"><span class="label">แบบข้อสอบ</span><div class="seg">
+      <button type="button" data-act="qsMode" data-id="mcq" aria-pressed="${st.mode==='mcq'}" ${nm?'':'disabled'}><b>MCQ</b><span>ตัวเลือก · ${nm} ข้อ</span></button>
+      <button type="button" data-act="qsMode" data-id="meq" aria-pressed="${st.mode==='meq'}" ${ne?'':'disabled'}><b>MEQ</b><span>เขียนตอบ · ${ne} ข้อ</span></button></div></div>
+    <div class="qgroup"><span class="label">จับเวลา</span><div class="chips">
+      <button class="chip" data-act="qsTimer" data-id="none" aria-pressed="${st.timer==='none'}">ไม่จับเวลา</button>
+      <button class="chip" data-act="qsTimer" data-id="q" aria-pressed="${st.timer==='q'}">จับทีละข้อ</button>
+      <button class="chip" data-act="qsTimer" data-id="set" aria-pressed="${st.timer==='set'}">จับทั้งชุด</button></div>
+      ${st.timer!=='none'?timeChips(st.timer,st.timer==='q'?st.qSec:st.setSec):''}
+      <p class="muted small">${setHint}</p></div>
+    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&n?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':'เริ่ม '+(st.mode==='meq'?'MEQ':'MCQ')+' ของ '+esc(kidById(sel).code)}</button></div>`
+    :`<p class="muted">บทนี้ยังไม่มีโจทย์${S.bro?' กดแก้ไขบทเรียนเพื่อเพิ่มโจทย์ MCQ หรือ MEQ':''}</p>`}
   </div></section>`;
 }
+
+/* quiz engine */
+function quizNow(){return Date.now()}
+function startQuizFor(lessonId,kid){
+  const l=Store.d.lessons[lessonId];const st=qset();const order=qsOf(l,st.mode);if(!order.length)return;
+  const now=quizNow();
+  S.quiz={lessonId,kid,mode:st.mode,timer:st.timer,qSec:st.qSec,setSec:st.setSec,order,i:0,res:[],picked:null,revealed:false,typed:'',
+    startAt:now,qStart:now,qEnd:st.timer==='q'?now+st.qSec*1000:null,setEnd:st.timer==='set'?now+st.setSec*1000:null,setOver:false,done:false};
+  quizLoop();render();window.scrollTo({top:0});
+}
+function curQ(){const q=S.quiz;const l=Store.d.lessons[q.lessonId];return l&&(l.questions||[])[q.order[q.i]]}
 function vQuiz(){
   const q=S.quiz;const l=Store.d.lessons[q.lessonId];if(!l){S.quiz=null;return vLearn()}
-  const k=kidById(q.kid);const qs=l.questions||[];
-  if(q.done){
-    const score=q.answers.filter(a=>a).length;
-    return `<section class="quiz"><div class="panel result">${pawn(k,'lg')}<span class="label">${esc(l.title)}</span><div class="score">${score}/${qs.length}</div>
-      <p>${q.firstTime?(score?`ได้ ${score} แต้มเข้าบ้าน`:'ครั้งนี้ยังไม่ได้แต้ม ลองอ่านบทเรียนอีกรอบ'):'เคยทำบทนี้แล้ว รอบนี้เป็นรอบฝึก ไม่นับแต้มเพิ่ม'}</p>
-      ${score===qs.length&&qs.length?'<p><b>เต็มทุกข้อ</b></p>':''}
-      <div class="btns"><button class="btn" data-act="retryQuiz">ทำอีกรอบ</button><button class="btn primary" data-act="endQuiz">กลับบทเรียน</button></div></div></section>`;
-  }
-  const it=qs[q.i];const answered=q.picked!=null||q.selfMark!=null;
+  const k=kidById(q.kid);const n=q.order.length;
+  if(q.done)return vQuizResult(q,l,k);
+  const it=curQ();if(!it){q.done=true;return vQuizResult(q,l,k)}
+  const r=q.res[q.i];const answered=!!r&&(q.mode==='mcq'||r.score!=null);
   let body='';
-  if(it.type==='open'){
-    body=q.revealed?`<div class="explain"><b>เฉลย:</b> ${md(it.answer||'')}${it.explain?`<div class="small muted">${md(it.explain)}</div>`:''}</div>
-      ${q.selfMark==null?`<div class="btns"><button class="btn big primary" data-act="selfMark" data-id="1">ตอบถูก</button><button class="btn big" data-act="selfMark" data-id="0">ยังไม่ถูก</button></div>`:''}`
-      :`<p class="muted small">คิดคำตอบในใจหรือพูดออกมา แล้วกดดูเฉลย</p><div class="btns"><button class="btn big primary" data-act="reveal">ดูเฉลย</button></div>`;
+  if(q.mode==='mcq'){
+    const pk=q.picked;
+    body=`<div class="choices">${(it.choices||[]).map((c,j)=>{let cls='';if(pk!=null){if(j===it.answer)cls='right';else if(j===pk)cls='wrong'}
+      return `<button class="choice ${cls}" data-act="pick" data-id="${j}" ${pk!=null?'disabled':''}><span class="L">${LET[j]}</span><span>${inline(esc(c))}</span></button>`}).join('')}</div>
+      ${pk!=null?`<div class="explain"><b>${r&&r.timeout?'หมดเวลา · คำตอบคือ '+LET[it.answer]:pk===it.answer?'ถูกต้อง':'ยังไม่ถูก คำตอบคือ '+LET[it.answer]}</b>${it.explain?`<div>${md(it.explain)}</div>`:''}</div>`:''}`;
   }else{
-    body=`<div class="choices">${(it.choices||[]).map((c,j)=>{let cls='';if(q.picked!=null){if(j===it.answer)cls='right';else if(j===q.picked)cls='wrong'}
-      return `<button class="choice ${cls}" data-act="pick" data-id="${j}" ${q.picked!=null?'disabled':''}><span class="L">${LET[j]}</span><span>${inline(esc(c))}</span></button>`}).join('')}</div>
-      ${q.picked!=null?`<div class="explain"><b>${q.picked===it.answer?'ถูกต้อง':'ยังไม่ถูก คำตอบคือ '+LET[it.answer]}</b>${it.explain?`<div>${md(it.explain)}</div>`:''}</div>`:''}`;
+    const mx=qMax(it);
+    body=!q.revealed?`<label class="field"><span>คำตอบของ ${esc(k?k.code:'')}</span><textarea id="meqAns" class="meq-box" data-input="meq" placeholder="เขียนคำตอบ อธิบายเป็นขั้นตอน">${esc(q.typed)}</textarea></label>
+      <div class="btns"><button class="btn primary big" data-act="meqSubmit">ส่งคำตอบ แล้วดูเฉลย</button></div>`
+    :`<div class="meq-yours"><span class="label">คำตอบของ ${esc(k?k.code:'')}${r&&r.timeout?' · หมดเวลา':''}</span><div class="prose">${q.typed.trim()?md(q.typed):'<span class="muted">ไม่ได้เขียนคำตอบ</span>'}</div></div>
+      <div class="explain"><b>แนวคำตอบ</b>${it.key||it.answer?`<div class="prose">${md(it.key||it.answer||'')}</div>`:'<div class="muted">ยังไม่ได้ใส่แนวคำตอบ</div>'}${it.explain?`<div class="small muted">${md(it.explain)}</div>`:''}</div>
+      <div class="qgroup"><span class="label">ให้คะแนน (เต็ม ${mx})</span><div class="chips">${Array.from({length:mx+1},(_,s)=>`<button class="chip" data-act="meqScore" data-id="${s}" aria-pressed="${r&&r.score===s}">${s}</button>`).join('')}</div></div>`;
   }
+  const cEnd=q.timer==='q'?q.qEnd:q.timer==='set'&&!q.setOver?q.setEnd:null;
+  const clock=q.timer==='none'?'':`<span class="clock ${cEnd&&cEnd-quizNow()<=10000?'warn':''}" id="qClock" aria-label="เวลาที่เหลือ">${cEnd?fmtTime((cEnd-quizNow())/1000):'—'}</span>`;
   return `<section class="quiz">
-    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(q.i/qs.length*100).toFixed(1)}%"></i></div><span class="label">ข้อ ${q.i+1}/${qs.length}</span><button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
+    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(q.i/n*100).toFixed(1)}%"></i></div><span class="label">${q.mode.toUpperCase()} · ข้อ ${q.i+1}/${n}</span>${clock}<button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
+    ${q.setOver?'<div class="banner">หมดเวลาทั้งชุด ข้อที่ยังไม่ได้ทำนับเป็น 0</div>':''}
+    ${q.mode==='meq'?`<span class="tag">เต็ม ${qMax(it)} คะแนน</span>`:''}
     <div class="qtext">${md(it.q)}</div>${body}
-    ${answered?`<div class="btns"><button class="btn primary big" data-act="nextQ">${q.i+1<qs.length?'ข้อต่อไป':'ดูผล'}</button></div>`:''}
+    ${answered?`<div class="btns"><button class="btn primary big" data-act="nextQ">${q.i+1<n&&!q.setOver?'ข้อต่อไป':'ดูผล'}</button></div>`:''}
   </section>`;
 }
+function vQuizResult(q,l,k){
+  const qs=l.questions||[];const meq=q.mode==='meq';
+  const got=q.res.reduce((s,r)=>s+(r?(meq?(+r.score||0):(r.ok?1:0)):0),0);
+  const full=meq?q.order.reduce((s,ix)=>s+qMax(qs[ix]||{}),0):q.order.length;
+  const used=((q.endAt||quizNow())-q.startAt)/1000;
+  return `<section class="quiz"><div class="panel result">${pawn(k,'lg')}<span class="label">${esc(l.title)} · ${meq?'MEQ':'MCQ'}</span><div class="score">${got}/${full}</div>
+    <p class="muted small">ใช้เวลา ${fmtDur(used)}${q.timer==='set'?' จาก '+fmtDur(q.setSec):q.timer==='q'?' · จับเวลาข้อละ '+fmtDur(q.qSec):''}</p>
+    <p>${q.firstTime?(got?`ได้ ${got} แต้มเข้าบ้าน`:'ครั้งนี้ยังไม่ได้แต้ม ลองทบทวนหัวข้ออีกรอบ'):'เคยทำ'+(meq?' MEQ ':' MCQ ')+'บทนี้แล้ว รอบนี้เป็นรอบฝึก ไม่นับแต้มเพิ่ม'}</p>
+    ${got===full&&full?'<p><b>เต็มทุกข้อ</b></p>':''}
+    <ol class="review">${q.order.map((ix,i)=>{const it=qs[ix]||{};const r=q.res[i];const ok=r&&(meq?(+r.score||0)>=qMax(it):r.ok);
+      const mark=meq?`${r&&r.score!=null?r.score:0}/${qMax(it)}`:(r&&r.ok?'ถูก':'ผิด');
+      return `<li class="${ok?'ok':'no'}"><span class="rv">${mark}</span><span class="rq">${esc(plain(it.q).slice(0,80))}${plain(it.q).length>80?'…':''}</span>${r&&r.timeout?'<span class="tag">หมดเวลา</span>':''}${r&&r.skipped?'<span class="tag">ไม่ได้ทำ</span>':''}</li>`}).join('')}</ol>
+    <div class="btns"><button class="btn" data-act="retryQuiz">ทำอีกรอบ</button><button class="btn primary" data-act="endQuiz">กลับบทเรียน</button></div></div></section>`;
+}
+let qTick=null;
+function quizLoop(){clearInterval(qTick);qTick=setInterval(()=>{
+  const q=S.quiz;if(!q||q.done){clearInterval(qTick);return}
+  const now=quizNow();const el=document.getElementById('qClock');
+  const end=q.timer==='q'?q.qEnd:q.timer==='set'?(q.setOver?null:q.setEnd):null;
+  if(el){if(end){const left=(end-now)/1000;el.textContent=fmtTime(left);el.classList.toggle('warn',left<=10)}else if(q.timer!=='none'){el.textContent='—';el.classList.remove('warn')}}
+  if(end&&now>=end)quizTimeout();
+},250)}
+function quizTimeout(){
+  const q=S.quiz;const it=curQ();if(!q||!it)return;
+  const box=document.getElementById('meqAns');if(box)q.typed=box.value;
+  if(q.timer==='q'){q.qEnd=null;
+    if(q.mode==='mcq'){if(q.picked==null){q.picked=-1;q.res[q.i]={ok:false,picked:-1,timeout:true,secs:q.qSec}}}
+    else if(!q.revealed){q.revealed=true;q.res[q.i]={text:q.typed,score:null,timeout:true,secs:q.qSec}}
+  }else if(q.timer==='set'){q.setOver=true;q.endAt=quizNow();
+    for(let i=q.i+1;i<q.order.length;i++)q.res[i]=q.mode==='mcq'?{ok:false,skipped:true}:{score:0,skipped:true};
+    if(q.mode==='mcq'){if(q.picked==null)q.res[q.i]={ok:false,timeout:true};q.endAt=quizNow();finishQuiz();return}
+    if(!q.revealed){q.revealed=true;q.res[q.i]={text:q.typed,score:null,timeout:true}}
+  }
+  render();
+}
 async function finishQuiz(){
-  const q=S.quiz;const l=Store.d.lessons[q.lessonId];const qs=l.questions||[];
-  const score=q.answers.filter(a=>a).length;
-  q.firstTime=!logs().some(e=>e.kind==='quiz'&&e.kid===q.kid&&e.lessonId===q.lessonId);
+  const q=S.quiz;const l=Store.d.lessons[q.lessonId];const qs=l.questions||[];const meq=q.mode==='meq';
+  clearInterval(qTick);q.endAt=q.endAt||quizNow();
+  const got=q.res.reduce((s,r)=>s+(r?(meq?(+r.score||0):(r.ok?1:0)):0),0);
+  const full=meq?q.order.reduce((s,ix)=>s+qMax(qs[ix]||{}),0):q.order.length;
+  q.firstTime=!logs().some(e=>e.kind==='quiz'&&e.kid===q.kid&&e.lessonId===q.lessonId&&(e.mode||'mcq')===q.mode);
   q.done=true;
   if(!q.saved){q.saved=true;
-    await Store.put('log',uid(),{kid:q.kid,kind:'quiz',lessonId:l.id,title:l.title,subject:l.subject,score,total:qs.length,perfect:score===qs.length&&qs.length>0,pts:q.firstTime?score:0,at:Date.now()});}
-  render();
+    await Store.put('log',uid(),{kid:q.kid,kind:'quiz',mode:q.mode,lessonId:l.id,title:l.title,subject:l.subject,score:got,total:full,perfect:got===full&&full>0,pts:q.firstTime?got:0,secs:Math.round((q.endAt-q.startAt)/1000),timer:q.timer,at:Date.now()});}
+  render();window.scrollTo({top:0});
+}
+function quizAdvance(){
+  const q=S.quiz;if(q.i+1<q.order.length&&!q.setOver){
+    q.i++;q.picked=null;q.revealed=false;q.typed='';const now=quizNow();q.qStart=now;if(q.timer==='q')q.qEnd=now+q.qSec*1000;
+    render();window.scrollTo({top:0});
+  }else{q.endAt=q.endAt||quizNow();finishQuiz()}
 }
 
 /* ---------- games room ---------- */
@@ -1058,8 +1206,9 @@ const VIEWS={home:vHome,learn:vLearn,games:vGames,tools:vTools,wall:vWall,sticke
 
 /* ---------- sheets (forms) ---------- */
 function openSheet(title,body,foot){
+  const sc=$('#sheetCard');const keep=!$('#sheet').hidden?sc.scrollTop:0;
   $('#sheetCard').innerHTML=`<div class="sheet-head"><h2>${title}</h2><button class="x" data-act="closeSheet" aria-label="ปิด">×</button></div><div class="form">${body}</div><div class="btns">${foot}</div>`;
-  $('#sheet').hidden=false;const f=$('#sheetCard input[type=text],#sheetCard textarea');if(f&&window.innerWidth>700)f.focus();
+  $('#sheet').hidden=false;if(keep){sc.scrollTop=keep;return}const f=$('#sheetCard input[type=text],#sheetCard textarea');if(f&&window.innerWidth>700)f.focus();
 }
 function closeSheet(){$('#sheet').hidden=true;$('#sheetCard').innerHTML='';S.draft=null}
 const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
@@ -1082,44 +1231,62 @@ function kidForm(id){
     `<button class="btn primary" data-act="saveKid" data-id="${esc(id||'')}">บันทึก</button>${id?(S.confirm===ck?`<button class="btn dangerfill" data-act="delKid" data-id="${esc(id)}">ยืนยันเอาออก (ประวัติแต้มยังอยู่)</button>`:`<button class="btn danger" data-act="askKid" data-id="${esc(id)}">เอาออกจากบ้าน</button>`):''}`);
 }
 
-function blankQ(){return {type:'mcq',q:'',choices:['','','',''],answer:0,explain:'',answer_text:''}}
+function blankQ(type){return {type:type||'mcq',q:'',choices:['','','',''],answer:0,explain:'',key:'',max:2}}
+function blankT(){return {name:'',stars:0,goals:''}}
 function lessonForm(id){
   const l=id?Store.d.lessons[id]:null;
-  S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?l.content:'',
-    questions:l?(l.questions||[]).map(q=>({type:q.type||'mcq',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',answer_text:q.type==='open'?(q.answer||''):''})):[blankQ()],example:l?!!l.example:false};
+  S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?(l.content||''):'',
+    topics:l&&l.topics?l.topics.map(t=>({name:t.name||'',stars:+t.stars||0,goals:(t.goals||[]).join('\n')})):[blankT()],
+    questions:l?(l.questions||[]).map(q=>isMEQ(q)?{type:'meq',q:q.q||'',choices:['','','',''],answer:0,explain:q.explain||'',key:q.key!=null?q.key:(q.answer||''),max:qMax(q)}
+      :{type:'mcq',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2}):[],
+    example:l?!!l.example:false};
   paintLessonForm();
 }
+function starPick(i,cur){
+  return `<div class="starpick" role="radiogroup" aria-label="ความยากของหัวข้อ ${i+1}">${[5,4,3,2,1].map(n=>`<input type="radio" id="t${i}_s${n}" name="t${i}_star" value="${n}" ${cur===n?'checked':''}><label for="t${i}_s${n}" title="${n} ดาว">${STAR}</label>`).join('')}</div>`;
+}
 function paintLessonForm(){
-  const d=S.draft;
+  const d=S.draft;const nm=d.questions.filter(q=>q.type!=='meq').length,ne=d.questions.length-nm;
   openSheet(d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`
     <div class="row2"><label class="field"><span>วิชา</span><select id="lfSubj">${SUBJECTS.map(([v,n])=>`<option value="${v}" ${d.subject===v?'selected':''}>${n}</option>`).join('')}</select></label>
-    <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น โมลและมวลโมเลกุล"></label></div>
+    <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น เคมีไฟฟ้า"></label></div>
     <div class="field"><span>เหมาะกับช่วงชั้น (ไม่เลือก = ทุกระดับ)</span><div class="pick">${BANDS.map(([v,n])=>`<label class="opt"><input type="checkbox" name="lfLv" value="${v}" ${d.levels.includes(v)?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
-    <label class="field"><span>เนื้อหา</span><textarea id="lfContent" style="min-height:180px" placeholder="## หัวข้อ&#10;- ข้อสำคัญ&#10;> กล่องเคล็ดลับ">${esc(d.content)}</textarea>
-      <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O เป็นตัวห้อย · x^2 หรือ Na^+ เป็นตัวยก · -> เป็นลูกศร · &lt;=&gt; เป็นลูกศรสมดุล</small></label>
-    <h3>โจทย์ ${d.questions.length} ข้อ</h3>
-    ${d.questions.map((q,i)=>`<fieldset class="qedit"><legend>ข้อ ${i+1}</legend>
-      <div class="row2"><select id="q${i}_type" data-change="qtype" aria-label="ชนิดโจทย์"><option value="mcq" ${q.type!=='open'?'selected':''}>ตัวเลือก</option><option value="open" ${q.type==='open'?'selected':''}>ตอบปากเปล่า</option></select>
+    <h3>หัวข้อ ${d.topics.length} หัวข้อ</h3>
+    ${d.topics.map((t,i)=>`<fieldset class="qedit"><legend>หัวข้อ ${i+1}</legend>
+      <input type="text" id="t${i}_name" value="${esc(t.name)}" placeholder="ชื่อหัวข้อ เช่น เลขออกซิเดชันและปฏิกิริยารีดอกซ์" aria-label="ชื่อหัวข้อ ${i+1}">
+      <div class="trow"><span class="small muted">ความยาก</span>${starPick(i,t.stars)}<div class="btns" style="margin-left:auto"><button class="btn sm ghost" data-act="tUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm danger" data-act="tDel" data-id="${i}">ลบหัวข้อ</button></div></div>
+      <textarea id="t${i}_goals" style="min-height:96px" placeholder="จุดประสงค์ บรรทัดละ 1 ข้อ เช่น&#10;หาเลขออกซิเดชันของธาตุในสารประกอบได้&#10;บอกได้ว่าสารใดเป็นตัวรีดิวซ์และตัวออกซิไดซ์" aria-label="จุดประสงค์ของหัวข้อ ${i+1}">${esc(t.goals)}</textarea>
+    </fieldset>`).join('')}
+    <div class="btns"><button class="btn" data-act="tAdd">เพิ่มหัวข้อ</button></div>
+    <details ${plain(d.content)?'open':''}><summary class="label" style="cursor:pointer">เนื้อหาเพิ่มเติม (ไม่ใส่ก็ได้)</summary>
+      <label class="field" style="margin-top:10px"><textarea id="lfContent" style="min-height:120px" aria-label="เนื้อหาเพิ่มเติม">${esc(d.content)}</textarea>
+      <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
+    <h3>โจทย์ · MCQ ${nm} ข้อ · MEQ ${ne} ข้อ</h3>
+    ${d.questions.map((q,i)=>`<fieldset class="qedit"><legend>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
+      <div class="row2"><select id="q${i}_type" data-change="qtype" aria-label="แบบโจทย์"><option value="mcq" ${q.type!=='meq'?'selected':''}>MCQ ตัวเลือก</option><option value="meq" ${q.type==='meq'?'selected':''}>MEQ เขียนตอบ</option></select>
       <div class="btns" style="justify-content:flex-end"><button class="btn sm ghost" data-act="qUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm danger" data-act="qDel" data-id="${i}">ลบข้อนี้</button></div></div>
       <textarea id="q${i}_q" style="min-height:70px" placeholder="โจทย์" aria-label="โจทย์ข้อ ${i+1}">${esc(q.q)}</textarea>
-      ${q.type==='open'?`<input type="text" id="q${i}_a" value="${esc(q.answer_text)}" placeholder="เฉลย" aria-label="เฉลย">`
+      ${q.type==='meq'?`<textarea id="q${i}_k" style="min-height:80px" placeholder="แนวคำตอบ / เกณฑ์ให้คะแนน" aria-label="แนวคำตอบ">${esc(q.key)}</textarea>
+        <label class="mini"><span>คะแนนเต็ม</span><input type="number" id="q${i}_m" min="1" max="20" value="${esc(q.max)}"></label>`
       :q.choices.map((c,j)=>`<div class="crow"><input type="radio" name="q${i}_ans" value="${j}" ${q.answer===j?'checked':''} aria-label="ตัวเลือก ${LET[j]} ถูก"><input type="text" id="q${i}_c${j}" value="${esc(c)}" placeholder="ตัวเลือก ${LET[j]}"></div>`).join('')+`<div class="btns"><button class="btn sm ghost" data-act="cAdd" data-id="${i}" ${q.choices.length>=6?'disabled':''}>เพิ่มตัวเลือก</button>${q.choices.length>2?`<button class="btn sm ghost" data-act="cDel" data-id="${i}">ลดตัวเลือก</button>`:''}</div><small class="muted">กดวงกลมหน้าตัวเลือกที่ถูก</small>`}
-      <input type="text" id="q${i}_e" value="${esc(q.explain)}" placeholder="คำอธิบายเฉลย (ไม่ใส่ก็ได้)" aria-label="คำอธิบาย">
+      <input type="text" id="q${i}_e" value="${esc(q.explain)}" placeholder="คำอธิบายเพิ่มเติม (ไม่ใส่ก็ได้)" aria-label="คำอธิบาย">
     </fieldset>`).join('')}
-    <div class="btns"><button class="btn" data-act="qAdd">เพิ่มโจทย์ 1 ข้อ</button></div>
+    <div class="btns"><button class="btn" data-act="qAdd" data-id="mcq">เพิ่ม MCQ</button><button class="btn" data-act="qAdd" data-id="meq">เพิ่ม MEQ</button></div>
     <details><summary class="label" style="cursor:pointer">วางโจทย์ทีละหลายข้อ</summary>
-      <div class="form" style="margin-top:10px"><textarea id="bulkQ" style="min-height:150px" placeholder="1. CO_2 มีมวลโมเลกุลเท่าไร&#10;A) 28&#10;*B) 44&#10;C) 32&#10;D) 60&#10;E: 12 + 2(16) = 44&#10;&#10;2. ทำไมน้ำแข็งลอยน้ำ&#10;ตอบ: ความหนาแน่นน้อยกว่าน้ำ"></textarea>
-      <small class="muted">เว้นบรรทัดระหว่างข้อ · ใส่ * หน้าตัวเลือกที่ถูก หรือเขียน ตอบ: B · บรรทัด E: คือคำอธิบาย · ไม่มีตัวเลือก = โจทย์ตอบปากเปล่า</small>
+      <div class="form" style="margin-top:10px"><textarea id="bulkQ" style="min-height:160px" placeholder="1. ข้อใดเป็นตัวออกซิไดซ์ใน Zn + Cu^{2+} -> Zn^{2+} + Cu&#10;A) Zn&#10;*B) Cu^{2+}&#10;C) Zn^{2+}&#10;D) Cu&#10;E: Cu^{2+} รับอิเล็กตรอน จึงถูกรีดิวซ์&#10;&#10;2. อธิบายหน้าที่ของสะพานเกลือในเซลล์กัลวานิก&#10;ตอบ: รักษาสมดุลประจุในสารละลายทั้งสองครึ่งเซลล์&#10;คะแนน: 3"></textarea>
+      <small class="muted">เว้นบรรทัดระหว่างข้อ · มีตัวเลือก = MCQ ใส่ * หน้าตัวที่ถูก · ไม่มีตัวเลือก = MEQ ใส่ ตอบ: แนวคำตอบ และ คะแนน: คะแนนเต็ม · E: คือคำอธิบาย</small>
       <div class="btns"><button class="btn" data-act="bulkAdd">แปลงเป็นโจทย์</button></div></div></details>`,
     `<button class="btn primary" data-act="saveLesson">บันทึกบทเรียน</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
 }
 function syncDraft(){
   const d=S.draft;if(!d)return;
-  d.subject=val('lfSubj')||d.subject;d.title=val('lfTitle');d.content=(document.getElementById('lfContent')||{}).value||'';d.levels=radios('lfLv');
+  d.subject=val('lfSubj')||d.subject;d.title=val('lfTitle');const ct=document.getElementById('lfContent');if(ct)d.content=ct.value;d.levels=radios('lfLv');
+  d.topics.forEach((t,i)=>{t.name=val('t'+i+'_name');const s=radio('t'+i+'_star');t.stars=s?+s:0;const g=document.getElementById('t'+i+'_goals');if(g)t.goals=g.value});
   d.questions.forEach((q,i)=>{
     const t=document.getElementById('q'+i+'_type');if(t)q.type=t.value;
     q.q=(document.getElementById('q'+i+'_q')||{}).value||'';q.explain=val('q'+i+'_e');
-    if(document.getElementById('q'+i+'_a'))q.answer_text=val('q'+i+'_a');
+    const k=document.getElementById('q'+i+'_k');if(k)q.key=k.value;
+    const m=document.getElementById('q'+i+'_m');if(m)q.max=Math.max(1,Math.min(20,Math.round(+m.value||1)));
     q.choices=q.choices.map((c,j)=>{const e=document.getElementById('q'+i+'_c'+j);return e?e.value:c});
     const r=radio('q'+i+'_ans');if(r!=='')q.answer=+r;
   });
@@ -1128,15 +1295,17 @@ function parseBulk(txt){
   const out=[];
   txt.split(/\n\s*\n/).forEach(block=>{
     const lines=block.split('\n').map(s=>s.trim()).filter(Boolean);if(!lines.length)return;
-    const q={type:'mcq',q:'',choices:[],answer:-1,explain:'',answer_text:''};let ans='';
+    const q=blankQ('mcq');q.choices=[];q.answer=-1;let ans='',max=0;
     lines.forEach((ln,idx)=>{let m;
       if((m=ln.match(/^(\*)?\s*([A-Ha-h])[).]\s+(.*)$/))&&idx>0){if(m[1])q.answer=q.choices.length;q.choices.push(m[3].replace(/\s*\*$/,''));if(/\*$/.test(m[3]))q.answer=q.choices.length-1;return}
-      if((m=ln.match(/^(ANS|Ans|ans|ตอบ|เฉลย)\s*[:：]\s*(.*)$/))){ans=m[2];return}
+      if((m=ln.match(/^(ANS|Ans|ans|ตอบ|เฉลย|แนวคำตอบ)\s*[:：]\s*(.*)$/))){ans+=(ans?'\n':'')+m[2];return}
+      if((m=ln.match(/^(คะแนน|คะแนนเต็ม|max|Max)\s*[:：]\s*(\d+)/))){max=+m[2];return}
       if((m=ln.match(/^(E|อธิบาย|เหตุผล)\s*[:：]\s*(.*)$/))){q.explain=m[2];return}
+      if(ans&&!q.choices.length){ans+='\n'+ln;return}
       q.q+=(q.q?'\n':'')+ln.replace(/^(Q\s*[:：]|\d+\s*[.)])\s*/,'');
     });
     if(q.choices.length>=2){if(q.answer<0){const L=ans.trim().toUpperCase().charAt(0);const ix=LET.indexOf(L);q.answer=ix>=0&&ix<q.choices.length?ix:0}}
-    else{q.type='open';q.choices=['','','',''];q.answer=0;q.answer_text=ans}
+    else{q.type='meq';q.choices=['','','',''];q.answer=0;q.key=ans;q.max=max||2}
     if(q.q)out.push(q);
   });
   return out;
@@ -1144,14 +1313,15 @@ function parseBulk(txt){
 async function saveLesson(){
   syncDraft();const d=S.draft;
   if(!d.title){toast('ใส่ชื่อบทก่อนบันทึก');return}
+  const topics=d.topics.filter(t=>t.name.trim()||t.goals.trim()).map(t=>({name:t.name.trim(),stars:t.stars||0,goals:t.goals.split('\n').map(s=>s.replace(/^\s*[-•]\s*/,'').trim()).filter(Boolean)}));
   const qs=d.questions.filter(q=>q.q.trim()).map(q=>{
-    if(q.type==='open')return {type:'open',q:q.q.trim(),answer:q.answer_text,explain:q.explain};
+    if(q.type==='meq')return {type:'meq',q:q.q.trim(),key:(q.key||'').trim(),max:Math.max(1,+q.max||1),explain:q.explain};
     const kept=q.choices.map((c,j)=>({c:c.trim(),j})).filter(x=>x.c);
     return {type:'mcq',q:q.q.trim(),choices:kept.map(x=>x.c),answer:kept.findIndex(x=>x.j===q.answer),explain:q.explain}});
   const bad=qs.find(q=>q.type==='mcq'&&(q.choices.length<2||q.answer<0));
-  if(bad){toast('มีข้อที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
+  if(bad){toast('มี MCQ ที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
   const id=d.id||uid();const old=d.id&&Store.d.lessons[d.id];
-  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
+  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,topics,content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
   closeSheet();S.learn.open=id;toast('บันทึกบทเรียนแล้ว');render();
 }
 
@@ -1218,16 +1388,22 @@ const ACT={
   openLesson(t){S.learn.open=t.dataset.id;S.confirm=null;render();window.scrollTo({top:0})},
   closeLesson(){S.learn.open=null;render()},
   quizKid(t){S.learn.player=t.dataset.id;render()},
-  startQuiz(t){if(!S.learn.player)return;S.quiz={lessonId:t.dataset.id,kid:S.learn.player,i:0,answers:[],picked:null,revealed:false,selfMark:null};render();window.scrollTo({top:0})},
-  pick(t){const q=S.quiz;if(q.picked!=null)return;const it=Store.d.lessons[q.lessonId].questions[q.i];q.picked=+t.dataset.id;q.answers[q.i]=q.picked===it.answer;render()},
-  reveal(){S.quiz.revealed=true;render()},
-  selfMark(t){S.quiz.selfMark=t.dataset.id==='1';S.quiz.answers[S.quiz.i]=S.quiz.selfMark;render()},
-  nextQ(){const q=S.quiz;const n=(Store.d.lessons[q.lessonId].questions||[]).length;if(q.i+1<n){q.i++;q.picked=null;q.revealed=false;q.selfMark=null;render();window.scrollTo({top:0})}else finishQuiz()},
-  retryQuiz(){const q=S.quiz;S.quiz={lessonId:q.lessonId,kid:q.kid,i:0,answers:[],picked:null,revealed:false,selfMark:null};render()},
-  endQuiz(){const q=S.quiz;S.quiz=null;S.learn.open=q?q.lessonId:null;render()},
+  qsMode(t){qset().mode=t.dataset.id;LS.set('qset',S.learn.qs);render()},
+  qsTimer(t){qset().timer=t.dataset.id;LS.set('qset',S.learn.qs);render()},
+  qsTime(t){const st=qset();const v=+t.dataset.id;if(st.timer==='q')st.qSec=v;else st.setSec=v;LS.set('qset',st);render()},
+  startQuiz(t){if(!S.learn.player)return;startQuizFor(t.dataset.id,S.learn.player)},
+  pick(t){const q=S.quiz;if(!q||q.picked!=null)return;const it=curQ();q.picked=+t.dataset.id;q.res[q.i]={ok:q.picked===it.answer,picked:q.picked,secs:Math.round((quizNow()-q.qStart)/1000)};q.qEnd=null;render()},
+  meqSubmit(){const q=S.quiz;const b=document.getElementById('meqAns');if(b)q.typed=b.value;q.revealed=true;q.qEnd=null;q.res[q.i]={text:q.typed,score:null,secs:Math.round((quizNow()-q.qStart)/1000)};render()},
+  meqScore(t){const q=S.quiz;const r=q.res[q.i]||(q.res[q.i]={text:q.typed});r.score=+t.dataset.id;render()},
+  nextQ(){quizAdvance()},
+  retryQuiz(){const q=S.quiz;Object.assign(qset(),{mode:q.mode,timer:q.timer,qSec:q.qSec,setSec:q.setSec});startQuizFor(q.lessonId,q.kid)},
+  endQuiz(){clearInterval(qTick);const q=S.quiz;S.quiz=null;S.learn.open=q?q.lessonId:null;render()},
   lessonForm(t){lessonForm(t.dataset.id||null)},
   async delLesson(t){await Store.del('lessons',t.dataset.id);S.learn.open=null;S.confirm=null;toast('ลบบทเรียนแล้ว');render()},
-  qAdd(){syncDraft();S.draft.questions.push(blankQ());paintLessonForm()},
+  tAdd(){syncDraft();S.draft.topics.push(blankT());paintLessonForm()},
+  tDel(t){syncDraft();S.draft.topics.splice(+t.dataset.id,1);paintLessonForm()},
+  tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
+  qAdd(t){syncDraft();S.draft.questions.push(blankQ(t.dataset.id));paintLessonForm()},
   qDel(t){syncDraft();S.draft.questions.splice(+t.dataset.id,1);paintLessonForm()},
   qUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   cAdd(t){syncDraft();S.draft.questions[+t.dataset.id].choices.push('');paintLessonForm()},
@@ -1380,9 +1556,11 @@ document.addEventListener('click',e=>{
   if(!t){if(e.target.id==='sheet')closeSheet();return}
   const fn=ACT[t.dataset.act];if(fn){e.preventDefault();fn(t,e)}
 });
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz)S.quiz.typed=e.target.value});
 document.addEventListener('change',e=>{
   const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
   if(c==='qtype'){syncDraft();paintLessonForm()}
+  if(c==='qsCustom'){const v=parseFloat(e.target.value);if(v>0){const st=qset();const sec=Math.round(v*60);if(st.timer==='q')st.qSec=sec;else st.setSec=sec;LS.set('qset',st);render()}}
   if(c==='unoStack'){S.uno.stack=e.target.checked;persist()}
   if(c==='scLow'){S.score.low=e.target.checked;persist()}
   if(c==='scGame'){S.score.game=e.target.value.trim();persist()}
