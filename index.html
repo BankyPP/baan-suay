@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Baan Suay">
+<meta name="theme-color" content="#1B365D">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Baan Suay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+html,body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+
+/* Layout: a family game table. House name + mode switch on top, rooms as a scrolling tab row, one content column.
+   Calm blue-grey paper and ink; the siblings' pawn colours are the only loud colour on the page. */
+:root{
+  --paper:#ECF0F3; --surface:#FFFFFF; --sunk:#DFE6EC; --ink:#17212B; --muted:#55626E; --line:#CDD6DE;
+  --btn:#17212B; --btn-ink:#FFFFFF; --good:#16825A; --good-bg:#DCF1E7; --bad:#BE3A2A; --bad-bg:#F8E0DC;
+  --focus:#2F5BD3; --scrim:rgba(12,18,24,.48);
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 6px 20px rgba(23,33,43,.08);
+  --f-head:"Kanit","Sarabun",system-ui,sans-serif;
+  --f-body:"Sarabun","Kanit",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#10161C; --surface:#18212A; --sunk:#222C37; --ink:#E6ECF1; --muted:#98A5B1; --line:#2D3844;
+  --btn:#E6ECF1; --btn-ink:#10161C; --good:#4CC18C; --good-bg:#16352A; --bad:#F2806E; --bad-bg:#3B201C;
+  --focus:#86A6FF; --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10161C; --surface:#18212A; --sunk:#222C37; --ink:#E6ECF1; --muted:#98A5B1; --line:#2D3844;
+  --btn:#E6ECF1; --btn-ink:#10161C; --good:#4CC18C; --good-bg:#16352A; --bad:#F2806E; --bad-bg:#3B201C;
+  --focus:#86A6FF; --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3);
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.65 var(--f-body)}
+h1,h2,h3,h4,h5{font-family:var(--f-head);line-height:1.25;text-wrap:balance;margin:0}
+h2{font-weight:600;font-size:1.35rem}
+h3{font-weight:500;font-size:1.08rem}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:16px 80px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand svg{width:46px;height:46px;flex:none;color:var(--ink)}
+.brand h1{font-weight:700;font-size:clamp(1.45rem,4.6vw,2.1rem);letter-spacing:-.005em}
+.brand small{display:block;font:500 .78rem/1.3 var(--f-head);color:var(--muted);letter-spacing:.03em}
+.modebtn{display:inline-flex;align-items:center;gap:8px;font:500 .9rem/1 var(--f-head);min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.modebtn .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.modebtn[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.modebtn[aria-pressed="true"] .dot{background:#38D38E}
+
+.tabs{display:flex;gap:2px;overflow-x:auto;margin-block:14px 20px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{font:500 1rem/1 var(--f-head);background:none;border:0;color:var(--muted);padding:12px 14px 13px;white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tabs button:hover{color:var(--ink)}
+
+.banner{font-size:.9rem;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 14px;margin-bottom:18px}
+
+.btn{font:500 .95rem/1.1 var(--f-head);display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-align:center}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad);background:transparent}
+.btn.dangerfill{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.sm{min-height:34px;padding:0 12px;font-size:.86rem;border-radius:10px}
+.btn.big{min-height:58px;font-size:1.1rem;padding:0 22px;border-radius:16px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.sec{display:grid;gap:14px;margin-bottom:32px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sec-head p{color:var(--muted);font-size:.92rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.label{font:500 .74rem/1.2 var(--f-head);letter-spacing:.06em;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{font:500 .86rem/1 var(--f-head);padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.chip .n{opacity:.6;margin-left:4px;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font:500 .72rem/1 var(--f-head);padding:5px 8px;border-radius:6px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.tag.ex{background:transparent;border:1px dashed var(--muted)}
+.subj{display:inline-block;font:600 .74rem/1 var(--f-head);letter-spacing:.04em;padding:5px 9px;border-radius:6px;border:1.5px solid var(--ink);color:var(--ink)}
+.empty{padding:28px 18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;display:grid;gap:12px;justify-items:center}
+.empty b{font:600 1.05rem var(--f-head);color:var(--ink)}
+
+/* pawns: the siblings as game pieces */
+.pawn{--c:#6B7785;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--c);color:#fff;font:600 15px/1 var(--f-head);letter-spacing:.02em;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2);flex:none;border:0;padding:0}
+.pawn.sm{width:26px;height:26px;font-size:10.5px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2)}
+.pawn.lg{width:64px;height:64px;font-size:22px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.2)}
+.pawn.xl{width:132px;height:132px;font-size:46px;box-shadow:inset 0 -10px 0 rgba(0,0,0,.2)}
+button.pawn{cursor:pointer;transition:transform .12s}
+button.pawn:active{transform:scale(.94)}
+button.pawn[aria-pressed="false"]{opacity:.32}
+button.pawn[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:3px}
+.pawns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stack{display:flex}
+.stack .pawn{margin-left:-6px;outline:2px solid var(--surface)}
+.stack .pawn:first-child{margin-left:0}
+
+/* race track */
+.board{display:grid;gap:10px}
+.lane{--c:#6B7785;display:grid;grid-template-columns:88px minmax(0,1fr) 70px;gap:12px;align-items:center}
+.lane-who b{font:600 1.02rem/1.2 var(--f-head);display:block}
+.lane-who small{display:block;color:var(--muted);font-size:.76rem;line-height:1.25}
+.track{position:relative;height:50px;border-radius:25px;background:var(--sunk);overflow:hidden}
+.track::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),var(--paper) calc(10% - 2px) 10%)}
+.track .fill{position:absolute;inset:0 auto 0 0;width:calc(50px + (100% - 50px) * var(--p));background:color-mix(in srgb,var(--c) 26%,transparent);border-radius:25px;transition:width .7s}
+.track .pawn{position:absolute;top:5px;left:calc(5px + (100% - 50px) * var(--p));transition:left .7s}
+.lane-pts{font:600 1.35rem/1 var(--f-head);text-align:right;font-variant-numeric:tabular-nums}
+.lane-pts small{display:block;font:400 .72rem var(--f-body);color:var(--muted)}
+.lead{font:600 .66rem/1 var(--f-head);background:var(--ink);color:var(--paper);padding:3px 6px;border-radius:5px;margin-left:4px;vertical-align:2px}
+@media (max-width:540px){.lane{grid-template-columns:56px minmax(0,1fr) 50px;gap:8px}.lane-who small{display:none}}
+
+.feed{display:grid;gap:0}
+.feed li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.feed li:last-child{border-bottom:0}
+.feed .pts{font:600 .95rem var(--f-head);font-variant-numeric:tabular-nums;color:var(--good)}
+.feed .pts.zero{color:var(--muted)}
+ul.plain{list-style:none;margin:0;padding:0}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.qcard{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;display:grid;gap:4px}
+.qcard:hover{border-color:var(--muted)}
+.qcard b{font:600 1rem var(--f-head)}
+.qcard span{color:var(--muted);font-size:.86rem;line-height:1.4}
+
+/* lessons */
+.lcard{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;display:grid;gap:8px;align-content:start;min-width:0}
+.lcard:hover{border-color:var(--muted)}
+.lcard .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lcard p{color:var(--muted);font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}
+.lcard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px;min-height:26px}
+.prose{max-width:68ch;overflow-wrap:anywhere}
+.prose h3,.prose h4,.prose h5{margin:1.1em 0 .4em}
+.prose h3{font-size:1.15rem;font-weight:600}
+.prose p,.prose ul,.prose ol{margin:.5em 0}
+.prose ul,.prose ol{padding-left:1.3em}
+.prose li{margin:.2em 0}
+.prose code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--sunk);padding:1px 5px;border-radius:5px}
+.tip{background:var(--sunk);border-radius:12px;padding:10px 14px;margin:.7em 0}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font:500 .92rem var(--f-head);cursor:pointer;padding:6px 0}
+.back:hover{color:var(--ink)}
+
+/* quiz */
+.quiz{display:grid;gap:16px;max-width:760px}
+.qtop{display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:8px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:4px;transition:width .3s}
+.qtext{font-size:1.2rem;line-height:1.55}
+.qtext p{margin:0}
+.choices{display:grid;gap:8px}
+.choice{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:center;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;font-size:1.02rem}
+.choice .L{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--sunk);font:600 .95rem var(--f-head)}
+.choice:hover:not(:disabled){border-color:var(--muted)}
+.choice:disabled{cursor:default}
+.choice.right{border-color:var(--good);background:var(--good-bg)}
+.choice.right .L{background:var(--good);color:#fff}
+.choice.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.choice.wrong .L{background:var(--bad);color:#fff}
+.explain{border-radius:14px;padding:12px 16px;background:var(--sunk)}
+.explain b{font-family:var(--f-head);font-weight:600}
+.result{text-align:center;display:grid;gap:10px;justify-items:center;padding:24px 16px}
+.result .score{font:700 3.6rem/1 var(--f-head);font-variant-numeric:tabular-nums}
+
+/* tools */
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,28px);display:grid;gap:18px;min-width:0}
+.bigq{font-size:clamp(1.3rem,3.4vw,1.9rem);line-height:1.5;font-weight:400}
+.bigq p{margin:0}
+.scoreline{display:flex;gap:14px;flex-wrap:wrap}
+.scoreline>span{display:inline-flex;align-items:center;gap:6px;font:600 1.1rem var(--f-head);font-variant-numeric:tabular-nums}
+.center{display:grid;justify-items:center;text-align:center;gap:10px}
+.turnname{font:600 clamp(1.6rem,5vw,2.4rem)/1.1 var(--f-head)}
+.dir{display:inline-flex;align-items:center;gap:8px;font:500 1rem var(--f-head);color:var(--muted)}
+.dir svg{width:26px;height:26px}
+.pending{font:600 1.15rem var(--f-head);background:var(--bad-bg);color:var(--bad);padding:8px 16px;border-radius:999px}
+.unocolors{display:flex;gap:8px;justify-content:center}
+.unocolors button{width:40px;height:40px;border-radius:10px;border:3px solid transparent;cursor:pointer}
+.unocolors button[aria-pressed="true"]{border-color:var(--ink)}
+.unogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.nextup{display:flex;gap:6px;align-items:center;justify-content:center;color:var(--muted);font-size:.9rem}
+.order{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-height:46px;padding:8px;border-radius:12px;background:var(--sunk)}
+.order .item{display:inline-flex;align-items:center;gap:4px;font:500 .8rem var(--f-head);color:var(--muted)}
+.prow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.prow .tot{font:700 2rem/1 var(--f-head);font-variant-numeric:tabular-nums;min-width:2.5ch;text-align:right}
+.prow .ctrl{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.prow .ctrl input{width:90px}
+.digits{font:600 clamp(4rem,16vw,7.5rem)/1 var(--f-head);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.digits.done{color:var(--bad);animation:blink .6s steps(2) 6}
+@keyframes blink{50%{opacity:.25}}
+.dice{display:flex;gap:14px;justify-content:center}
+.dice svg{width:84px;height:84px}
+.rank{display:grid;gap:8px;width:100%;max-width:460px}
+.rank div{display:grid;grid-template-columns:28px auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:var(--sunk);text-align:left}
+.rank .no{font:600 1rem var(--f-head);color:var(--muted)}
+.rank .v{font:700 1.3rem var(--f-head);font-variant-numeric:tabular-nums}
+
+/* Baan Suay Game Show: one deliberate stage look (navy + marquee yellow) in both themes */
+.bs{--bs-navy:#1B365D;--bs-deep:#122847;--bs-hover:#244876;--bs-line:#081324;--bs-gold:#FFF35C;--bs-white:#FFFFFF;--bs-dim:rgba(255,255,255,.62);
+  background:var(--bs-navy);color:var(--bs-white);border-radius:6px;padding:clamp(14px,2.6vw,28px);display:grid;gap:clamp(12px,2vw,20px);box-shadow:inset 0 3px 0 #6F9BE6,var(--shadow);min-width:0}
+.bs-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.bs-title{font:600 clamp(1.35rem,3.8vw,2.6rem)/1.15 var(--f-head);color:var(--bs-gold);letter-spacing:.005em}
+.bs-finalbtn{font:600 clamp(.9rem,1.6vw,1.1rem)/1 var(--f-head);color:var(--bs-gold);background:transparent;border:2px solid var(--bs-line);border-radius:3px;padding:14px 22px;cursor:pointer}
+.bs-finalbtn:hover{background:var(--bs-hover)}
+.bs-scroll{overflow-x:auto;margin-inline:-2px;padding-inline:2px}
+.bs-grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(78px,1fr));gap:3px;background:var(--bs-line);border:3px solid var(--bs-line);min-width:calc(var(--cols) * 81px)}
+.bs-cat{background:var(--bs-navy);color:var(--bs-white);font:500 clamp(.82rem,1.7vw,1.15rem)/1.25 var(--f-head);text-align:center;padding:10px 6px;min-height:clamp(66px,9vw,104px);display:grid;place-items:center;border:0;overflow-wrap:break-word;word-break:normal;text-wrap:balance}
+button.bs-cat{cursor:pointer;outline-offset:-4px}
+button.bs-cat:hover{background:var(--bs-hover)}
+.bs-cell{background:var(--bs-navy);color:var(--bs-gold);font:600 clamp(1.25rem,3.6vw,2.5rem)/1 var(--f-head);font-variant-numeric:tabular-nums;border:0;min-height:clamp(66px,9.5vw,110px);cursor:pointer;display:grid;place-items:center;position:relative;padding:4px;outline-offset:-4px}
+.bs-cell:hover{background:var(--bs-hover)}
+.bs-cell.used{background:var(--bs-deep)}
+.bs-cell .who{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
+.bs-cell .none{font:500 .74rem/1.2 var(--f-head);color:rgba(255,255,255,.38)}
+.bs-cell.blank::after{content:"";position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#FF7F6E}
+.bs-scores{display:flex;gap:10px 22px;flex-wrap:wrap}
+.bs-scores>span{display:inline-flex;align-items:center;gap:8px;font:600 clamp(1.1rem,2.4vw,1.6rem)/1 var(--f-head);color:var(--bs-gold);font-variant-numeric:tabular-nums}
+.bs-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bs-btn{font:600 1rem/1.1 var(--f-head);min-height:48px;padding:0 20px;border-radius:3px;border:2px solid var(--bs-gold);background:var(--bs-gold);color:var(--bs-navy);cursor:pointer}
+.bs-btn.ghost{background:transparent;color:var(--bs-gold)}
+.bs-btn.line{background:transparent;color:var(--bs-white);border-color:rgba(255,255,255,.35)}
+.bs-btn:disabled{opacity:.4;cursor:not-allowed}
+.bs-note{font-size:.88rem;color:var(--bs-dim)}
+.bs-q .bs-qtop{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 clamp(1rem,2vw,1.35rem)/1.3 var(--f-head);color:var(--bs-white)}
+.bs-pts{color:var(--bs-gold);font-family:var(--f-head);font-weight:600;font-variant-numeric:tabular-nums}
+.bs-qtext{font:400 clamp(1.4rem,4vw,2.6rem)/1.45 var(--f-body);color:var(--bs-white);min-height:3.4em;display:grid;align-content:center;text-align:center;overflow-wrap:anywhere}
+.bs-ans{border:2px dashed var(--bs-gold);padding:14px 18px;color:var(--bs-gold);font-size:clamp(1.15rem,3vw,1.8rem);line-height:1.45;text-align:center;border-radius:3px;overflow-wrap:anywhere}
+.bs .md p{margin:0}
+.bs .md ul,.bs .md ol{text-align:left;display:inline-block;margin:0}
+.bs-label{display:block;font:500 .8rem/1.3 var(--f-head);letter-spacing:.04em;color:var(--bs-dim);margin-bottom:8px}
+.bs .pawn[aria-pressed="true"]{outline-color:var(--bs-gold)}
+.bs .pawn[aria-pressed="false"]{opacity:.35}
+.bs :focus-visible{outline-color:var(--bs-gold)}
+.bs-final-title{font:700 clamp(2rem,6.5vw,3.8rem)/1.05 var(--f-head);color:var(--bs-gold);text-align:center;text-wrap:balance}
+.bs-wrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto 112px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:1.05rem}
+.bs-wrow:last-child{border-bottom:0}
+.bs input[type=number]{background:var(--bs-deep);color:var(--bs-white);border:1px solid rgba(255,255,255,.3);font-family:var(--f-head);font-size:1.15rem}
+.bs-rank div{background:var(--bs-deep);color:var(--bs-white)}
+.bs-rank .no{color:var(--bs-dim)}
+.bs-rank .v{color:var(--bs-gold)}
+@media (max-width:540px){.bs-wrow{grid-template-columns:auto minmax(0,1fr) 84px}.bs-wrow>.bs-pts:nth-child(3){display:none}}
+
+/* wall */
+.posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;align-items:start}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:8px;min-width:0}
+.post.pinned{border-color:var(--ink);border-width:1.5px}
+.post .by{display:flex;align-items:center;gap:8px;font:500 .84rem var(--f-head);color:var(--muted);flex-wrap:wrap}
+.post h3{font-size:1.1rem}
+
+/* stickers */
+.stickers{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.stk-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;justify-items:center;text-align:center;gap:6px}
+.stk-card svg{width:88px;height:88px}
+.stk-card b{font:600 .98rem var(--f-head)}
+.stk-card span{font-size:.8rem;color:var(--muted);line-height:1.35}
+.stk-card.locked b{color:var(--muted)}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--scrim);display:grid;place-items:end center;padding:12px;padding-top:calc(12px + env(safe-area-inset-top,0px));padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+@media (min-width:720px){.sheet{place-items:center}}
+.sheet-card{background:var(--surface);color:var(--ink);width:min(700px,100%);max-height:100%;overflow:auto;border-radius:20px;padding:20px;box-shadow:var(--shadow);display:grid;gap:16px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font:500 1.1rem var(--f-head);flex:none}
+.form{display:grid;gap:14px}
+.field{display:grid;gap:6px;min-width:0}
+.field>span{font:500 .84rem/1.2 var(--f-head);color:var(--muted)}
+.field small{color:var(--muted);font-size:.8rem;line-height:1.4}
+input[type=text],input[type=number],input[type=date],textarea,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+textarea{min-height:110px;resize:vertical;line-height:1.55}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:560px){.row2,.row3{grid-template-columns:1fr}}
+.pick{display:flex;gap:10px;flex-wrap:wrap}
+.pick label{position:relative;cursor:pointer;display:inline-flex}
+.pick input{position:absolute;opacity:0;width:1px;height:1px}
+.pick input+.pawn{opacity:.32}
+.pick input:checked+.pawn{opacity:1;outline:3px solid var(--ink);outline-offset:3px}
+.pick input:focus-visible+*{outline:3px solid var(--focus);outline-offset:3px}
+.opt input+span{display:inline-block;font:500 .86rem/1 var(--f-head);padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.opt input:checked+span{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.sw input+span{display:block;width:34px;height:34px;border-radius:50%;background:var(--c);opacity:1}
+.sw input:checked+span{outline:3px solid var(--ink);outline-offset:3px}
+.check{display:flex;gap:8px;align-items:center;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--ink)}
+.qedit{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;margin:0;min-width:0}
+.qedit legend{font:600 .9rem var(--f-head);padding:0 6px}
+.crow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:center}
+.crow input[type=radio]{width:20px;height:20px;accent-color:var(--good)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--btn);color:var(--btn-ink);font:500 .95rem var(--f-head);padding:12px 18px;border-radius:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.table{width:100%;border-collapse:collapse;font-size:.92rem}
+.table td,.table th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.table th{font:500 .78rem var(--f-head);color:var(--muted)}
+.scroll{overflow-x:auto}
+.kidrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.kidrow:last-child{border-bottom:0}
+.kidrow b{font:600 1rem var(--f-head)}
+details.rules summary{cursor:pointer;font:500 .88rem var(--f-head);color:var(--muted)}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.gcard .facts{display:flex;gap:6px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 46 46" aria-hidden="true"><path d="M5 22 23 6l18 16" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19v20h26V19" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"/><circle cx="17" cy="30" r="3.4" fill="#2F5BD3"/><circle cx="23" cy="25" r="3.4" fill="#D23F77"/><circle cx="29" cy="30" r="3.4" fill="#D9940F"/></svg>
+      <div><small>บ้านของเรา</small><h1 id="houseName">Baan Suay</h1></div>
+    </div>
+    <button type="button" class="modebtn" id="modeBtn" data-act="toggleBro" aria-pressed="false"><span class="dot"></span><span class="mlabel">โหมดพี่</span></button>
+  </header>
+  <nav class="tabs" id="tabs" aria-label="ห้องในบ้าน"></nav>
+  <div id="banner"></div>
+  <main id="view"></main>
+</div>
+<div class="sheet" id="sheet" hidden><div class="sheet-card" id="sheetCard" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<!-- ===== ตั้งค่า Firebase: วาง firebaseConfig ของบ้านแทนค่าในวงเล็บปีกกาด้านล่าง ===== -->
+<script>
+window.FIREBASE_CONFIG = {
+  apiKey: "ใส่ apiKey ที่นี่",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+</script>
+<!-- ===== จบส่วนตั้งค่า ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+'use strict';
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const LS={get(k,d){try{const v=localStorage.getItem('house6.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+          set(k,v){try{localStorage.setItem('house6.'+k,JSON.stringify(v))}catch(e){}}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const okColor=c=>/^#[0-9a-fA-F]{3,8}$/.test(c||'')?c:'#6B7785';
+const LET='ABCDEFGH';
+
+const SUBJECTS=[['chem','เคมี'],['phys','ฟิสิกส์'],['bio','ชีวะ'],['math','คณิต'],['eng','อังกฤษ'],['other','อื่นๆ']];
+const subjName=id=>(SUBJECTS.find(s=>s[0]===id)||[0,'อื่นๆ'])[1];
+const BANDS=[['kinder','อนุบาล'],['pri1','ประถมต้น'],['pri2','ประถมปลาย'],['sec','มัธยม (ไม่ระบุช่วง)'],['sec1','มัธยมต้น'],['sec2','มัธยมปลาย'],['uni','มหาวิทยาลัย']];
+const bandName=id=>(BANDS.find(b=>b[0]===id)||[0,''])[1];
+const KINDS=[['compete','แข่งกัน'],['coop','ช่วยกัน'],['party','ปาร์ตี้'],['brain','ฝึกสมอง']];
+const kindName=id=>(KINDS.find(k=>k[0]===id)||[0,'เกม'])[1];
+const POSTTYPES=[['news','ข่าวในบ้าน'],['plan','นัดหมาย'],['memory','ความทรงจำ'],['story','เรื่องเล่า']];
+const postType=id=>(POSTTYPES.find(k=>k[0]===id)||[0,'โพสต์'])[1];
+const SWATCHES=['#2F5BD3','#D23F77','#D9940F','#23935F','#7650CC','#E5612A','#0E8C9C','#8A6A3B','#C2416B','#4A5868'];
+const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['timer','จับเวลาและสุ่ม']];
+
+function bandFits(levels,band){
+  if(!levels||!levels.length||!band) return true;
+  return levels.some(l=>l===band||(l==='sec'&&(band==='sec1'||band==='sec2'))||(band==='sec'&&(l==='sec1'||l==='sec2')));
+}
+const dfmt=t=>new Date(t).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});
+function ago(t){if(!t)return'';const d=(Date.now()-t)/1000;if(d<60)return'เมื่อกี้';if(d<3600)return Math.floor(d/60)+' นาทีที่แล้ว';if(d<86400)return Math.floor(d/3600)+' ชม.ที่แล้ว';if(d<7*86400)return Math.floor(d/86400)+' วันที่แล้ว';return dfmt(t)}
+
+/* light markdown: ## heading, - list, 1. list, > tip, **bold**, *italic*, `code`, H_2O, x^2, ->, <=> */
+function inline(s){
+  return s.replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\w)/g,'$1<em>$2</em>')
+    .replace(/_\{([^}]+)\}/g,'<sub>$1</sub>')
+    .replace(/\^\{([^}]+)\}/g,'<sup>$1</sup>')
+    .replace(/([A-Za-z)\]])_(\d+)/g,'$1<sub>$2</sub>')
+    .replace(/\^(\d*[+\-−]|\d+)/g,'<sup>$1</sup>')
+    .replace(/&lt;=&gt;/g,'⇌').replace(/-&gt;/g,'→');
+}
+function md(src){
+  const lines=esc(src||'').split(/\r?\n/);let out='',list=null,para=[];
+  const fp=()=>{if(para.length){out+='<p>'+inline(para.join('<br>'))+'</p>';para=[]}};
+  const fl=()=>{if(list){out+='</'+list+'>';list=null}};
+  for(const raw of lines){const l=raw.replace(/\s+$/,'');let m;
+    if(!l.trim()){fp();fl();continue}
+    if((m=l.match(/^(#{1,3})\s+(.*)$/))){fp();fl();const h=m[1].length+2;out+=`<h${h}>${inline(m[2])}</h${h}>`;continue}
+    if((m=l.match(/^\s*[-•]\s+(.*)$/))){fp();if(list!=='ul'){fl();out+='<ul>';list='ul'}out+=`<li>${inline(m[1])}</li>`;continue}
+    if((m=l.match(/^\s*\d+[.)]\s+(.*)$/))){fp();if(list!=='ol'){fl();out+='<ol>';list='ol'}out+=`<li>${inline(m[1])}</li>`;continue}
+    if((m=l.match(/^&gt;\s?(.*)$/))){fp();fl();out+=`<aside class="tip">${inline(m[1])}</aside>`;continue}
+    fl();para.push(l);
+  }
+  fp();fl();return out;
+}
+const plain=s=>String(s||'').replace(/[#*>`_^{}]/g,'').replace(/\s+/g,' ').trim();
+
+/* ---------- storage: shared database in the artifact, browser storage elsewhere ---------- */
+const COLS=['kids','lessons','log','posts','games','sessions','meta','boards'];
+const Store={
+  mode:'loading', d:{kids:{},lessons:{},log:{},posts:{},games:{},sessions:{},meta:{},boards:{}}, db:null,
+  async init(){
+    COLS.forEach(c=>this.d[c]={});
+    let db=null;const cfg=window.FIREBASE_CONFIG;
+    if(cfg&&cfg.apiKey&&!/ใส่/.test(cfg.apiKey)){
+      if(!window.firebase){this.err='โหลด Firebase ไม่ได้ ตรวจอินเทอร์เน็ตแล้วเปิดหน้าใหม่'}
+      else{try{if(!firebase.apps.length)firebase.initializeApp(cfg);await firebase.auth().signInAnonymously();db=firebase.firestore();this.kind='firebase'}
+        catch(e){this.err='เข้าฐานข้อมูล Firebase ไม่ได้ ('+(e&&e.code||'error')+') ตรวจว่าเปิด Anonymous ใน Authentication แล้ว และวาง Rules ถูกต้อง'}}
+    }else if(window.claude&&typeof window.claude.use==='function'){try{db=await window.claude.use('db')}catch(e){db=null}if(db)this.kind='claude'}
+    if(db){
+      this.db=db;this.mode='shared';
+      COLS.forEach(c=>{
+        db.collection(c).onSnapshot(s=>{const m={};s.docs.forEach(x=>{m[x.id]=Object.assign({},x.data(),{id:x.id})});this.d[c]=m;changed()},
+          ()=>toast('เชื่อมต่อข้อมูลบ้านไม่ได้ ลองเปิดหน้านี้ใหม่'));
+      });
+    }else{
+      this.mode='local';
+      COLS.forEach(c=>{let m={};try{m=JSON.parse(localStorage.getItem('house6:'+c)||'{}')||{}}catch(e){}
+        const out={};Object.keys(m).forEach(id=>{if(m[id]&&typeof m[id]==='object')out[id]=Object.assign({},m[id],{id})});this.d[c]=out});
+    }
+    changed();
+  },
+  async put(c,id,obj){
+    const body=JSON.parse(JSON.stringify(obj));delete body.id;
+    this.d[c]=Object.assign({},this.d[c],{[id]:Object.assign({},body,{id})});changed();
+    try{
+      if(this.mode==='shared') await this.db.collection(c).doc(id).set(body);
+      else localStorage.setItem('house6:'+c,JSON.stringify(this.d[c]));
+      return true;
+    }catch(e){toast('บันทึกไม่สำเร็จ ตรวจว่ามีสิทธิ์แก้ไขบ้านนี้ แล้วลองใหม่');return false}
+  },
+  async del(c,id){
+    const m=Object.assign({},this.d[c]);delete m[id];this.d[c]=m;changed();
+    try{
+      if(this.mode==='shared') await this.db.collection(c).doc(id).delete();
+      else localStorage.setItem('house6:'+c,JSON.stringify(this.d[c]));
+    }catch(e){toast('ลบไม่สำเร็จ ลองใหม่อีกครั้ง')}
+  }
+};
+
+/* ---------- data getters ---------- */
+const kids=()=>Object.values(Store.d.kids).sort((a,b)=>(a.order??99)-(b.order??99)||String(a.code).localeCompare(String(b.code)));
+const kidById=id=>Store.d.kids[id];
+const league=()=>kids().filter(k=>k.league!==false);
+const lessons=()=>Object.values(Store.d.lessons).sort((a,b)=>(b.at||0)-(a.at||0));
+const logs=()=>Object.values(Store.d.log).sort((a,b)=>(b.at||0)-(a.at||0));
+const games=()=>Object.values(Store.d.games).sort((a,b)=>String(a.name).localeCompare(String(b.name),'th'));
+const sessions=()=>Object.values(Store.d.sessions).sort((a,b)=>(b.at||0)-(a.at||0));
+const posts=()=>Object.values(Store.d.posts).sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||((b.at||0)-(a.at||0)));
+const houseName=()=>(Store.d.meta.house&&Store.d.meta.house.name)||'Baan Suay';
+const kidLabel=k=>k.nick?`${k.code} · ${k.nick}`:k.code;
+
+function pawn(k,cls){if(!k)return'';return `<span class="pawn ${cls||''}" style="--c:${okColor(k.color)}" title="${esc(kidLabel(k))}">${esc(k.code)}</span>`}
+function pawnBtn(k,act,on,cls,extra){return `<button type="button" class="pawn ${cls||''}" style="--c:${okColor(k.color)}" data-act="${act}" data-id="${esc(k.id)}" aria-pressed="${on?'true':'false'}" aria-label="${esc(kidLabel(k))}" ${extra||''}>${esc(k.code)}</button>`}
+function guestPawn(p,cls){return `<span class="pawn ${cls||''}" style="--c:${okColor(p.color)}" title="${esc(p.name)}">${esc(p.code||p.name.slice(0,2))}</span>`}
+function playerPawn(p,cls){const k=p.id&&kidById(p.id);return k?pawn(k,cls):guestPawn(p,cls)}
+const playerName=p=>{const k=p.id&&kidById(p.id);return k?kidLabel(k):p.name};
+
+function totals(range){
+  const t={};const n=new Date();const m0=new Date(n.getFullYear(),n.getMonth(),1).getTime();
+  for(const e of logs()){if(range==='month'&&(e.at||0)<m0)continue;t[e.kid]=(t[e.kid]||0)+(+e.pts||0)}
+  return t;
+}
+function stats(kid){
+  const st={pts:0,quizzes:0,bySubj:{},perfect:0,perfectChem:0,wins:0,coop:0,showCorrect:0,stickers:new Set()};const seen=new Set();
+  for(const e of logs()){
+    if(e.kid!==kid)continue;st.pts+=(+e.pts||0);
+    if(e.kind==='quiz'){if(!seen.has(e.lessonId)){seen.add(e.lessonId);st.quizzes++;st.bySubj[e.subject]=(st.bySubj[e.subject]||0)+1}
+      if(e.perfect){st.perfect++;if(e.subject==='chem')st.perfectChem++}}
+    if(e.kind==='game'){if(e.win&&!e.coop)st.wins++;if(e.coop)st.coop++;st.showCorrect+=(+e.correct||0)}
+    if(e.kind==='sticker'&&e.sticker)st.stickers.add(e.sticker);
+  }
+  return st;
+}
+
+/* ---------- stickers ---------- */
+const G={
+  book:'<path d="M-15 -11h11a4 4 0 0 1 4 4v20a4 4 0 0 0-4-3h-11z M15 -11h-11a4 4 0 0 0-4 4v20a4 4 0 0 1 4-3h11z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>',
+  flask:'<path d="M-6 -15h12 M-3.5 -15v9l-10 16a3 3 0 0 0 2.6 4.5h21.8a3 3 0 0 0 2.6-4.5l-10-16v-9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M-8.5 5h17l3.5 5.6a1.4 1.4 0 0 1-1.2 2.1h-21.6a1.4 1.4 0 0 1-1.2-2.1z" fill="currentColor"/>',
+  atom:'<g fill="none" stroke="currentColor" stroke-width="2.6"><ellipse rx="17" ry="6.5"/><ellipse rx="17" ry="6.5" transform="rotate(60)"/><ellipse rx="17" ry="6.5" transform="rotate(-60)"/></g><circle r="3.6" fill="currentColor"/>',
+  bolt:'<path d="M4 -17 -10 3h9l-3 14 14-21h-9z" fill="currentColor"/>',
+  leaf:'<path d="M-13 13C-13 -6 -1 -15 15 -15C15 2 6 13 -13 13Z M-13 13 4 -4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
+  plus:'<path d="M0 -14v28M-14 0h28" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>',
+  abc:'<text y="6.5" text-anchor="middle" font-family="Kanit,sans-serif" font-weight="700" font-size="18" fill="currentColor">ABC</text>',
+  star:'<path d="M0 -16 4.7 -5.8 15.4 -4.9 7.2 2.2 9.6 13 0 7.4 -9.6 13 -7.2 2.2 -15.4 -4.9 -4.7 -5.8z" fill="currentColor"/>',
+  coin:'<circle r="14" fill="none" stroke="currentColor" stroke-width="3"/><circle r="7" fill="currentColor"/>',
+  trophy:'<path d="M-9 -14h18v8a9 9 0 0 1-18 0z" fill="currentColor"/><path d="M-9 -11h-5a5.5 5.5 0 0 0 5.5 8.5 M9 -11h5a5.5 5.5 0 0 1-5.5 8.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M-2.5 3h5v6h-5z M-9 9h18v5h-18z" fill="currentColor"/>',
+  heart:'<path d="M0 14C-15 4-16 -5-11.5 -10-7.5 -14-2.2 -12 0 -7.6 2.2 -12 7.5 -14 11.5 -10 16 -5 15 4 0 14z" fill="currentColor"/>',
+  home:'<path d="M-15 0 0 -14 15 0 M-10.5 -4v16h21v-16" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><rect x="-3.5" y="3" width="7" height="9" fill="currentColor"/>',
+  dice:'<rect x="-13" y="-13" width="26" height="26" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="-5.5" cy="-5.5" r="2.8" fill="currentColor"/><circle cx="5.5" cy="5.5" r="2.8" fill="currentColor"/><circle r="2.8" fill="currentColor"/>'
+};
+const STICKERS=[
+  {id:'first',name:'ควิซแรก',desc:'ทำควิซครบ 1 บท',g:'book',c:'#2F5BD3',t:s=>s.quizzes>=1},
+  {id:'chem5',name:'นักเคมีน้อย',desc:'ทำควิซเคมีครบ 5 บท',g:'flask',c:'#0E8C9C',t:s=>(s.bySubj.chem||0)>=5},
+  {id:'atom',name:'อะตอมแน่น',desc:'ได้คะแนนเต็มควิซเคมี',g:'atom',c:'#0E8C9C',t:s=>s.perfectChem>=1},
+  {id:'phys3',name:'แรงดีไม่มีตก',desc:'ทำควิซฟิสิกส์ครบ 3 บท',g:'bolt',c:'#D9940F',t:s=>(s.bySubj.phys||0)>=3},
+  {id:'bio3',name:'ชีวะชีวิต',desc:'ทำควิซชีวะครบ 3 บท',g:'leaf',c:'#23935F',t:s=>(s.bySubj.bio||0)>=3},
+  {id:'math5',name:'เลขไม่กลัว',desc:'ทำควิซคณิตครบ 5 บท',g:'plus',c:'#7650CC',t:s=>(s.bySubj.math||0)>=5},
+  {id:'eng5',name:'Word Collector',desc:'ทำควิซอังกฤษครบ 5 บท',g:'abc',c:'#D23F77',t:s=>(s.bySubj.eng||0)>=5},
+  {id:'perfect',name:'เต็มร้อย',desc:'ได้คะแนนเต็มควิซใดก็ได้',g:'star',c:'#E5612A',t:s=>s.perfect>=1},
+  {id:'p50',name:'50 แต้มแรก',desc:'สะสมครบ 50 แต้ม',g:'coin',c:'#8A6A3B',t:s=>s.pts>=50},
+  {id:'p200',name:'200 แต้ม',desc:'สะสมครบ 200 แต้ม',g:'coin',c:'#4A5868',t:s=>s.pts>=200},
+  {id:'p500',name:'500 แต้ม',desc:'สะสมครบ 500 แต้ม',g:'coin',c:'#B8860B',t:s=>s.pts>=500},
+  {id:'win1',name:'แชมป์โต๊ะเกม',desc:'ชนะเกมแข่งกัน 1 ครั้ง',g:'trophy',c:'#D9940F',t:s=>s.wins>=1},
+  {id:'win10',name:'เจ้าโต๊ะ',desc:'ชนะเกมแข่งกัน 10 ครั้ง',g:'trophy',c:'#C2416B',t:s=>s.wins>=10},
+  {id:'coop3',name:'ทีมเดียวกัน',desc:'เล่นเกมช่วยกันครบ 3 ครั้ง',g:'heart',c:'#23935F',t:s=>s.coop>=3},
+  {id:'show10',name:'มือไวเกมโชว์',desc:'ตอบถูกใน Baan Suay Game Show ครบ 10 ข้อ',g:'bolt',c:'#2F5BD3',t:s=>s.showCorrect>=10},
+  {id:'sp_help',name:'ช่วยงานบ้าน',desc:'สติกเกอร์พิเศษจากพี่',g:'home',c:'#E5612A',special:true},
+  {id:'sp_kind',name:'ใจดีกับน้อง',desc:'สติกเกอร์พิเศษจากพี่',g:'heart',c:'#D23F77',special:true},
+  {id:'sp_try',name:'ขยันพิเศษ',desc:'สติกเกอร์พิเศษจากพี่',g:'star',c:'#7650CC',special:true},
+  {id:'sp_fair',name:'เล่นแฟร์',desc:'สติกเกอร์พิเศษจากพี่',g:'dice',c:'#0E8C9C',special:true}
+];
+const stickerName=id=>(STICKERS.find(s=>s.id===id)||{name:id}).name;
+const hasSticker=(s,st)=>s.special?st.stickers.has(s.id):s.t(st);
+function stickerSVG(s,got){
+  return `<svg viewBox="-40 -40 80 80" aria-hidden="true"><circle r="37" style="fill:${got?s.c:'var(--sunk)'}"/><circle r="31" fill="none" style="stroke:${got?'rgba(255,255,255,.5)':'var(--line)'}" stroke-width="2" stroke-dasharray="4 4"/><g style="color:${got?'#fff':'var(--muted)'};opacity:${got?1:.55}">${G[s.g]||''}</g></svg>`;
+}
+
+/* ---------- state ---------- */
+const S={
+  tab:LS.get('tab','home'), bro:LS.get('bro',false), lb:'month',
+  learn:{subj:'all',kid:'all',open:null}, quiz:null, confirm:null,
+  gameKind:'all', stickerKid:null, tool:LS.get('tool',null),
+  bs:LS.get('bs',null), uno:LS.get('uno',null), score:LS.get('score',null),
+  timer:{total:60,left:60,run:false,endAt:0,done:false}, rnd:{pool:null,pick:null,spinning:false}, dice:{n:2,vals:[3,5]}, coin:null,
+  draft:null
+};
+const persist=()=>{LS.set('tab',S.tab);LS.set('bro',S.bro);LS.set('tool',S.tool);LS.set('bs',S.bs);LS.set('uno',S.uno);LS.set('score',S.score)};
+
+/* ---------- render ---------- */
+let pending=false;
+const typing=()=>{const a=document.activeElement;return a&&$('#view').contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)};
+function changed(){if(typing()){pending=true;return}render()}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!typing()){pending=false;render()}},0));
+
+const TABS=[['home','หน้าบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
+function render(){
+  if(S.tab==='admin'&&!S.bro)S.tab='home';
+  $('#houseName').textContent=houseName();
+  const mb=$('#modeBtn');mb.setAttribute('aria-pressed',S.bro?'true':'false');$('.mlabel',mb).textContent=S.bro?'โหมดพี่ เปิดอยู่':'โหมดพี่';
+  $('#tabs').innerHTML=TABS.filter(t=>!t[2]||S.bro).map(([id,n])=>`<button type="button" data-act="tab" data-id="${id}" ${S.tab===id?'aria-current="page"':''}>${n}</button>`).join('');
+  $('#banner').innerHTML=Store.err?`<div class="banner">${esc(Store.err)}</div>`:Store.mode==='local'?`<div class="banner">เปิดแบบเครื่องเดียว: ข้อมูลบ้านเก็บไว้ในเบราว์เซอร์ของเครื่องนี้ ใช้ “สำรองข้อมูล” ในจัดการบ้านเพื่อย้ายไปเครื่องอื่น</div>`:'';
+  const v=$('#view');
+  if(Store.mode==='loading'){v.innerHTML='<div class="panel muted">กำลังเปิดประตูบ้าน…</div>';return}
+  v.innerHTML=(VIEWS[S.tab]||vHome)();
+  if(S.tab==='tools'&&S.tool==='timer')paintTimer();
+}
+
+/* ---------- home ---------- */
+function emptyHouse(){
+  return `<div class="empty"><b>บ้านนี้ยังไม่มีสมาชิก</b><p>เพิ่มพี่น้องแต่ละคนก่อน แล้วสนามแข่ง ห้องเรียน และสติกเกอร์จะเริ่มทำงาน</p>${S.bro?'<button class="btn primary" data-act="kidForm">เพิ่มสมาชิกคนแรก</button>':'<button class="btn primary" data-act="toggleBro">เปิดโหมดพี่เพื่อเพิ่มสมาชิก</button>'}</div>`;
+}
+function logText(e){
+  switch(e.kind){
+    case 'quiz':return `ควิซ${subjName(e.subject)} “${esc(e.title||'')}” ได้ ${e.score}/${e.total}`;
+    case 'game':return e.coop?`เล่น ${esc(e.game||'เกม')} แบบช่วยกัน${e.win?' · ผ่านด่าน':''}`:`เล่น ${esc(e.game||'เกม')}${e.win?' · ชนะ':''}${e.correct?` · ตอบถูก ${e.correct} ข้อ`:''}`;
+    case 'award':return esc(e.note||'แต้มพิเศษจากพี่');
+    case 'sticker':return `ได้สติกเกอร์ “${esc(stickerName(e.sticker))}”${e.note?' · '+esc(e.note):''}`;
+    default:return esc(e.note||'');
+  }
+}
+function vHome(){
+  const ks=kids();if(!ks.length)return emptyHouse();
+  const t=totals(S.lb);const lg=league();
+  const max=Math.max(1,...lg.map(k=>t[k.id]||0));
+  const sorted=lg.slice().sort((a,b)=>(t[b.id]||0)-(t[a.id]||0));
+  const top=t[sorted[0]&&sorted[0].id]||0;
+  const lanes=sorted.map(k=>{const p=t[k.id]||0;const r=(p/max).toFixed(3);return `<div class="lane" style="--c:${okColor(k.color)};--p:${r}">
+    <div class="lane-who"><b>${esc(k.code)}${p>0&&p===top?'<span class="lead">นำ</span>':''}</b><small>${esc(k.grade||'')}</small></div>
+    <div class="track" role="img" aria-label="${esc(k.code)} ${p} แต้ม"><span class="fill"></span><span class="pawn">${esc(k.code)}</span></div>
+    <div class="lane-pts">${p}<small>แต้ม</small></div></div>`}).join('');
+  const feed=logs().slice(0,8);
+  const lp=posts()[0];
+  return `<section class="sec">
+    <div class="sec-head"><div><h2>สนามแข่งในบ้าน</h2><p>แต้มจากควิซ เกม และแต้มพิเศษจากพี่</p></div>
+      <div class="btns"><div class="chips"><button class="chip" data-act="lb" data-id="month" aria-pressed="${S.lb==='month'}">เดือนนี้</button><button class="chip" data-act="lb" data-id="all" aria-pressed="${S.lb==='all'}">ทั้งหมด</button></div>
+      ${S.bro?'<button class="btn primary sm" data-act="awardForm">ให้แต้ม</button>':''}</div></div>
+    <div class="panel board">${lanes||'<p class="muted">ยังไม่มีใครอยู่ในสนามแข่ง เปิด “นับในสนามแข่ง” ให้สมาชิกในจัดการบ้าน</p>'}</div>
+  </section>
+  <section class="sec"><div class="sec-head"><h2>เล่นอะไรดีวันนี้</h2></div>
+    <div class="quick">${TOOL_LIST.map(x=>`<button class="qcard" data-act="openTool" data-id="${x.id}"><b>${x.name}</b><span>${x.desc}</span></button>`).join('')}</div>
+  </section>
+  <div class="two">
+    <section class="sec"><div class="sec-head"><h2>ล่าสุดในบ้าน</h2></div>
+      <div class="panel">${feed.length?`<ul class="plain feed">${feed.map(e=>{const k=kidById(e.kid);return `<li>${k?pawn(k,'sm'):'<span class="pawn sm">?</span>'}<div class="small"><span>${logText(e)}</span><br><span class="muted">${ago(e.at)}</span></div><span class="pts ${(+e.pts||0)?'':'zero'}">${(+e.pts||0)>0?'+':''}${+e.pts||0}</span></li>`}).join('')}</ul>`:'<p class="muted">ยังไม่มีอะไรเกิดขึ้น ลองทำควิซในห้องเรียน หรือเล่นเกมโชว์ด้วยกัน</p>'}</div>
+    </section>
+    <section class="sec"><div class="sec-head"><h2>กำแพงบ้าน</h2><button class="btn sm" data-act="tab" data-id="wall">ดูทั้งหมด</button></div>
+      ${lp?postCard(lp):'<div class="empty">ยังไม่มีโพสต์ <button class="btn sm" data-act="postForm">เขียนโพสต์แรก</button></div>'}
+    </section>
+  </div>`;
+}
+
+/* ---------- learn ---------- */
+function vLearn(){
+  if(S.quiz)return vQuiz();
+  if(S.learn.open&&Store.d.lessons[S.learn.open])return vLesson(Store.d.lessons[S.learn.open]);
+  const all=lessons();const fk=S.learn.kid!=='all'&&kidById(S.learn.kid);
+  const list=all.filter(l=>(S.learn.subj==='all'||l.subject===S.learn.subj)&&(!fk||bandFits(l.levels,fk.band)));
+  const cnt=id=>all.filter(l=>l.subject===id).length;
+  const doneBy=l=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
+  return `<section class="sec">
+    <div class="sec-head"><div><h2>ห้องเรียน</h2><p>บทเรียนสั้นๆ พร้อมควิซ ทำครั้งแรกได้แต้มเท่ากับข้อที่ตอบถูก</p></div>${S.bro?'<button class="btn primary" data-act="lessonForm">เพิ่มบทเรียน</button>':''}</div>
+    <div class="chips"><button class="chip" data-act="subj" data-id="all" aria-pressed="${S.learn.subj==='all'}">ทุกวิชา<span class="n">${all.length}</span></button>${SUBJECTS.filter(s=>s[0]!=='other'||cnt('other')).map(([id,n])=>`<button class="chip" data-act="subj" data-id="${id}" aria-pressed="${S.learn.subj===id}">${n}<span class="n">${cnt(id)}</span></button>`).join('')}</div>
+    <div class="chips"><span class="label">เหมาะกับ</span><button class="chip" data-act="lkid" data-id="all" aria-pressed="${S.learn.kid==='all'}">ทุกคน</button>${kids().map(k=>pawnBtn(k,'lkid',S.learn.kid===k.id,'sm')).join('')}</div>
+    ${list.length?`<div class="grid">${list.map(l=>`<button class="lcard" data-act="openLesson" data-id="${esc(l.id)}">
+      <div class="meta"><span class="subj">${subjName(l.subject)}</span><span class="tag">${(l.levels&&l.levels.length)?l.levels.map(bandName).join(' · '):'ทุกระดับ'}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
+      <h3>${esc(l.title)}</h3><p>${esc(plain(l.content).slice(0,96))}${plain(l.content).length>96?'…':''}</p>
+      <div class="foot"><span class="muted small">${(l.questions||[]).length} ข้อ</span><span class="stack">${doneBy(l).map(k=>pawn(k,'sm')).join('')}</span></div></button>`).join('')}</div>`
+      :`<div class="empty"><b>${all.length?'ไม่มีบทเรียนที่ตรงกับตัวกรอง':'ยังไม่มีบทเรียน'}</b>${S.bro?'<p>เพิ่มบทเรียนพร้อมโจทย์ได้เลย หรือวางโจทย์ทีละหลายข้อด้วยรูปแบบข้อความ</p><button class="btn primary" data-act="lessonForm">เพิ่มบทเรียน</button>':'<p>ให้พี่เปิดโหมดพี่แล้วเพิ่มบทเรียน</p>'}</div>`}
+  </section>`;
+}
+function vLesson(l){
+  const qs=l.questions||[];const ck='lesson:'+l.id;
+  const ks=kids();const sel=S.learn.player&&kidById(S.learn.player)?S.learn.player:null;
+  return `<section class="sec">
+    <button class="back" data-act="closeLesson">← กลับห้องเรียน</button>
+    <div class="sec-head"><div class="chips"><span class="subj">${subjName(l.subject)}</span><span class="tag">${(l.levels&&l.levels.length)?l.levels.map(bandName).join(' · '):'ทุกระดับ'}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
+    ${S.bro?`<div class="btns"><button class="btn sm" data-act="lessonForm" data-id="${esc(l.id)}">แก้ไข</button>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delLesson" data-id="${esc(l.id)}">ยืนยันลบบทเรียน</button><button class="btn sm ghost" data-act="cancelAsk">ไม่ลบ</button>`:`<button class="btn sm danger" data-act="ask" data-id="${ck}">ลบ</button>`}</div>`:''}</div>
+    <h2 style="font-size:1.7rem">${esc(l.title)}</h2>
+    <div class="prose">${md(l.content)}</div>
+  </section>
+  <section class="sec"><div class="panel" style="display:grid;gap:14px">
+    <div><h3>ควิซท้ายบท · ${qs.length} ข้อ</h3><p class="muted small">เลือกคนที่จะทำ แล้วกดเริ่ม</p></div>
+    ${qs.length?`<div class="pawns">${ks.map(k=>pawnBtn(k,'quizKid',sel===k.id,'lg')).join('')}</div>
+    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel?'':'disabled'}>${sel?'เริ่มควิซของ '+esc(kidById(sel).code):'เลือกคนทำควิซก่อน'}</button></div>`:'<p class="muted">บทนี้ยังไม่มีโจทย์</p>'}
+  </div></section>`;
+}
+function vQuiz(){
+  const q=S.quiz;const l=Store.d.lessons[q.lessonId];if(!l){S.quiz=null;return vLearn()}
+  const k=kidById(q.kid);const qs=l.questions||[];
+  if(q.done){
+    const score=q.answers.filter(a=>a).length;
+    return `<section class="quiz"><div class="panel result">${pawn(k,'lg')}<span class="label">${esc(l.title)}</span><div class="score">${score}/${qs.length}</div>
+      <p>${q.firstTime?(score?`ได้ ${score} แต้มเข้าบ้าน`:'ครั้งนี้ยังไม่ได้แต้ม ลองอ่านบทเรียนอีกรอบ'):'เคยทำบทนี้แล้ว รอบนี้เป็นรอบฝึก ไม่นับแต้มเพิ่ม'}</p>
+      ${score===qs.length&&qs.length?'<p><b>เต็มทุกข้อ</b></p>':''}
+      <div class="btns"><button class="btn" data-act="retryQuiz">ทำอีกรอบ</button><button class="btn primary" data-act="endQuiz">กลับบทเรียน</button></div></div></section>`;
+  }
+  const it=qs[q.i];const answered=q.picked!=null||q.selfMark!=null;
+  let body='';
+  if(it.type==='open'){
+    body=q.revealed?`<div class="explain"><b>เฉลย:</b> ${md(it.answer||'')}${it.explain?`<div class="small muted">${md(it.explain)}</div>`:''}</div>
+      ${q.selfMark==null?`<div class="btns"><button class="btn big primary" data-act="selfMark" data-id="1">ตอบถูก</button><button class="btn big" data-act="selfMark" data-id="0">ยังไม่ถูก</button></div>`:''}`
+      :`<p class="muted small">คิดคำตอบในใจหรือพูดออกมา แล้วกดดูเฉลย</p><div class="btns"><button class="btn big primary" data-act="reveal">ดูเฉลย</button></div>`;
+  }else{
+    body=`<div class="choices">${(it.choices||[]).map((c,j)=>{let cls='';if(q.picked!=null){if(j===it.answer)cls='right';else if(j===q.picked)cls='wrong'}
+      return `<button class="choice ${cls}" data-act="pick" data-id="${j}" ${q.picked!=null?'disabled':''}><span class="L">${LET[j]}</span><span>${inline(esc(c))}</span></button>`}).join('')}</div>
+      ${q.picked!=null?`<div class="explain"><b>${q.picked===it.answer?'ถูกต้อง':'ยังไม่ถูก คำตอบคือ '+LET[it.answer]}</b>${it.explain?`<div>${md(it.explain)}</div>`:''}</div>`:''}`;
+  }
+  return `<section class="quiz">
+    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(q.i/qs.length*100).toFixed(1)}%"></i></div><span class="label">ข้อ ${q.i+1}/${qs.length}</span><button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
+    <div class="qtext">${md(it.q)}</div>${body}
+    ${answered?`<div class="btns"><button class="btn primary big" data-act="nextQ">${q.i+1<qs.length?'ข้อต่อไป':'ดูผล'}</button></div>`:''}
+  </section>`;
+}
+async function finishQuiz(){
+  const q=S.quiz;const l=Store.d.lessons[q.lessonId];const qs=l.questions||[];
+  const score=q.answers.filter(a=>a).length;
+  q.firstTime=!logs().some(e=>e.kind==='quiz'&&e.kid===q.kid&&e.lessonId===q.lessonId);
+  q.done=true;
+  if(!q.saved){q.saved=true;
+    await Store.put('log',uid(),{kid:q.kid,kind:'quiz',lessonId:l.id,title:l.title,subject:l.subject,score,total:qs.length,perfect:score===qs.length&&qs.length>0,pts:q.firstTime?score:0,at:Date.now()});}
+  render();
+}
+
+/* ---------- games room ---------- */
+function vGames(){
+  const all=games();const list=all.filter(g=>S.gameKind==='all'||g.kind===S.gameKind);
+  const ss=sessions().slice(0,12);
+  return `<section class="sec">
+    <div class="sec-head"><div><h2>ห้องเกม</h2><p>คลังเกมที่เล่นกันจริงในบ้าน จอเป็นแค่ผู้ช่วย ส่วนเกมเล่นกันบนโต๊ะ</p></div>${S.bro?'<button class="btn primary" data-act="gameForm">เพิ่มเกม</button>':''}</div>
+    <div class="chips"><button class="chip" data-act="gkind" data-id="all" aria-pressed="${S.gameKind==='all'}">ทั้งหมด</button>${KINDS.map(([id,n])=>`<button class="chip" data-act="gkind" data-id="${id}" aria-pressed="${S.gameKind===id}">${n}</button>`).join('')}</div>
+    ${list.length?`<div class="grid">${list.map(g=>`<article class="gcard">
+      <div class="facts"><span class="subj">${kindName(g.kind)}</span>${g.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
+      <h3>${esc(g.name)}</h3>
+      <div class="facts"><span class="tag">${esc(g.min||2)}–${esc(g.max||6)} คน</span>${g.minutes?`<span class="tag">${esc(g.minutes)} นาที</span>`:''}${g.props?`<span class="tag">${esc(g.props)}</span>`:''}</div>
+      ${g.rules?`<details class="rules"><summary>กติกา</summary><div class="prose small">${md(g.rules)}</div></details>`:''}
+      <div class="btns">${g.helper?`<button class="btn sm primary" data-act="openTool" data-id="${esc(g.helper)}" data-game="${esc(g.name)}">${esc((HELPERS.find(h=>h[0]===g.helper)||[0,'ตัวช่วย'])[1])}</button>`:''}${S.bro?`<button class="btn sm" data-act="gameForm" data-id="${esc(g.id)}">แก้ไข</button>`:''}</div>
+    </article>`).join('')}</div>`:`<div class="empty"><b>${all.length?'ไม่มีเกมประเภทนี้':'ยังไม่มีเกมในคลัง'}</b><p>เพิ่มเกมที่เล่นกันในบ้าน เช่น ไพ่ บอร์ดเกม หรือเกมที่คิดขึ้นเอง พร้อมกติกาและตัวช่วยที่ใช้</p>${S.bro?'<button class="btn primary" data-act="gameForm">เพิ่มเกม</button>':''}</div>`}
+  </section>
+  <section class="sec"><div class="sec-head"><h2>บันทึกการเล่น</h2></div>
+    <div class="panel">${ss.length?`<div class="scroll"><table class="table"><thead><tr><th>วันที่</th><th>เกม</th><th>คนเล่น</th><th>ผล</th>${S.bro?'<th></th>':''}</tr></thead><tbody>${ss.map(s=>`<tr><td class="small">${dfmt(s.at)}</td><td>${esc(s.game)}</td><td><span class="stack">${(s.players||[]).map(p=>playerPawn(p,'sm')).join('')}</span></td><td class="small">${s.coop?(s.win?'ผ่านด่าน':'ยังไม่ผ่าน'):((s.winners||[]).length?'ชนะ: '+s.winners.map(w=>esc(playerName(w))).join(', '):'—')}</td>${S.bro?`<td>${S.confirm==='ses:'+s.id?`<button class="btn sm dangerfill" data-act="delSession" data-id="${esc(s.id)}">ยืนยัน</button>`:`<button class="btn sm ghost" data-act="ask" data-id="ses:${esc(s.id)}">ลบ</button>`}</td>`:''}</tr>`).join('')}</tbody></table></div>`:'<p class="muted">ยังไม่มีบันทึก เมื่อจบเกมในตัวช่วยเล่นแล้วกดบันทึก ผลจะมาอยู่ที่นี่</p>'}</div>
+  </section>`;
+}
+
+/* ---------- tools ---------- */
+const TOOL_LIST=[
+  {id:'bsgs',name:'Baan Suay Game Show',desc:'กระดานเกมโชว์แบบ Jeopardy เลือกหัวข้อและคะแนน มี Final Question'},
+  {id:'uno',name:'ตัวช่วย UNO',desc:'บอกว่าตาใคร หมุนทางไหน ต้องจั่วกี่ใบ'},
+  {id:'score',name:'กระดานคะแนน',desc:'เก็บแต้มบอร์ดเกม แบบแข่งกันหรือช่วยกัน'},
+  {id:'timer',name:'จับเวลาและสุ่ม',desc:'นับถอยหลัง สุ่มคนเริ่ม ทอยลูกเต๋า โยนเหรียญ'}
+];
+const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},timer:{view:vTimer}};
+function vTools(){
+  if(S.tool&&TOOLS[S.tool]){const t=TOOL_LIST.find(x=>x.id===S.tool)||TOOLS[S.tool];
+    return `<section class="sec"><div class="sec-head"><div><button class="back" data-act="closeTool">← ตัวช่วยทั้งหมด</button><h2>${esc(t.name||'')}</h2></div></div>${TOOLS[S.tool].view()}</section>`}
+  return `<section class="sec"><div class="sec-head"><div><h2>ตัวช่วยเล่น</h2><p>ใช้จอแค่ช่วยจำ ช่วยนับ ช่วยจับเวลา ส่วนการเล่นอยู่บนโต๊ะ</p></div></div>
+    <div class="quick">${TOOL_LIST.concat(Object.keys(TOOLS).filter(id=>!TOOL_LIST.some(x=>x.id===id)).map(id=>({id,name:TOOLS[id].name||id,desc:TOOLS[id].desc||''}))).map(x=>`<button class="qcard" data-act="openTool" data-id="${esc(x.id)}"><b>${esc(x.name)}</b><span>${esc(x.desc)}</span></button>`).join('')}</div></section>`;
+}
+function playerPicker(sel,act){
+  const ks=kids();
+  return `<div class="pawns">${ks.map(k=>pawnBtn(k,act,sel.includes(k.id),'lg')).join('')}</div>`;
+}
+
+/* ---------- Baan Suay Game Show (jeopardy board) ---------- */
+const GUEST_COLORS=['#6B7785','#0E8C9C','#8A6A3B','#C2416B','#4A5868'];
+const pk=p=>p.id||('g:'+p.name);
+const catName=n=>esc(n).replace(/&amp;/g,'&amp;<wbr>').replace(/\//g,'/<wbr>');
+const clone=o=>JSON.parse(JSON.stringify(o));
+const boards=()=>Object.values(Store.d.boards).sort((a,b)=>(a.at||0)-(b.at||0));
+const bRows=b=>b.cats&&b.cats.length?Math.max(...b.cats.map(c=>(c.qs||[]).length)):0;
+function bNorm(b){b=clone(b);b.cats=b.cats||[];const n=bRows(b)||1;b.cats.forEach(c=>{c.qs=c.qs||[];while(c.qs.length<n)c.qs.push({q:'',a:'',pts:''})});b.final=b.final||{cat:'',q:'',a:''};return b}
+function bVal(b,c,r){
+  const step=+b.step||10;const cell=b.cats[c]&&b.cats[c].qs[r];
+  if(b.ptsMode==='custom'&&cell&&cell.pts!==''&&cell.pts!=null&&!isNaN(+cell.pts))return +cell.pts;
+  if(b.ptsMode==='row')return (r+1)*step;
+  return (r*b.cats.length+c+1)*step;
+}
+function newBoard(cols,rows){return {title:'Baan Suay Game Show',ptsMode:'seq',step:10,
+  cats:Array.from({length:cols},(_,i)=>({name:'หัวข้อ '+(i+1),qs:Array.from({length:rows},()=>({q:'',a:'',pts:''}))})),final:{cat:'',q:'',a:''},at:Date.now()}}
+function bsBoardNow(){const s=S.bs;let b=s&&Store.d.boards[s.boardId];if(!b){const all=boards();if(all.length){b=all[0];if(s)s.boardId=b.id}}return b?Object.assign(bNorm(b),{id:b.id}):null}
+async function saveBoard(b){await Store.put('boards',b.id,b)}
+function bsScores(s,b){
+  const sc={};s.players.forEach(p=>{sc[pk(p)]=0});
+  Object.keys(s.used||{}).forEach(k=>{const [c,r]=k.split('-').map(Number);if(!b||!b.cats[c]||r>=b.cats[c].qs.length)return;const v=bVal(b,c,r);(s.used[k].w||[]).forEach(x=>{if(x in sc)sc[x]+=v})});
+  const f=s.final;if(f&&f.done)s.players.forEach(p=>{const x=pk(p);const w=+((f.wager||{})[x])||0;sc[x]+=(f.right||{})[x]?w:-w});
+  return sc;
+}
+function bsPawnBtn(p,act,on,cls){const k=p.id&&kidById(p.id);const code=k?k.code:(p.code||String(p.name).slice(0,2));
+  return `<button type="button" class="pawn ${cls||''}" style="--c:${okColor(k?k.color:p.color)}" data-act="${act}" data-id="${esc(pk(p))}" aria-pressed="${on?'true':'false'}" aria-label="${esc(playerName(p))}">${esc(code)}</button>`}
+function bsScoreBar(s,b){const sc=bsScores(s,b);
+  return s.players.length?`<div class="bs-scores">${s.players.map(p=>`<span>${playerPawn(p)}${sc[pk(p)]}</span>`).join('')}</div>`:''}
+
+function vBsgs(){
+  if(!S.bs)S.bs={phase:'setup',boardId:null,players:[],used:{},open:null,revealed:false,got:[],final:null,edit:false,saved:false,award:5};
+  const s=S.bs;const b=bsBoardNow();
+  if(!b){return `<div class="empty"><b>ยังไม่มีกระดานเกมโชว์</b><p>สร้างกระดานแล้วใส่หัวข้อ คำถาม และเฉลย</p>${S.bro?'<button class="btn primary" data-act="bsNewBoard">สร้างกระดาน</button>':'<button class="btn primary" data-act="toggleBro">เปิดโหมดพี่เพื่อสร้างกระดาน</button>'}</div>`}
+  if(s.edit&&!S.bro)s.edit=false;
+  if(s.phase==='setup')return bsSetup(s,b);
+  if(s.phase==='q')return bsQuestion(s,b);
+  if(s.phase==='final')return bsFinalView(s,b);
+  if(s.phase==='end')return bsEnd(s,b);
+  return bsBoardView(s,b);
+}
+function bsSetup(s,b){
+  const all=boards();const filled=b.cats.reduce((n,c)=>n+c.qs.filter(q=>q.q).length,0);const total=b.cats.length*bRows(b);
+  return `<div class="stage">
+    ${all.length>1?`<div><h3>เลือกกระดาน</h3></div><div class="chips">${all.map(x=>`<button class="chip" data-act="bsPickBoard" data-id="${esc(x.id)}" aria-pressed="${x.id===b.id}">${esc(x.title||'กระดาน')}</button>`).join('')}</div>`:''}
+    <div class="panel" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><div><b style="font-family:var(--f-head);font-weight:600">${esc(b.title)}</b><div class="small muted">${b.cats.length} หัวข้อ · หัวข้อละ ${bRows(b)} ข้อ · ใส่คำถามแล้ว ${filled}/${total} ช่อง${b.final.q?' · มีคำถามสุดท้ายแล้ว':' · ยังไม่มีคำถามสุดท้าย'}</div></div>
+      ${S.bro?'<button class="btn" data-act="bsEditMode">แก้ไขกระดาน</button>':''}</div>
+    <div><h3>คนเล่น ${s.players.length} คน</h3><p class="muted small">แตะเพื่อเลือก เล่นเป็นทีมก็ได้ โดยเพิ่มชื่อทีมในช่องด้านล่าง</p></div>
+    <div class="pawns">${kids().map(k=>pawnBtn(k,'bsPlayer',s.players.some(p=>p.id===k.id),'lg')).join('')}</div>
+    <div class="row2"><label class="field"><span>เพื่อน แขก หรือชื่อทีม</span><input type="text" id="bsGuest" placeholder="เช่น ทีมแดง"></label><div style="align-self:end"><button class="btn" data-act="bsGuest">เพิ่ม</button></div></div>
+    ${s.players.some(p=>!p.id)?`<div><p class="muted small">แตะเพื่อเอาออก</p><div class="pawns">${s.players.filter(p=>!p.id).map(p=>bsPawnBtn(p,'bsPlayer',true,'lg')).join('')}</div></div>`:''}
+    <div class="btns"><button class="btn primary big" data-act="bsStart" ${s.players.length?'':'disabled'}>${s.players.length?'เปิดกระดาน':'เลือกคนเล่นก่อน'}</button></div>
+  </div>`;
+}
+function bsBoardView(s,b){
+  const cols=b.cats.length,rows=bRows(b);const edit=!!s.edit;
+  let cells='';
+  b.cats.forEach((c,ci)=>{cells+=edit?`<button type="button" class="bs-cat" data-act="bsCat" data-c="${ci}">${c.name?catName(c.name):'ตั้งชื่อหัวข้อ'}</button>`:`<div class="bs-cat">${catName(c.name)}</div>`});
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const key=c+'-'+r;const v=bVal(b,c,r);const cell=b.cats[c].qs[r];const u=s.used[key];
+    if(edit)cells+=`<button type="button" class="bs-cell ${cell.q?'':'blank'}" data-act="bsOpen" data-c="${c}" data-r="${r}" aria-label="แก้ไข ${esc(b.cats[c].name)} ${v}">${v}</button>`;
+    else if(u)cells+=`<button type="button" class="bs-cell used" data-act="bsOpen" data-c="${c}" data-r="${r}" aria-label="${esc(b.cats[c].name)} ${v} เล่นแล้ว">${(u.w||[]).length?`<span class="who">${u.w.map(x=>{const p=s.players.find(p=>pk(p)===x);return p?playerPawn(p,'sm'):''}).join('')}</span>`:'<span class="none">ไม่มีใครได้</span>'}</button>`;
+    else cells+=`<button type="button" class="bs-cell" data-act="bsOpen" data-c="${c}" data-r="${r}">${v}</button>`;
+  }
+  const left=cols*rows-Object.keys(s.used).length;
+  return `<div class="bs">
+    <div class="bs-head"><h3 class="bs-title">${esc(b.title)}</h3><button type="button" class="bs-finalbtn" data-act="bsFinal">${edit?'แก้ Final Question':'Final Question!'}</button></div>
+    <div class="bs-scroll"><div class="bs-grid" style="--cols:${cols}">${cells}</div></div>
+    ${edit?`<div class="bs-tools"><button class="bs-btn ghost" data-act="bsAddCol" ${cols>=10?'disabled':''}>+ หัวข้อ</button><button class="bs-btn ghost" data-act="bsDelCol" ${cols<=1?'disabled':''}>− หัวข้อ</button><button class="bs-btn ghost" data-act="bsAddRow" ${rows>=10?'disabled':''}>+ แถว</button><button class="bs-btn ghost" data-act="bsDelRow" ${rows<=1?'disabled':''}>− แถว</button><button class="bs-btn ghost" data-act="bsSettings">ชื่อและคะแนน</button><button class="bs-btn" data-act="bsEditMode">เสร็จแล้ว</button></div>
+      <p class="bs-note">แตะหัวข้อเพื่อเปลี่ยนชื่อ แตะช่องคะแนนเพื่อใส่คำถามและเฉลย · จุดแดงคือช่องที่ยังไม่มีคำถาม</p>`
+    :bsScoreBar(s,b)}
+  </div>
+  ${edit?'':`<div class="btns" style="margin-top:14px">${S.bro?'<button class="btn" data-act="bsEditMode">แก้ไขกระดาน</button>':''}<button class="btn" data-act="bsEndNow">จบเกม${left?' (เหลือ '+left+' ช่อง)':''}</button><button class="btn ghost" data-act="bsToSetup">เปลี่ยนคนเล่นหรือกระดาน</button></div>`}`;
+}
+function bsQuestion(s,b){
+  const [c,r]=s.open;const cat=b.cats[c];const cell=cat&&cat.qs[r];
+  if(!cell){s.phase='board';return bsBoardView(s,b)}
+  const v=bVal(b,c,r);const key=c+'-'+r;const was=s.used[key];
+  return `<div class="bs bs-q">
+    <div class="bs-qtop"><span>${esc(cat.name)}</span><span class="bs-pts">${v}</span></div>
+    <div class="bs-qtext md">${cell.q?md(cell.q):'<span style="opacity:.6">ช่องนี้ยังไม่มีคำถาม</span>'}</div>
+    ${s.revealed?`<div class="bs-ans md"><span class="bs-label">เฉลย</span>${cell.a?md(cell.a):'—'}</div>`:''}
+    <div><span class="bs-label">ใครตอบถูก แตะได้มากกว่า 1 คน</span><div class="pawns">${s.players.map(p=>bsPawnBtn(p,'bsGot',s.got.includes(pk(p)),'lg')).join('')}</div></div>
+    <div class="bs-tools">
+      ${s.revealed?'':'<button class="bs-btn" data-act="bsReveal">เฉลย</button>'}
+      <button class="bs-btn" data-act="bsMark" ${s.got.length?'':'disabled'}>${s.got.length?'ให้ '+v+' คะแนน ('+s.got.length+' คน)':'เลือกคนที่ตอบถูก'}</button>
+      <button class="bs-btn ghost" data-act="bsNone">ไม่มีใครตอบได้</button>
+      ${was?'<button class="bs-btn line" data-act="bsClear">คืนช่องนี้ให้ยังไม่เล่น</button>':''}
+      <button class="bs-btn line" data-act="bsBack">กลับกระดาน</button>
+      ${S.bro?`<button class="bs-btn line" data-act="bsCellForm" data-c="${c}" data-r="${r}">แก้ข้อนี้</button>`:''}
+    </div>
+  </div>`;
+}
+function bsMaxWager(s,b,sc,x){let top=0;b.cats.forEach((c,ci)=>c.qs.forEach((q,ri)=>{top=Math.max(top,bVal(b,ci,ri))}));return Math.max(sc[x]||0,top)}
+function bsFinalView(s,b){
+  const f=s.final;const fq=b.final;const sc=bsScores(s,b);
+  if(!fq.q)return `<div class="bs bs-q"><div class="bs-final-title">Final Question!</div><p class="bs-qtext" style="font-size:1.2rem">ยังไม่ได้ตั้งคำถามสุดท้าย</p><div class="bs-tools">${S.bro?'<button class="bs-btn" data-act="bsFinalForm">ตั้งคำถามสุดท้าย</button>':''}<button class="bs-btn line" data-act="bsFinalBack">กลับกระดาน</button></div></div>`;
+  if(f.step==='wager')return `<div class="bs bs-q">
+    <div class="bs-final-title">Final Question!</div>
+    <div class="bs-qtop" style="justify-content:center"><span>หัวข้อ: <b class="bs-pts">${esc(fq.cat||'ลับเฉพาะ')}</b></span></div>
+    <div><span class="bs-label">ลงเดิมพัน ตอบถูกได้คะแนนเท่าที่ลง ตอบผิดเสียเท่าที่ลง</span>
+    ${s.players.map((p,i)=>{const x=pk(p);return `<div class="bs-wrow">${playerPawn(p)}<span>${esc(playerName(p))}</span><span class="bs-pts">${sc[x]}</span><input type="number" id="bsW_${i}" min="0" max="${bsMaxWager(s,b,sc,x)}" value="${esc((f.wager||{})[x]||0)}" aria-label="เดิมพันของ ${esc(playerName(p))} สูงสุด ${bsMaxWager(s,b,sc,x)}"></div>`}).join('')}</div>
+    <p class="bs-note">ลงได้สูงสุดเท่าคะแนนที่มี หรือเท่าช่องที่แพงที่สุดบนกระดานถ้าคะแนนยังน้อย</p>
+    <div class="bs-tools"><button class="bs-btn" data-act="bsWagerLock">ล็อกเดิมพัน แล้วเปิดคำถาม</button><button class="bs-btn line" data-act="bsFinalBack">กลับกระดาน</button></div>
+  </div>`;
+  return `<div class="bs bs-q">
+    <div class="bs-qtop"><span>Final Question! · ${esc(fq.cat||'')}</span></div>
+    <div class="bs-qtext md">${md(fq.q)}</div>
+    ${f.step==='judge'?`<div class="bs-ans md"><span class="bs-label">เฉลย</span>${md(fq.a||'—')}</div>
+      <div><span class="bs-label">แตะคนที่ตอบถูก คนที่ไม่ได้แตะถือว่าตอบผิด</span>
+      ${s.players.map(p=>{const x=pk(p);const w=+((f.wager||{})[x])||0;const ok=!!(f.right||{})[x];return `<div class="bs-wrow">${bsPawnBtn(p,'bsRight',ok,'')}<span>${esc(playerName(p))}</span><span class="bs-pts">${ok?'+':'−'}${w}</span><span class="bs-pts" style="text-align:right">${sc[x]+(ok?w:-w)}</span></div>`}).join('')}</div>
+      <div class="bs-tools"><button class="bs-btn" data-act="bsFinalDone">สรุปผล</button></div>`
+    :'<div class="bs-tools"><button class="bs-btn" data-act="bsFinalReveal">เฉลย</button></div>'}
+  </div>`;
+}
+function bsEnd(s,b){
+  const sc=bsScores(s,b);const r=s.players.slice().sort((a,c)=>sc[pk(c)]-sc[pk(a)]);const best=r.length?sc[pk(r[0])]:0;
+  return `<div class="bs bs-q" style="justify-items:center;text-align:center">
+    <span class="bs-label">${esc(b.title)}</span>
+    <div class="bs-final-title">${r.length&&best>0?esc(r.filter(p=>sc[pk(p)]===best).map(playerName).join(' & '))+' ชนะ':'จบเกม'}</div>
+    <div class="rank bs-rank">${r.map((p,i)=>`<div><span class="no">${i+1}</span>${playerPawn(p)}<span>${esc(playerName(p))}</span><span class="v">${sc[pk(p)]}</span></div>`).join('')}</div>
+    ${s.saved?'<p class="bs-note">บันทึกผลเข้าบ้านแล้ว</p>':`<label class="field" style="max-width:240px;text-align:left"><span style="color:rgba(255,255,255,.7)">แต้มบ้านให้ผู้ชนะ</span><input type="number" id="bsAward" value="${esc(s.award==null?5:s.award)}" min="0" max="50"></label><button class="bs-btn" data-act="bsSave">บันทึกผลเข้าบ้าน</button>`}
+    <div class="bs-tools" style="justify-content:center"><button class="bs-btn ghost" data-act="bsReplay">เล่นใหม่ กระดานเดิม</button><button class="bs-btn line" data-act="bsToSetup">เปลี่ยนคนเล่นหรือกระดาน</button>${s.final&&s.final.done?'':'<button class="bs-btn line" data-act="bsBack">กลับกระดาน</button>'}</div>
+  </div>`;
+}
+/* edit sheets */
+function bsCatForm(c){const b=bsBoardNow();const ck='bscol:'+c;
+  openSheet('หัวข้อที่ '+(c+1),`<label class="field"><span>ชื่อหัวข้อ</span><input type="text" id="bsCatName" value="${esc(b.cats[c].name)}"></label>`,
+  `<button class="btn primary" data-act="bsCatSave" data-c="${c}">บันทึก</button>${b.cats.length>1?(S.confirm===ck?`<button class="btn dangerfill" data-act="bsColDel" data-c="${c}">ยืนยันลบหัวข้อและคำถามทั้งคอลัมน์</button>`:`<button class="btn danger" data-act="bsColAsk" data-c="${c}">ลบหัวข้อนี้</button>`):''}`)}
+function bsCellForm(c,r){const b=bsBoardNow();const cell=b.cats[c].qs[r];const v=bVal(b,c,r);
+  openSheet(esc(b.cats[c].name)+' · '+v,`
+    <label class="field"><span>คำถาม</span><textarea id="bsQ">${esc(cell.q)}</textarea></label>
+    <label class="field"><span>เฉลย</span><textarea id="bsA" style="min-height:80px">${esc(cell.a)}</textarea></label>
+    ${b.ptsMode==='custom'?`<label class="field" style="max-width:200px"><span>คะแนนช่องนี้</span><input type="number" id="bsP" value="${esc(cell.pts===''||cell.pts==null?v:cell.pts)}"></label>`:`<small class="muted">คะแนนช่องนี้ ${v} ตั้งคะแนนเองทีละช่องได้ใน “ชื่อและคะแนน”</small>`}`,
+  `<button class="btn primary" data-act="bsCellSave" data-c="${c}" data-r="${r}">บันทึก</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`)}
+function bsFinalForm(){const b=bsBoardNow();
+  openSheet('Final Question',`
+    <label class="field"><span>หัวข้อ (บอกก่อนลงเดิมพัน)</span><input type="text" id="bsFC" value="${esc(b.final.cat)}"></label>
+    <label class="field"><span>คำถาม</span><textarea id="bsFQ">${esc(b.final.q)}</textarea></label>
+    <label class="field"><span>เฉลย</span><textarea id="bsFA" style="min-height:80px">${esc(b.final.a)}</textarea></label>`,
+  `<button class="btn primary" data-act="bsFinalSave">บันทึก</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`)}
+function bsSettingsForm(){const b=bsBoardNow();const ck='bsdel:'+b.id;
+  openSheet('ชื่อและคะแนน',`
+    <label class="field"><span>ชื่อกระดาน</span><input type="text" id="bsTitle" value="${esc(b.title)}"></label>
+    <div class="field"><span>วิธีนับคะแนน</span><div class="pick">${[['seq','เรียงต่อกันทั้งกระดาน'],['row','เท่ากันทั้งแถว'],['custom','ตั้งเองทีละช่อง']].map(([v,n])=>`<label class="opt"><input type="radio" name="bsMode" value="${v}" ${(b.ptsMode||'seq')===v?'checked':''}><span>${n}</span></label>`).join('')}</div>
+    <small>เรียงต่อกัน: 10, 20, 30 ไล่จากซ้ายไปขวาทีละแถว · เท่ากันทั้งแถว: แถวแรก 10 แถวสอง 20</small></div>
+    <label class="field" style="max-width:200px"><span>ช่วงห่างคะแนน</span><input type="number" id="bsStep" value="${esc(b.step||10)}" min="1"></label>`,
+  `<button class="btn primary" data-act="bsSettingsSave">บันทึก</button><button class="btn" data-act="bsNewBoard">สร้างกระดานใหม่</button>${boards().length>1?(S.confirm===ck?`<button class="btn dangerfill" data-act="bsDelBoard">ยืนยันลบกระดานนี้</button>`:`<button class="btn danger" data-act="bsDelAsk">ลบกระดานนี้</button>`):''}`)}
+async function bsMutate(fn){const b=bsBoardNow();if(!b)return;fn(b);await saveBoard(b);render()}
+
+/* UNO */
+const UNO_COLORS=[['red','#D63A2F'],['yellow','#E6B416'],['green','#2E9B4E'],['blue','#2B67C9']];
+function vUno(){
+  const u=S.uno;
+  if(!u||u.phase==='setup'){
+    if(!u)S.uno={phase:'setup',order:[],stack:false,award:2};
+    const o=S.uno.order;
+    return `<div class="stage">
+      <div><h3>เรียงคนเล่นตามที่นั่ง</h3><p class="muted small">แตะตามลำดับวนรอบโต๊ะ แตะซ้ำเพื่อเอาออก</p></div>
+      <div class="pawns">${kids().map(k=>pawnBtn(k,'unoAdd',o.some(p=>p.id===k.id),'lg')).join('')}</div>
+      <div class="row2"><label class="field"><span>เพื่อนหรือแขกที่มาเล่นด้วย</span><input type="text" id="unoGuest" placeholder="ชื่อ เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="unoGuest">เพิ่มแขก</button></div></div>
+      <div class="order" aria-label="ลำดับที่นั่ง">${o.length?o.map((p,i)=>`<span class="item">${i+1}${playerPawn(p,'sm')}</span>`).join('<span class="muted">→</span>'):'<span class="muted small">ยังไม่มีคนเล่น</span>'}</div>
+      <label class="check"><input type="checkbox" id="unoStack" ${S.uno.stack?'checked':''} data-change="unoStack"> ให้ซ้อน +2 / +4 ได้</label>
+      <div class="btns"><button class="btn primary big" data-act="unoStart" ${o.length>=2?'':'disabled'}>${o.length>=2?'เริ่มเล่น':'ต้องมีอย่างน้อย 2 คน'}</button>${o.length?'<button class="btn ghost" data-act="unoClear">ล้างลำดับ</button>':''}</div>
+    </div>`;
+  }
+  const n=u.order.length;const cur=u.order[u.cur];const nx=i=>u.order[((u.cur+u.dir*i)%n+n)%n];
+  if(u.phase==='win'){
+    return `<div class="stage center"><h3>ใครลงไพ่ใบสุดท้าย</h3><div class="pawns" style="justify-content:center">${u.order.map((p,i)=>p.id?pawnBtn(kidById(p.id)||{id:p.id,code:'?'},'unoWin',false,'lg'):`<button type="button" class="pawn lg" style="--c:${okColor(p.color)}" data-act="unoWin" data-guest="${i}" aria-pressed="false">${esc(p.code)}</button>`).join('')}</div><button class="btn ghost" data-act="unoBack">กลับไปเล่นต่อ</button></div>`;
+  }
+  const arrow=u.dir===1?'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const wins=u.wins||{};
+  return `<div class="stage center">
+    <span class="dir">${arrow}${u.dir===1?'วนตามเข็ม':'วนทวนเข็ม'}</span>
+    ${playerPawn(cur,'xl')}
+    <div class="turnname">ตา ${esc(playerName(cur))}</div>
+    ${u.pending?`<div class="pending">โดน +${u.pending} ซ้อนได้ หรือจั่วแล้วข้าม</div>`:''}
+    ${u.msg?`<p class="muted">${esc(u.msg)}</p>`:''}
+    <div class="nextup">ต่อไป ${[1,2,3].slice(0,Math.min(3,n-1)).map(i=>playerPawn(nx(i),'sm')).join('')}</div>
+    <div class="unocolors" aria-label="สีปัจจุบัน">${UNO_COLORS.map(([id,c])=>`<button type="button" style="background:${c}" data-act="unoColor" data-id="${id}" aria-pressed="${u.color===id}" aria-label="สี ${id}"></button>`).join('')}</div>
+  </div>
+  <div class="unogrid" style="margin-top:12px">
+    ${u.pending?`<button class="btn big primary" data-act="uno" data-id="take">จั่ว +${u.pending} แล้วข้าม</button>${u.stack?'<button class="btn big" data-act="uno" data-id="d2">ซ้อน +2</button><button class="btn big" data-act="uno" data-id="d4">ซ้อน +4</button>':''}`
+    :`<button class="btn big primary" data-act="uno" data-id="next">ลงไพ่ / จั่วแล้ว</button>
+      <button class="btn big" data-act="uno" data-id="skip">ข้าม</button>
+      <button class="btn big" data-act="uno" data-id="rev">กลับทาง</button>
+      <button class="btn big" data-act="uno" data-id="d2">+2</button>
+      <button class="btn big" data-act="uno" data-id="d4">+4 เปลี่ยนสี</button>`}
+  </div>
+  <div class="btns" style="margin-top:12px"><button class="btn" data-act="uno" data-id="undo" ${(u.hist||[]).length?'':'disabled'}>ย้อนกลับ</button><button class="btn" data-act="unoEnd">จบรอบ: มีคนชนะ</button><button class="btn ghost" data-act="unoReset">ตั้งค่าใหม่</button></div>
+  ${Object.keys(wins).length?`<div class="panel" style="margin-top:12px"><span class="label">ชนะในวันนี้</span><div class="scoreline" style="margin-top:8px">${u.order.map((p,i)=>`<span>${playerPawn(p,'sm')}${wins[p.id||('g'+i)]||0}</span>`).join('')}</div></div>`:''}`;
+}
+function unoAct(a){
+  const u=S.uno;const n=u.order.length;u.hist=u.hist||[];
+  if(a==='undo'){const h=u.hist.pop();if(h)Object.assign(u,h);return}
+  u.hist.push({cur:u.cur,dir:u.dir,pending:u.pending,color:u.color,msg:u.msg});if(u.hist.length>40)u.hist.shift();
+  const step=k=>{u.cur=((u.cur+u.dir*k)%n+n)%n};const who=k=>playerName(u.order[((u.cur+u.dir*k)%n+n)%n]);
+  u.msg='';
+  if(a==='next'){step(1)}
+  else if(a==='skip'){u.msg=who(1)+' โดนข้าม';step(2)}
+  else if(a==='rev'){u.dir*=-1;if(n===2){u.msg='2 คนเล่น กลับทาง = ได้เล่นอีกตา'}else{step(1)}}
+  else if(a==='d2'||a==='d4'){const add=a==='d2'?2:4;
+    if(u.stack){u.pending=(u.pending||0)+add;step(1)}
+    else{u.msg=who(1)+' จั่ว '+add+' ใบ แล้วข้าม';step(2)}}
+  else if(a==='take'){u.msg=playerName(u.order[u.cur])+' จั่ว '+u.pending+' ใบ แล้วข้าม';u.pending=0;step(1)}
+}
+
+/* scoreboard */
+function vScore(){
+  const s=S.score;
+  if(!s||s.phase==='setup'){
+    if(!s)S.score={phase:'setup',game:'',mode:'compete',low:false,players:[],award:2};
+    const c=S.score;
+    return `<div class="stage">
+      <label class="field"><span>เกมอะไร</span><input type="text" id="scGame" list="gameNames" value="${esc(c.game)}" placeholder="เช่น Splendor, เกมด่านของพี่" data-change="scGame"><datalist id="gameNames">${games().map(g=>`<option value="${esc(g.name)}">`).join('')}</datalist></label>
+      <div class="chips"><span class="label">แบบ</span><button class="chip" data-act="scMode" data-id="compete" aria-pressed="${c.mode==='compete'}">แข่งกัน</button><button class="chip" data-act="scMode" data-id="coop" aria-pressed="${c.mode==='coop'}">ช่วยกันเป็นทีม</button></div>
+      ${c.mode==='compete'?`<label class="check"><input type="checkbox" id="scLow" data-change="scLow" ${c.low?'checked':''}> คะแนนน้อยสุดชนะ</label>`:''}
+      <div><h3>คนเล่น</h3></div>
+      <div class="pawns">${kids().map(k=>pawnBtn(k,'scPlayer',c.players.some(p=>p.id===k.id),'lg')).join('')}</div>
+      <div class="row2"><label class="field"><span>เพื่อนหรือแขก</span><input type="text" id="scGuest" placeholder="ชื่อ"></label><div style="align-self:end"><button class="btn" data-act="scGuest">เพิ่มแขก</button></div></div>
+      ${c.players.some(p=>!p.id)?`<div class="pawns">${c.players.filter(p=>!p.id).map(p=>guestPawn(p,'')).join('')}</div>`:''}
+      <div class="btns"><button class="btn primary big" data-act="scStart" ${c.players.length?'':'disabled'}>${c.players.length?'เริ่มนับคะแนน':'เลือกคนเล่นก่อน'}</button></div>
+    </div>`;
+  }
+  if(s.phase==='end'){
+    if(s.mode==='coop'){
+      return `<div class="stage center"><span class="label">${esc(s.game||'เกมช่วยกัน')}</span><div class="score" style="font:700 3rem var(--f-head)">${s.team||0}</div>
+        <p>${s.result==='win'?'ทีมผ่านด่าน':'ทีมยังไม่ผ่าน คราวหน้าเอาใหม่'}</p><div class="pawns" style="justify-content:center">${s.players.map(p=>playerPawn(p)).join('')}</div>
+        ${s.saved?'<p class="muted">บันทึกแล้ว</p>':`<label class="check"><input type="checkbox" id="scAward" ${s.result==='win'?'checked':''}> ให้แต้มทุกคนในทีม</label><label class="field" style="max-width:180px"><span>คนละกี่แต้ม</span><input type="number" id="scAwardN" value="${esc(s.award)}" min="0" max="50"></label><button class="btn primary big" data-act="scSave">บันทึกผล</button>`}
+        <div class="btns"><button class="btn" data-act="scAgain">เล่นอีกรอบ</button></div></div>`;
+    }
+    const r=rankScore(s);const best=r.length?r[0].pts:0;
+    return `<div class="stage center"><span class="label">${esc(s.game||'เกม')}</span>
+      <div class="rank">${r.map((p,i)=>`<div><span class="no">${i+1}</span>${playerPawn(p)}<span>${esc(playerName(p))}</span><span class="v">${p.pts}</span></div>`).join('')}</div>
+      ${s.saved?'<p class="muted">บันทึกแล้ว</p>':`<label class="check"><input type="checkbox" id="scAward" checked> ให้แต้มบ้านกับผู้ชนะ</label><label class="field" style="max-width:180px"><span>กี่แต้ม</span><input type="number" id="scAwardN" value="${esc(s.award)}" min="0" max="50"></label><button class="btn primary big" data-act="scSave">บันทึกผล</button>`}
+      <div class="btns"><button class="btn" data-act="scAgain">เล่นอีกรอบ</button></div></div>`;
+  }
+  const ctrl=key=>`<div class="ctrl"><button class="btn sm" data-act="scAdd" data-id="${key}" data-n="-1">−1</button><button class="btn sm" data-act="scAdd" data-id="${key}" data-n="1">+1</button><button class="btn sm" data-act="scAdd" data-id="${key}" data-n="5">+5</button><button class="btn sm" data-act="scAdd" data-id="${key}" data-n="10">+10</button><input type="number" id="scIn_${key}" placeholder="แต้ม" aria-label="ใส่แต้มเอง"><button class="btn sm" data-act="scAddIn" data-id="${key}">ใส่</button></div>`;
+  return `<div class="stage">
+    <div class="sec-head"><h3>${esc(s.game||'เกม')} · ${s.mode==='coop'?'ช่วยกัน':'แข่งกัน'}${s.low?' · น้อยสุดชนะ':''}</h3><button class="btn sm" data-act="scUndo" ${(s.hist||[]).length?'':'disabled'}>ย้อนกลับ</button></div>
+    ${s.mode==='coop'?`<div class="prow"><div class="stack">${s.players.map(p=>playerPawn(p,'sm')).join('')}</div><b>คะแนนทีม</b><span class="tot">${s.team||0}</span>${ctrl('team')}</div>`
+    :s.players.map((p,i)=>`<div class="prow">${playerPawn(p)}<b>${esc(playerName(p))}</b><span class="tot">${p.pts||0}</span>${ctrl(i)}</div>`).join('')}
+    <div class="btns">${s.mode==='coop'?'<button class="btn primary" data-act="scCoop" data-id="win">ผ่านด่าน</button><button class="btn" data-act="scCoop" data-id="lose">ยังไม่ผ่าน</button>':'<button class="btn primary" data-act="scEnd">จบเกม</button>'}<button class="btn ghost" data-act="scReset">ตั้งค่าใหม่</button></div>
+  </div>`;
+}
+const rankScore=s=>s.players.map(p=>Object.assign({},p,{pts:p.pts||0})).sort((a,b)=>s.low?a.pts-b.pts:b.pts-a.pts);
+
+/* timer & random */
+function vTimer(){
+  const t=S.timer;const ks=kids();const pool=S.rnd.pool||ks.map(k=>k.id);
+  const pick=S.rnd.pick&&kidById(S.rnd.pick);
+  return `<div class="two">
+    <div class="stage center"><span class="label">นับถอยหลัง</span>
+      <div class="digits ${t.done?'done':''}" id="timerDigits">0:00</div>
+      <div class="chips" style="justify-content:center">${[[30,'30 วิ'],[60,'1 นาที'],[180,'3 นาที'],[300,'5 นาที'],[600,'10 นาที']].map(([v,n])=>`<button class="chip" data-act="tPreset" data-id="${v}" aria-pressed="${t.total===v}">${n}</button>`).join('')}</div>
+      <div class="btns" style="justify-content:center"><button class="btn primary big" data-act="tGo">${t.run?'หยุดชั่วคราว':'เริ่ม'}</button><button class="btn big" data-act="tReset">เริ่มใหม่</button></div>
+    </div>
+    <div style="display:grid;gap:16px">
+      <div class="stage center"><span class="label">ใครเริ่มก่อน</span>
+        ${pick?pawn(pick,'xl'):'<span class="pawn xl" style="--c:var(--sunk);color:var(--muted)">?</span>'}
+        <div class="pawns" style="justify-content:center">${ks.map(k=>pawnBtn(k,'rndPool',pool.includes(k.id),'sm')).join('')}</div>
+        <button class="btn primary" data-act="rndGo" ${pool.length?'':'disabled'}>สุ่ม</button>
+      </div>
+      <div class="stage center"><span class="label">ลูกเต๋าและเหรียญ</span>
+        <div class="dice">${S.dice.vals.slice(0,S.dice.n).map(dieSVG).join('')}</div>
+        <div class="btns" style="justify-content:center"><button class="chip" data-act="diceN" data-id="1" aria-pressed="${S.dice.n===1}">1 ลูก</button><button class="chip" data-act="diceN" data-id="2" aria-pressed="${S.dice.n===2}">2 ลูก</button><button class="btn primary" data-act="diceGo">ทอย</button></div>
+        <p class="turnname" style="font-size:1.4rem">${S.coin?esc(S.coin):'&nbsp;'}</p>
+        <button class="btn" data-act="coinGo">โยนเหรียญ</button>
+      </div>
+    </div></div>`;
+}
+function dieSVG(v){
+  const P={1:[[0,0]],2:[[-1,-1],[1,1]],3:[[-1,-1],[0,0],[1,1]],4:[[-1,-1],[1,-1],[-1,1],[1,1]],5:[[-1,-1],[1,-1],[0,0],[-1,1],[1,1]],6:[[-1,-1],[1,-1],[-1,0],[1,0],[-1,1],[1,1]]}[v]||[];
+  return `<svg viewBox="-30 -30 60 60" role="img" aria-label="ลูกเต๋า ${v}"><rect x="-27" y="-27" width="54" height="54" rx="12" style="fill:var(--surface);stroke:var(--ink)" stroke-width="3"/>${P.map(([x,y])=>`<circle cx="${x*13}" cy="${y*13}" r="5.2" style="fill:var(--ink)"/>`).join('')}</svg>`;
+}
+let tick=null,actx=null;
+function paintTimer(){const el=$('#timerDigits');if(!el)return;const t=S.timer;let left=t.run?Math.max(0,Math.ceil((t.endAt-Date.now())/1000)):t.left;el.textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0')}
+function timerLoop(){clearInterval(tick);tick=setInterval(()=>{const t=S.timer;if(!t.run){clearInterval(tick);return}
+  const left=Math.max(0,Math.ceil((t.endAt-Date.now())/1000));if(left<=0){t.run=false;t.left=0;t.done=true;clearInterval(tick);beep();if(S.tab==='tools')render();return}paintTimer()},250)}
+function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,.35,.7].forEach(d=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.0001,actx.currentTime+d);g.gain.exponentialRampToValueAtTime(.3,actx.currentTime+d+.02);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d+.28);o.start(actx.currentTime+d);o.stop(actx.currentTime+d+.3)})}catch(e){}}
+
+/* ---------- wall ---------- */
+function postCard(p){
+  const k=kidById(p.author);const ck='post:'+p.id;
+  return `<article class="post ${p.pin?'pinned':''}">
+    <div class="by">${k?pawn(k,'sm'):''}<span>${k?esc(k.code):''}</span><span class="tag">${postType(p.type)}</span>${p.pin?'<span class="tag">ปักหมุด</span>':''}${p.example?'<span class="tag ex">ตัวอย่าง</span>':''}<span>${p.date?'วันที่ '+esc(dfmt(new Date(p.date+'T00:00').getTime())):ago(p.at)}</span></div>
+    <h3>${esc(p.title)}</h3><div class="prose small">${md(p.text)}</div>
+    ${S.bro?`<div class="btns"><button class="btn sm" data-act="postForm" data-id="${esc(p.id)}">แก้ไข</button>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delPost" data-id="${esc(p.id)}">ยืนยันลบ</button>`:`<button class="btn sm ghost" data-act="ask" data-id="${ck}">ลบ</button>`}</div>`:''}
+  </article>`;
+}
+function vWall(){
+  const ps=posts();
+  return `<section class="sec"><div class="sec-head"><div><h2>กำแพงบ้าน</h2><p>ข่าวในบ้าน นัดหมาย เรื่องเล่า ใครจะเขียนก็ได้</p></div><button class="btn primary" data-act="postForm">เขียนโพสต์</button></div>
+    ${ps.length?`<div class="posts">${ps.map(postCard).join('')}</div>`:'<div class="empty"><b>กำแพงยังว่าง</b><p>เริ่มด้วยนัดเล่นเกมสุดสัปดาห์นี้ หรือเรื่องตลกในบ้านวันนี้</p></div>'}</section>`;
+}
+
+/* ---------- stickers ---------- */
+function vStickers(){
+  const ks=kids();if(!ks.length)return emptyHouse();
+  if(!S.stickerKid||!kidById(S.stickerKid))S.stickerKid=ks[0].id;
+  const k=kidById(S.stickerKid);const st=stats(k.id);
+  const got=STICKERS.filter(s=>hasSticker(s,st)).length;
+  return `<section class="sec"><div class="sec-head"><div><h2>สมุดสติกเกอร์</h2><p>สติกเกอร์ได้เองเมื่อทำครบเงื่อนไข ส่วนสติกเกอร์พิเศษพี่เป็นคนมอบ</p></div>${S.bro?'<button class="btn primary" data-act="stickerForm">มอบสติกเกอร์พิเศษ</button>':''}</div>
+    <div class="pawns">${ks.map(x=>{const n=STICKERS.filter(s=>hasSticker(s,stats(x.id))).length;return `<span style="display:grid;justify-items:center;gap:4px">${pawnBtn(x,'stkKid',x.id===k.id,'lg')}<span class="small muted">${n}</span></span>`}).join('')}</div>
+    <div class="panel"><b style="font-family:var(--f-head);font-weight:600">${esc(kidLabel(k))}</b> <span class="muted">ได้แล้ว ${got} จาก ${STICKERS.length} · แต้มสะสม ${st.pts}</span></div>
+    <div class="stickers">${STICKERS.map(s=>{const g=hasSticker(s,st);return `<div class="stk-card ${g?'':'locked'}">${stickerSVG(s,g)}<b>${esc(s.name)}</b><span>${esc(s.desc)}</span></div>`}).join('')}</div>
+  </section>`;
+}
+
+/* ---------- admin ---------- */
+function vAdmin(){
+  const ks=kids();const lg=logs().slice(0,40);
+  return `<section class="sec"><div class="sec-head"><h2>ชื่อบ้าน</h2></div>
+    <div class="panel row2"><label class="field"><span>ชื่อที่แสดงด้านบน</span><input type="text" id="adHouse" value="${esc(houseName())}"></label><div style="align-self:end"><button class="btn primary" data-act="saveHouse">บันทึกชื่อบ้าน</button></div></div></section>
+  <section class="sec"><div class="sec-head"><div><h2>สมาชิกในบ้าน</h2><p>ปรับชั้นเรียนได้ทุกปี บทเรียนจะกรองตามช่วงชั้น</p></div><button class="btn primary" data-act="kidForm">เพิ่มสมาชิก</button></div>
+    <div class="panel">${ks.length?ks.map(k=>`<div class="kidrow">${pawn(k,'lg')}<div><b>${esc(kidLabel(k))}</b><div class="small muted">${esc(k.grade||'')}${k.band?' · '+bandName(k.band):''}${k.league===false?' · ไม่นับในสนามแข่ง':''}</div></div><button class="btn sm" data-act="kidForm" data-id="${esc(k.id)}">แก้ไข</button></div>`).join(''):'<p class="muted">ยังไม่มีสมาชิก</p>'}</div></section>
+  <section class="sec"><div class="sec-head"><div><h2>ประวัติแต้ม</h2><p>ลบรายการที่ให้ผิดได้ แต้มรวมจะคำนวณใหม่ทันที</p></div></div>
+    <div class="panel">${lg.length?`<ul class="plain feed">${lg.map(e=>{const k=kidById(e.kid);const ck='log:'+e.id;return `<li>${k?pawn(k,'sm'):'<span class="pawn sm">?</span>'}<div class="small"><span>${logText(e)}</span> <span class="muted">· ${ago(e.at)} · ${(+e.pts||0)} แต้ม</span></div>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delLog" data-id="${esc(e.id)}">ยืนยัน</button>`:`<button class="btn sm ghost" data-act="ask" data-id="${ck}">ลบ</button>`}</li>`}).join('')}</ul>`:'<p class="muted">ยังไม่มีประวัติ</p>'}</div></section>
+  <section class="sec"><div class="sec-head"><div><h2>สำรองและย้ายข้อมูล</h2><p>คัดลอกข้อมูลบ้านทั้งหมดเป็นข้อความ เก็บไว้หรือนำไปใส่ในเว็บไซต์จริง</p></div></div>
+    <div class="panel form">
+      <div class="btns"><button class="btn" data-act="exportData">คัดลอกข้อมูลทั้งหมด</button></div>
+      <label class="field"><span>นำเข้าข้อมูล (วางข้อความที่คัดลอกไว้)</span><textarea id="importBox" placeholder='{"house":"house6", ...}'></textarea><small>รายการที่มีอยู่แล้วจะถูกแทนที่ด้วยรายการที่ id ตรงกัน รายการอื่นยังอยู่ครบ</small></label>
+      <div class="btns"><button class="btn primary" data-act="importData">นำเข้า</button></div>
+    </div></section>
+  <section class="sec"><div class="panel small muted">ที่เก็บข้อมูลตอนนี้: ${Store.kind==='firebase'?'Firebase (ทุกเครื่องที่เปิดเว็บนี้เห็นข้อมูลเดียวกัน)':Store.mode==='shared'?'ฐานข้อมูลของหน้านี้ (ทุกคนที่มีสิทธิ์เปิดเห็นข้อมูลเดียวกัน)':'เบราว์เซอร์ของเครื่องนี้'} · โหมดพี่เป็นแค่สวิตช์ซ่อนปุ่มแก้ไข ไม่ใช่รหัสผ่าน</div></section>`;
+}
+
+const VIEWS={home:vHome,learn:vLearn,games:vGames,tools:vTools,wall:vWall,stickers:vStickers,admin:vAdmin};
+
+/* ---------- sheets (forms) ---------- */
+function openSheet(title,body,foot){
+  $('#sheetCard').innerHTML=`<div class="sheet-head"><h2>${title}</h2><button class="x" data-act="closeSheet" aria-label="ปิด">×</button></div><div class="form">${body}</div><div class="btns">${foot}</div>`;
+  $('#sheet').hidden=false;const f=$('#sheetCard input[type=text],#sheetCard textarea');if(f&&window.innerWidth>700)f.focus();
+}
+function closeSheet(){$('#sheet').hidden=true;$('#sheetCard').innerHTML='';S.draft=null}
+const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
+const checked=id=>{const e=document.getElementById(id);return !!(e&&e.checked)};
+const radio=name=>{const e=$(`#sheetCard input[name="${name}"]:checked`);return e?e.value:''};
+const radios=name=>$$(`#sheetCard input[name="${name}"]:checked`).map(e=>e.value);
+const kidPick=(name,type,sel)=>`<div class="pick">${kids().map(k=>`<label><input type="${type}" name="${name}" value="${esc(k.id)}" ${sel.includes(k.id)?'checked':''}>${pawn(k,'lg')}</label>`).join('')}</div>`;
+
+function kidForm(id){
+  const k=id?kidById(id):{code:'',nick:'',grade:'',band:'',color:SWATCHES[kids().length%SWATCHES.length],league:true,order:kids().length+1};
+  const ck='kid:'+(id||'');
+  openSheet(id?'แก้ไขสมาชิก':'เพิ่มสมาชิก',`
+    <div class="row2"><label class="field"><span>ชื่อย่อบนตัวหมาก</span><input type="text" id="kfCode" maxlength="3" value="${esc(k.code)}" placeholder="เช่น B2"></label>
+    <label class="field"><span>ชื่อเล่น (ไม่ใส่ก็ได้)</span><input type="text" id="kfNick" value="${esc(k.nick||'')}"></label></div>
+    <div class="row2"><label class="field"><span>ชั้นเรียนตอนนี้</span><input type="text" id="kfGrade" value="${esc(k.grade||'')}" placeholder="เช่น ป.5, ม.2"></label>
+    <label class="field"><span>ช่วงชั้น (ใช้กรองบทเรียน)</span><select id="kfBand"><option value="">ไม่ระบุ</option>${BANDS.map(([v,n])=>`<option value="${v}" ${k.band===v?'selected':''}>${n}</option>`).join('')}</select></label></div>
+    <div class="field"><span>สีตัวหมาก</span><div class="pick sw">${SWATCHES.map(c=>`<label><input type="radio" name="kfColor" value="${c}" ${okColor(k.color).toLowerCase()===c.toLowerCase()?'checked':''}><span style="--c:${c}" aria-label="${c}"></span></label>`).join('')}</div></div>
+    <div class="row2"><label class="field"><span>ลำดับ</span><input type="number" id="kfOrder" value="${esc(k.order||1)}" min="1" max="30"></label>
+    <label class="check" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="kfLeague" ${k.league!==false?'checked':''}> นับในสนามแข่ง</label></div>`,
+    `<button class="btn primary" data-act="saveKid" data-id="${esc(id||'')}">บันทึก</button>${id?(S.confirm===ck?`<button class="btn dangerfill" data-act="delKid" data-id="${esc(id)}">ยืนยันเอาออก (ประวัติแต้มยังอยู่)</button>`:`<button class="btn danger" data-act="askKid" data-id="${esc(id)}">เอาออกจากบ้าน</button>`):''}`);
+}
+
+function blankQ(){return {type:'mcq',q:'',choices:['','','',''],answer:0,explain:'',answer_text:''}}
+function lessonForm(id){
+  const l=id?Store.d.lessons[id]:null;
+  S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?l.content:'',
+    questions:l?(l.questions||[]).map(q=>({type:q.type||'mcq',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',answer_text:q.type==='open'?(q.answer||''):''})):[blankQ()],example:l?!!l.example:false};
+  paintLessonForm();
+}
+function paintLessonForm(){
+  const d=S.draft;
+  openSheet(d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`
+    <div class="row2"><label class="field"><span>วิชา</span><select id="lfSubj">${SUBJECTS.map(([v,n])=>`<option value="${v}" ${d.subject===v?'selected':''}>${n}</option>`).join('')}</select></label>
+    <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น โมลและมวลโมเลกุล"></label></div>
+    <div class="field"><span>เหมาะกับช่วงชั้น (ไม่เลือก = ทุกระดับ)</span><div class="pick">${BANDS.map(([v,n])=>`<label class="opt"><input type="checkbox" name="lfLv" value="${v}" ${d.levels.includes(v)?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
+    <label class="field"><span>เนื้อหา</span><textarea id="lfContent" style="min-height:180px" placeholder="## หัวข้อ&#10;- ข้อสำคัญ&#10;> กล่องเคล็ดลับ">${esc(d.content)}</textarea>
+      <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O เป็นตัวห้อย · x^2 หรือ Na^+ เป็นตัวยก · -> เป็นลูกศร · &lt;=&gt; เป็นลูกศรสมดุล</small></label>
+    <h3>โจทย์ ${d.questions.length} ข้อ</h3>
+    ${d.questions.map((q,i)=>`<fieldset class="qedit"><legend>ข้อ ${i+1}</legend>
+      <div class="row2"><select id="q${i}_type" data-change="qtype" aria-label="ชนิดโจทย์"><option value="mcq" ${q.type!=='open'?'selected':''}>ตัวเลือก</option><option value="open" ${q.type==='open'?'selected':''}>ตอบปากเปล่า</option></select>
+      <div class="btns" style="justify-content:flex-end"><button class="btn sm ghost" data-act="qUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm danger" data-act="qDel" data-id="${i}">ลบข้อนี้</button></div></div>
+      <textarea id="q${i}_q" style="min-height:70px" placeholder="โจทย์" aria-label="โจทย์ข้อ ${i+1}">${esc(q.q)}</textarea>
+      ${q.type==='open'?`<input type="text" id="q${i}_a" value="${esc(q.answer_text)}" placeholder="เฉลย" aria-label="เฉลย">`
+      :q.choices.map((c,j)=>`<div class="crow"><input type="radio" name="q${i}_ans" value="${j}" ${q.answer===j?'checked':''} aria-label="ตัวเลือก ${LET[j]} ถูก"><input type="text" id="q${i}_c${j}" value="${esc(c)}" placeholder="ตัวเลือก ${LET[j]}"></div>`).join('')+`<div class="btns"><button class="btn sm ghost" data-act="cAdd" data-id="${i}" ${q.choices.length>=6?'disabled':''}>เพิ่มตัวเลือก</button>${q.choices.length>2?`<button class="btn sm ghost" data-act="cDel" data-id="${i}">ลดตัวเลือก</button>`:''}</div><small class="muted">กดวงกลมหน้าตัวเลือกที่ถูก</small>`}
+      <input type="text" id="q${i}_e" value="${esc(q.explain)}" placeholder="คำอธิบายเฉลย (ไม่ใส่ก็ได้)" aria-label="คำอธิบาย">
+    </fieldset>`).join('')}
+    <div class="btns"><button class="btn" data-act="qAdd">เพิ่มโจทย์ 1 ข้อ</button></div>
+    <details><summary class="label" style="cursor:pointer">วางโจทย์ทีละหลายข้อ</summary>
+      <div class="form" style="margin-top:10px"><textarea id="bulkQ" style="min-height:150px" placeholder="1. CO_2 มีมวลโมเลกุลเท่าไร&#10;A) 28&#10;*B) 44&#10;C) 32&#10;D) 60&#10;E: 12 + 2(16) = 44&#10;&#10;2. ทำไมน้ำแข็งลอยน้ำ&#10;ตอบ: ความหนาแน่นน้อยกว่าน้ำ"></textarea>
+      <small class="muted">เว้นบรรทัดระหว่างข้อ · ใส่ * หน้าตัวเลือกที่ถูก หรือเขียน ตอบ: B · บรรทัด E: คือคำอธิบาย · ไม่มีตัวเลือก = โจทย์ตอบปากเปล่า</small>
+      <div class="btns"><button class="btn" data-act="bulkAdd">แปลงเป็นโจทย์</button></div></div></details>`,
+    `<button class="btn primary" data-act="saveLesson">บันทึกบทเรียน</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+function syncDraft(){
+  const d=S.draft;if(!d)return;
+  d.subject=val('lfSubj')||d.subject;d.title=val('lfTitle');d.content=(document.getElementById('lfContent')||{}).value||'';d.levels=radios('lfLv');
+  d.questions.forEach((q,i)=>{
+    const t=document.getElementById('q'+i+'_type');if(t)q.type=t.value;
+    q.q=(document.getElementById('q'+i+'_q')||{}).value||'';q.explain=val('q'+i+'_e');
+    if(document.getElementById('q'+i+'_a'))q.answer_text=val('q'+i+'_a');
+    q.choices=q.choices.map((c,j)=>{const e=document.getElementById('q'+i+'_c'+j);return e?e.value:c});
+    const r=radio('q'+i+'_ans');if(r!=='')q.answer=+r;
+  });
+}
+function parseBulk(txt){
+  const out=[];
+  txt.split(/\n\s*\n/).forEach(block=>{
+    const lines=block.split('\n').map(s=>s.trim()).filter(Boolean);if(!lines.length)return;
+    const q={type:'mcq',q:'',choices:[],answer:-1,explain:'',answer_text:''};let ans='';
+    lines.forEach((ln,idx)=>{let m;
+      if((m=ln.match(/^(\*)?\s*([A-Ha-h])[).]\s+(.*)$/))&&idx>0){if(m[1])q.answer=q.choices.length;q.choices.push(m[3].replace(/\s*\*$/,''));if(/\*$/.test(m[3]))q.answer=q.choices.length-1;return}
+      if((m=ln.match(/^(ANS|Ans|ans|ตอบ|เฉลย)\s*[:：]\s*(.*)$/))){ans=m[2];return}
+      if((m=ln.match(/^(E|อธิบาย|เหตุผล)\s*[:：]\s*(.*)$/))){q.explain=m[2];return}
+      q.q+=(q.q?'\n':'')+ln.replace(/^(Q\s*[:：]|\d+\s*[.)])\s*/,'');
+    });
+    if(q.choices.length>=2){if(q.answer<0){const L=ans.trim().toUpperCase().charAt(0);const ix=LET.indexOf(L);q.answer=ix>=0&&ix<q.choices.length?ix:0}}
+    else{q.type='open';q.choices=['','','',''];q.answer=0;q.answer_text=ans}
+    if(q.q)out.push(q);
+  });
+  return out;
+}
+async function saveLesson(){
+  syncDraft();const d=S.draft;
+  if(!d.title){toast('ใส่ชื่อบทก่อนบันทึก');return}
+  const qs=d.questions.filter(q=>q.q.trim()).map(q=>{
+    if(q.type==='open')return {type:'open',q:q.q.trim(),answer:q.answer_text,explain:q.explain};
+    const kept=q.choices.map((c,j)=>({c:c.trim(),j})).filter(x=>x.c);
+    return {type:'mcq',q:q.q.trim(),choices:kept.map(x=>x.c),answer:kept.findIndex(x=>x.j===q.answer),explain:q.explain}});
+  const bad=qs.find(q=>q.type==='mcq'&&(q.choices.length<2||q.answer<0));
+  if(bad){toast('มีข้อที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
+  const id=d.id||uid();const old=d.id&&Store.d.lessons[d.id];
+  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
+  closeSheet();S.learn.open=id;toast('บันทึกบทเรียนแล้ว');render();
+}
+
+function gameForm(id){
+  const g=id?Store.d.games[id]:{name:'',kind:'compete',min:2,max:6,minutes:'',props:'',rules:'',helper:''};const ck='game:'+(id||'');
+  openSheet(id?'แก้ไขเกม':'เพิ่มเกม',`
+    <label class="field"><span>ชื่อเกม</span><input type="text" id="gfName" value="${esc(g.name)}" placeholder="เช่น Splendor, เกมด่านของพี่"></label>
+    <div class="field"><span>ประเภท</span><div class="pick">${KINDS.map(([v,n])=>`<label class="opt"><input type="radio" name="gfKind" value="${v}" ${g.kind===v?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
+    <div class="row3"><label class="field"><span>คนเล่นน้อยสุด</span><input type="number" id="gfMin" value="${esc(g.min)}" min="1"></label><label class="field"><span>มากสุด</span><input type="number" id="gfMax" value="${esc(g.max)}" min="1"></label><label class="field"><span>เวลา (นาที)</span><input type="number" id="gfTime" value="${esc(g.minutes||'')}" min="1"></label></div>
+    <label class="field"><span>อุปกรณ์</span><input type="text" id="gfProps" value="${esc(g.props||'')}" placeholder="เช่น ไพ่ 1 สำรับ, ลูกเต๋า 2 ลูก"></label>
+    <label class="field"><span>กติกา</span><textarea id="gfRules" style="min-height:150px">${esc(g.rules||'')}</textarea><small>ใช้ ## หัวข้อ และ - รายการ ได้เหมือนบทเรียน</small></label>
+    <label class="field"><span>ตัวช่วยที่ใช้ตอนเล่น</span><select id="gfHelper">${HELPERS.map(([v,n])=>`<option value="${v}" ${g.helper===v?'selected':''}>${n}</option>`).join('')}</select></label>`,
+    `<button class="btn primary" data-act="saveGame" data-id="${esc(id||'')}">บันทึกเกม</button>${id?(S.confirm===ck?`<button class="btn dangerfill" data-act="delGame" data-id="${esc(id)}">ยืนยันลบเกม</button>`:`<button class="btn danger" data-act="askGame" data-id="${esc(id)}">ลบเกม</button>`):''}`);
+}
+function postForm(id){
+  const p=id?Store.d.posts[id]:{author:S.lastAuthor||'',type:'news',title:'',text:'',date:'',pin:false};
+  openSheet(id?'แก้ไขโพสต์':'เขียนโพสต์',`
+    <div class="field"><span>ใครเขียน</span>${kidPick('pfAuthor','radio',[p.author])}</div>
+    <div class="field"><span>ประเภท</span><div class="pick">${POSTTYPES.map(([v,n])=>`<label class="opt"><input type="radio" name="pfType" value="${v}" ${p.type===v?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
+    <label class="field"><span>หัวข้อ</span><input type="text" id="pfTitle" value="${esc(p.title)}"></label>
+    <label class="field"><span>เนื้อหา</span><textarea id="pfText">${esc(p.text)}</textarea></label>
+    <div class="row2"><label class="field"><span>วันที่ของเรื่อง (ไม่ใส่ก็ได้)</span><input type="date" id="pfDate" value="${esc(p.date||'')}"></label>${S.bro?`<label class="check" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="pfPin" ${p.pin?'checked':''}> ปักหมุดไว้บนสุด</label>`:''}</div>`,
+    `<button class="btn primary" data-act="savePost" data-id="${esc(id||'')}">โพสต์</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+function awardForm(){
+  openSheet('ให้แต้ม',`
+    <div class="field"><span>ให้ใคร (เลือกได้หลายคน)</span>${kidPick('awKid','checkbox',[])}</div>
+    <div class="field"><span>กี่แต้ม</span><div class="pick">${[1,2,3,5,10].map(n=>`<label class="opt"><input type="radio" name="awPts" value="${n}" ${n===1?'checked':''}><span>+${n}</span></label>`).join('')}</div></div>
+    <label class="field"><span>เพราะอะไร</span><input type="text" id="awNote" placeholder="เช่น ช่วยล้างจาน, อ่านหนังสือครบชั่วโมง"></label>`,
+    `<button class="btn primary" data-act="saveAward">ให้แต้ม</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+function stickerForm(){
+  openSheet('มอบสติกเกอร์พิเศษ',`
+    <div class="field"><span>ให้ใคร</span>${kidPick('skKid','radio',[S.stickerKid||''])}</div>
+    <div class="field"><span>สติกเกอร์</span><div class="pick">${STICKERS.filter(s=>s.special).map((s,i)=>`<label class="opt"><input type="radio" name="skId" value="${s.id}" ${i===0?'checked':''}><span>${esc(s.name)}</span></label>`).join('')}</div></div>
+    <label class="field"><span>ข้อความถึงน้อง (ไม่ใส่ก็ได้)</span><input type="text" id="skNote"></label>`,
+    `<button class="btn primary" data-act="saveSticker">มอบสติกเกอร์</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+
+/* ---------- toast ---------- */
+let tt=null;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},2600)}
+
+/* ---------- actions ---------- */
+async function saveGameSession(o){
+  const id=uid();const at=Date.now();
+  await Store.put('sessions',id,{game:o.game,players:o.players.map(p=>p.id?{id:p.id}:{name:p.name,code:p.code,color:p.color}),winners:(o.winners||[]).map(p=>p.id?{id:p.id}:{name:p.name}),coop:!!o.coop,win:!!o.win,at});
+  for(const p of o.players){if(!p.id||!kidById(p.id))continue;
+    const isW=o.coop?!!o.win:(o.winners||[]).some(w=>w.id===p.id);
+    await Store.put('log',uid(),{kid:p.id,kind:'game',game:o.game,coop:!!o.coop,win:isW,correct:(o.correct&&o.correct[p.id])||0,pts:(o.pts&&o.pts[p.id])||0,session:id,at});
+  }
+}
+function guestFrom(name){const n=name.trim();if(!n)return null;return {name:n,code:n.slice(0,2),color:'#6B7785'}}
+
+const ACT={
+  tab(t){S.tab=t.dataset.id;S.confirm=null;persist();render();window.scrollTo({top:0})},
+  toggleBro(){S.bro=!S.bro;S.confirm=null;persist();render();toast(S.bro?'เปิดโหมดพี่: แก้ไขได้':'ปิดโหมดพี่แล้ว')},
+  lb(t){S.lb=t.dataset.id;render()},
+  ask(t){S.confirm=t.dataset.id;render()},
+  cancelAsk(){S.confirm=null;render()},
+  closeSheet,
+  /* learn */
+  subj(t){S.learn.subj=t.dataset.id;render()},
+  lkid(t){S.learn.kid=S.learn.kid===t.dataset.id?'all':t.dataset.id;render()},
+  openLesson(t){S.learn.open=t.dataset.id;S.confirm=null;render();window.scrollTo({top:0})},
+  closeLesson(){S.learn.open=null;render()},
+  quizKid(t){S.learn.player=t.dataset.id;render()},
+  startQuiz(t){if(!S.learn.player)return;S.quiz={lessonId:t.dataset.id,kid:S.learn.player,i:0,answers:[],picked:null,revealed:false,selfMark:null};render();window.scrollTo({top:0})},
+  pick(t){const q=S.quiz;if(q.picked!=null)return;const it=Store.d.lessons[q.lessonId].questions[q.i];q.picked=+t.dataset.id;q.answers[q.i]=q.picked===it.answer;render()},
+  reveal(){S.quiz.revealed=true;render()},
+  selfMark(t){S.quiz.selfMark=t.dataset.id==='1';S.quiz.answers[S.quiz.i]=S.quiz.selfMark;render()},
+  nextQ(){const q=S.quiz;const n=(Store.d.lessons[q.lessonId].questions||[]).length;if(q.i+1<n){q.i++;q.picked=null;q.revealed=false;q.selfMark=null;render();window.scrollTo({top:0})}else finishQuiz()},
+  retryQuiz(){const q=S.quiz;S.quiz={lessonId:q.lessonId,kid:q.kid,i:0,answers:[],picked:null,revealed:false,selfMark:null};render()},
+  endQuiz(){const q=S.quiz;S.quiz=null;S.learn.open=q?q.lessonId:null;render()},
+  lessonForm(t){lessonForm(t.dataset.id||null)},
+  async delLesson(t){await Store.del('lessons',t.dataset.id);S.learn.open=null;S.confirm=null;toast('ลบบทเรียนแล้ว');render()},
+  qAdd(){syncDraft();S.draft.questions.push(blankQ());paintLessonForm()},
+  qDel(t){syncDraft();S.draft.questions.splice(+t.dataset.id,1);paintLessonForm()},
+  qUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
+  cAdd(t){syncDraft();S.draft.questions[+t.dataset.id].choices.push('');paintLessonForm()},
+  cDel(t){syncDraft();const q=S.draft.questions[+t.dataset.id];q.choices.pop();if(q.answer>=q.choices.length)q.answer=0;paintLessonForm()},
+  bulkAdd(){syncDraft();const got=parseBulk(val('bulkQ'));if(!got.length){toast('ไม่พบโจทย์ ตรวจรูปแบบอีกครั้ง');return}
+    S.draft.questions=S.draft.questions.filter(q=>q.q.trim()).concat(got);paintLessonForm();toast('เพิ่ม '+got.length+' ข้อแล้ว')},
+  saveLesson,
+  /* games */
+  gkind(t){S.gameKind=t.dataset.id;render()},
+  gameForm(t){S.confirm=null;gameForm(t.dataset.id||null)},
+  askGame(t){S.confirm='game:'+t.dataset.id;gameForm(t.dataset.id)},
+  async saveGame(t){const name=val('gfName');if(!name){toast('ใส่ชื่อเกมก่อน');return}
+    const id=t.dataset.id||uid();const old=Store.d.games[id];
+    await Store.put('games',id,{name,kind:radio('gfKind')||'compete',min:+val('gfMin')||1,max:+val('gfMax')||+val('gfMin')||6,minutes:+val('gfTime')||'',props:val('gfProps'),rules:(document.getElementById('gfRules')||{}).value||'',helper:val('gfHelper'),example:!!(old&&old.example),at:old&&old.at||Date.now()});
+    closeSheet();toast('บันทึกเกมแล้ว');render()},
+  async delGame(t){await Store.del('games',t.dataset.id);S.confirm=null;closeSheet();toast('ลบเกมแล้ว');render()},
+  async delSession(t){const id=t.dataset.id;await Store.del('sessions',id);for(const e of logs().filter(e=>e.session===id))await Store.del('log',e.id);S.confirm=null;toast('ลบบันทึกและแต้มของเกมนั้นแล้ว');render()},
+  /* tools */
+  openTool(t){S.tool=t.dataset.id;S.tab='tools';
+    if(t.dataset.game&&S.tool==='score'&&(!S.score||S.score.phase==='setup')){S.score=Object.assign({phase:'setup',game:'',mode:'compete',low:false,players:[],award:2},S.score||{},{game:t.dataset.game});const g=games().find(x=>x.name===t.dataset.game);if(g&&g.kind==='coop')S.score.mode='coop'}
+    persist();render();window.scrollTo({top:0})},
+  closeTool(){S.tool=null;persist();render()},
+  bsPickBoard(t){S.bs.boardId=t.dataset.id;S.bs.used={};S.bs.final=null;persist();render()},
+  bsPlayer(t){const s=S.bs,id=t.dataset.id;const i=s.players.findIndex(p=>pk(p)===id);if(i>=0)s.players.splice(i,1);else if(kidById(id))s.players.push({id});persist();render()},
+  bsGuest(){const n=val('bsGuest');if(!n)return;const s=S.bs;if(s.players.some(p=>pk(p)==='g:'+n)){toast('มีชื่อนี้แล้ว');return}
+    s.players.push({name:n,code:n.slice(0,2),color:GUEST_COLORS[s.players.filter(p=>!p.id).length%GUEST_COLORS.length]});persist();render()},
+  bsStart(){const s=S.bs;const b=bsBoardNow();if(!b||!s.players.length)return;Object.assign(s,{boardId:b.id,phase:'board',used:{},final:null,saved:false,edit:false,open:null});persist();render();window.scrollTo({top:0})},
+  bsEditMode(){const s=S.bs;s.edit=!s.edit;if(s.edit&&s.phase!=='board')s.phase='board';if(!s.edit&&!s.players.length)s.phase='setup';persist();render()},
+  bsOpen(t){const s=S.bs;const c=+t.dataset.c,r=+t.dataset.r;if(s.edit){bsCellForm(c,r);return}
+    const u=s.used[c+'-'+r];Object.assign(s,{open:[c,r],revealed:!!u,got:u?(u.w||[]).slice():[],phase:'q'});persist();render();window.scrollTo({top:0})},
+  bsReveal(){S.bs.revealed=true;persist();render()},
+  bsGot(t){const s=S.bs,id=t.dataset.id;s.got=s.got.includes(id)?s.got.filter(x=>x!==id):s.got.concat(id);persist();render()},
+  bsMark(){const s=S.bs;if(!s.got.length)return;s.used[s.open.join('-')]={w:s.got.slice()};s.phase='board';s.got=[];persist();render()},
+  bsNone(){const s=S.bs;s.used[s.open.join('-')]={w:[]};s.phase='board';s.got=[];persist();render()},
+  bsClear(){const s=S.bs;delete s.used[s.open.join('-')];s.phase='board';s.got=[];persist();render()},
+  bsBack(){S.bs.phase='board';persist();render()},
+  bsFinal(){const s=S.bs;if(s.edit){bsFinalForm();return}s.final={step:'wager',wager:{},right:{}};s.phase='final';persist();render();window.scrollTo({top:0})},
+  bsFinalBack(){S.bs.final=null;S.bs.phase='board';persist();render()},
+  bsWagerLock(){const s=S.bs;const b=bsBoardNow();const sc=bsScores(s,b);
+    s.players.forEach((p,i)=>{const x=pk(p);let w=Math.floor(+val('bsW_'+i)||0);w=Math.max(0,Math.min(w,bsMaxWager(s,b,sc,x)));s.final.wager[x]=w});
+    s.final.step='q';persist();render()},
+  bsFinalReveal(){S.bs.final.step='judge';persist();render()},
+  bsRight(t){const f=S.bs.final;f.right[t.dataset.id]=!f.right[t.dataset.id];persist();render()},
+  bsFinalDone(){S.bs.final.done=true;S.bs.phase='end';persist();render();window.scrollTo({top:0})},
+  bsEndNow(){S.bs.phase='end';persist();render();window.scrollTo({top:0})},
+  async bsSave(){const s=S.bs;if(s.saved)return;const b=bsBoardNow();const sc=bsScores(s,b);const n=Math.max(0,Math.min(50,Math.floor(+val('bsAward')||0)));s.award=n;s.saved=true;persist();
+    const best=Math.max(...s.players.map(p=>sc[pk(p)]));const winners=best>0?s.players.filter(p=>sc[pk(p)]===best):[];
+    const correct={};Object.values(s.used).forEach(u=>(u.w||[]).forEach(x=>{if(!x.startsWith('g:'))correct[x]=(correct[x]||0)+1}));
+    const pts={};winners.forEach(p=>{if(p.id)pts[p.id]=n});
+    await saveGameSession({game:b.title||'Baan Suay Game Show',players:s.players,winners,correct,pts});toast('บันทึกผลเข้าบ้านแล้ว');render()},
+  bsReplay(){Object.assign(S.bs,{phase:'board',used:{},final:null,saved:false,open:null});persist();render()},
+  bsToSetup(){Object.assign(S.bs,{phase:'setup',edit:false});persist();render()},
+  bsCat(t){S.confirm=null;bsCatForm(+t.dataset.c)},
+  bsColAsk(t){S.confirm='bscol:'+t.dataset.c;bsCatForm(+t.dataset.c)},
+  async bsCatSave(t){const name=val('bsCatName');const c=+t.dataset.c;closeSheet();await bsMutate(b=>{b.cats[c].name=name})},
+  async bsColDel(t){const c=+t.dataset.c;S.confirm=null;closeSheet();await bsMutate(b=>{if(b.cats.length>1)b.cats.splice(c,1)});S.bs.used={};persist()},
+  async bsAddCol(){await bsMutate(b=>{if(b.cats.length<10)b.cats.push({name:'หัวข้อ '+(b.cats.length+1),qs:Array.from({length:bRows(b)||1},()=>({q:'',a:'',pts:''}))})})},
+  async bsDelCol(){const b=bsBoardNow();const last=b.cats[b.cats.length-1];if(last&&last.qs.some(q=>q.q)){S.confirm='bscol:'+(b.cats.length-1);bsCatForm(b.cats.length-1);toast('หัวข้อสุดท้ายมีคำถามอยู่ ยืนยันในหน้าต่างนี้ก่อน');return}
+    await bsMutate(x=>{if(x.cats.length>1)x.cats.pop()})},
+  async bsAddRow(){await bsMutate(b=>{if(bRows(b)<10)b.cats.forEach(c=>c.qs.push({q:'',a:'',pts:''}))})},
+  async bsDelRow(){const b=bsBoardNow();const r=bRows(b)-1;if(r<1)return;if(b.cats.some(c=>c.qs[r]&&c.qs[r].q)&&S.confirm!=='bsrow'){S.confirm='bsrow';toast('แถวล่างสุดมีคำถามอยู่ กด − แถว อีกครั้งเพื่อยืนยัน');return}
+    S.confirm=null;await bsMutate(x=>{x.cats.forEach(c=>c.qs.pop())})},
+  bsCellForm(t){bsCellForm(+t.dataset.c,+t.dataset.r)},
+  async bsCellSave(t){const c=+t.dataset.c,r=+t.dataset.r;const q=(document.getElementById('bsQ')||{}).value||'';const a=(document.getElementById('bsA')||{}).value||'';const pe=document.getElementById('bsP');
+    closeSheet();await bsMutate(b=>{const cell=b.cats[c].qs[r];cell.q=q.trim();cell.a=a.trim();if(pe)cell.pts=pe.value===''?'':+pe.value});toast('บันทึกข้อนี้แล้ว')},
+  bsFinalForm(){bsFinalForm()},
+  async bsFinalSave(){const cat=val('bsFC'),q=(document.getElementById('bsFQ')||{}).value||'',a=(document.getElementById('bsFA')||{}).value||'';closeSheet();await bsMutate(b=>{b.final={cat,q:q.trim(),a:a.trim()}});toast('บันทึกคำถามสุดท้ายแล้ว')},
+  bsSettings(){S.confirm=null;bsSettingsForm()},
+  async bsSettingsSave(){const title=val('bsTitle')||'Baan Suay Game Show';const mode=radio('bsMode')||'seq';const step=Math.max(1,Math.floor(+val('bsStep')||10));
+    closeSheet();await bsMutate(b=>{if(mode==='custom'&&b.ptsMode!=='custom')b.cats.forEach((c,ci)=>c.qs.forEach((q,ri)=>{if(q.pts===''||q.pts==null)q.pts=bVal(b,ci,ri)}));b.title=title;b.ptsMode=mode;b.step=step})},
+  async bsNewBoard(){const id='board-'+uid();closeSheet();if(!S.bs)S.bs={phase:'setup',players:[],used:{},final:null};
+    await Store.put('boards',id,newBoard(5,5));Object.assign(S.bs,{boardId:id,phase:'board',edit:true,used:{},final:null});S.bro=true;persist();render();toast('สร้างกระดานใหม่แล้ว เริ่มตั้งหัวข้อได้เลย')},
+  bsDelAsk(){S.confirm='bsdel:'+S.bs.boardId;bsSettingsForm()},
+  async bsDelBoard(){const id=bsBoardNow().id;closeSheet();S.confirm=null;await Store.del('boards',id);Object.assign(S.bs,{boardId:null,phase:'setup',edit:false,used:{}});persist();render()},
+  unoAdd(t){const o=S.uno.order,id=t.dataset.id;const i=o.findIndex(p=>p.id===id);if(i>=0)o.splice(i,1);else o.push({id});persist();render()},
+  unoGuest(){const g=guestFrom(val('unoGuest'));if(!g)return;S.uno.order.push(g);persist();render()},
+  unoClear(){S.uno.order=[];persist();render()},
+  unoStart(){const u=S.uno;Object.assign(u,{phase:'play',cur:0,dir:1,pending:0,hist:[],msg:'',color:null,wins:u.wins||{}});persist();render()},
+  uno(t){unoAct(t.dataset.id);persist();render()},
+  unoColor(t){S.uno.color=t.dataset.id;persist();render()},
+  unoEnd(){S.uno.phase='win';persist();render()},
+  unoBack(){S.uno.phase='play';persist();render()},
+  async unoWin(t){const u=S.uno;let w;if(t.dataset.guest!=null){const i=+t.dataset.guest;w=u.order[i];u.wins['g'+i]=(u.wins['g'+i]||0)+1}else{w=u.order.find(p=>p.id===t.dataset.id);u.wins[w.id]=(u.wins[w.id]||0)+1}
+    u.phase='play';u.cur=0;u.dir=1;u.pending=0;u.hist=[];u.msg=playerName(w)+' ชนะรอบนี้ เริ่มรอบใหม่ได้เลย';persist();render();
+    await saveGameSession({game:'UNO',players:u.order,winners:[w],pts:w.id?{[w.id]:u.award||0}:{}});toast('บันทึกผล UNO แล้ว')},
+  unoReset(){S.uno=Object.assign({},S.uno,{phase:'setup'});persist();render()},
+  scMode(t){S.score.mode=t.dataset.id;persist();render()},
+  scPlayer(t){const a=S.score.players,id=t.dataset.id;const i=a.findIndex(p=>p.id===id);if(i>=0)a.splice(i,1);else a.push({id,pts:0});persist();render()},
+  scGuest(){const g=guestFrom(val('scGuest'));if(!g)return;g.pts=0;S.score.players.push(g);persist();render()},
+  scStart(){const s=S.score;s.game=val('scGame')||s.game;s.players.forEach(p=>p.pts=0);Object.assign(s,{phase:'play',team:0,hist:[],saved:false,result:null});persist();render()},
+  scAdd(t){scoreAdd(t.dataset.id,+t.dataset.n)},
+  scAddIn(t){const v=parseFloat(val('scIn_'+t.dataset.id));if(isNaN(v))return;scoreAdd(t.dataset.id,v)},
+  scUndo(){const s=S.score;const h=(s.hist||[]).pop();if(!h)return;if(h.k==='team')s.team-=h.n;else s.players[+h.k].pts-=h.n;persist();render()},
+  scEnd(){S.score.phase='end';persist();render()},
+  scCoop(t){S.score.result=t.dataset.id;S.score.phase='end';persist();render()},
+  async scSave(){const s=S.score;if(s.saved)return;const aw=checked('scAward');const n=Math.max(0,Math.min(50,+val('scAwardN')||0));s.award=n;s.saved=true;persist();
+    if(s.mode==='coop'){const pts={};if(aw)s.players.forEach(p=>{if(p.id)pts[p.id]=n});await saveGameSession({game:s.game||'เกมช่วยกัน',players:s.players,coop:true,win:s.result==='win',pts})}
+    else{const r=rankScore(s);const best=r.length?r[0].pts:0;const winners=r.filter(p=>p.pts===best);const pts={};if(aw)winners.forEach(p=>{if(p.id)pts[p.id]=n});await saveGameSession({game:s.game||'เกม',players:s.players,winners,pts})}
+    toast('บันทึกผลแล้ว');render()},
+  scAgain(){const s=S.score;s.players.forEach(p=>p.pts=0);Object.assign(s,{phase:'play',team:0,hist:[],saved:false,result:null});persist();render()},
+  scReset(){S.score.phase='setup';persist();render()},
+  tPreset(t){const v=+t.dataset.id;Object.assign(S.timer,{total:v,left:v,run:false,done:false});clearInterval(tick);render()},
+  tGo(){const t=S.timer;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume&&actx.resume()}catch(e){}
+    if(t.run){t.left=Math.max(0,Math.ceil((t.endAt-Date.now())/1000));t.run=false;clearInterval(tick)}
+    else{if(t.left<=0)t.left=t.total;t.done=false;t.endAt=Date.now()+t.left*1000;t.run=true;timerLoop()}render()},
+  tReset(){Object.assign(S.timer,{left:S.timer.total,run:false,done:false});clearInterval(tick);render()},
+  rndPool(t){const ks=kids().map(k=>k.id);const a=S.rnd.pool||ks;const id=t.dataset.id;S.rnd.pool=a.includes(id)?a.filter(x=>x!==id):a.concat(id);render()},
+  rndGo(){const pool=S.rnd.pool||kids().map(k=>k.id);if(!pool.length||S.rnd.spinning)return;S.rnd.spinning=true;let n=0;const steps=12;
+    const spin=()=>{S.rnd.pick=pool[Math.floor(Math.random()*pool.length)];render();if(++n<steps)setTimeout(spin,60+n*14);else S.rnd.spinning=false};spin()},
+  diceN(t){S.dice.n=+t.dataset.id;render()},
+  diceGo(){S.dice.vals=[1,2].map(()=>1+Math.floor(Math.random()*6));render()},
+  coinGo(){S.coin=Math.random()<.5?'หัว':'ก้อย';render()},
+  /* wall */
+  postForm(t){postForm(t.dataset.id||null)},
+  async savePost(t){const title=val('pfTitle'),text=(document.getElementById('pfText')||{}).value||'';if(!title&&!text.trim()){toast('เขียนหัวข้อหรือเนื้อหาก่อน');return}
+    const id=t.dataset.id||uid();const old=Store.d.posts[id];const author=radio('pfAuthor');S.lastAuthor=author;
+    await Store.put('posts',id,{author,type:radio('pfType')||'news',title,text,date:val('pfDate'),pin:S.bro?checked('pfPin'):!!(old&&old.pin),example:!!(old&&old.example),at:old&&old.at||Date.now()});
+    closeSheet();toast('โพสต์แล้ว');render()},
+  async delPost(t){await Store.del('posts',t.dataset.id);S.confirm=null;render()},
+  /* stickers & points */
+  stkKid(t){S.stickerKid=t.dataset.id;render()},
+  stickerForm,
+  async saveSticker(){const kid=radio('skKid'),sid=radio('skId');if(!kid){toast('เลือกน้องก่อน');return}
+    await Store.put('log',uid(),{kid,kind:'sticker',sticker:sid,note:val('skNote'),pts:0,at:Date.now()});closeSheet();S.stickerKid=kid;toast('มอบสติกเกอร์แล้ว');render()},
+  awardForm,
+  async saveAward(){const ids=radios('awKid');const n=+radio('awPts')||1;if(!ids.length){toast('เลือกคนที่จะได้แต้มก่อน');return}
+    const note=val('awNote');for(const kid of ids)await Store.put('log',uid(),{kid,kind:'award',pts:n,note,at:Date.now()});closeSheet();toast('ให้ '+n+' แต้มแล้ว');render()},
+  async delLog(t){await Store.del('log',t.dataset.id);S.confirm=null;render()},
+  /* admin */
+  async saveHouse(){const n=val('adHouse');if(!n)return;await Store.put('meta','house',{name:n});toast('เปลี่ยนชื่อบ้านแล้ว')},
+  kidForm(t){S.confirm=null;kidForm(t.dataset.id||null)},
+  askKid(t){S.confirm='kid:'+t.dataset.id;kidForm(t.dataset.id)},
+  async saveKid(t){const code=val('kfCode');if(!code){toast('ใส่ชื่อย่อก่อน');return}
+    const id=t.dataset.id||code.toLowerCase().replace(/[^a-z0-9]/g,'')+'-'+uid().slice(-4);
+    await Store.put('kids',id,{code,nick:val('kfNick'),grade:val('kfGrade'),band:val('kfBand'),color:radio('kfColor')||SWATCHES[0],order:+val('kfOrder')||1,league:checked('kfLeague')});
+    closeSheet();toast('บันทึกสมาชิกแล้ว');render()},
+  async delKid(t){await Store.del('kids',t.dataset.id);S.confirm=null;closeSheet();render()},
+  async exportData(){const data={};COLS.forEach(c=>{data[c]={};Object.values(Store.d[c]).forEach(x=>{const b=Object.assign({},x);delete b.id;data[c][x.id]=b})});
+    const txt=JSON.stringify({house:'house6',v:1,at:new Date().toISOString(),data});
+    try{await navigator.clipboard.writeText(txt);toast('คัดลอกข้อมูลบ้านแล้ว')}catch(e){const b=$('#importBox');if(b){b.value=txt;b.focus();b.select()}toast('คัดลอกอัตโนมัติไม่ได้ ข้อความอยู่ในกล่องด้านล่าง กดคัดลอกเอง')}},
+  async importData(){let o;try{o=JSON.parse(val('importBox'))}catch(e){toast('ข้อความไม่ใช่ข้อมูลบ้านที่ถูกต้อง');return}
+    if(!o||!o.data){toast('ไม่พบข้อมูลบ้านในข้อความนี้');return}let n=0;
+    for(const c of COLS){const m=o.data[c]||{};for(const id of Object.keys(m)){if(typeof m[id]==='object'){await Store.put(c,id,m[id]);n++}}}
+    toast('นำเข้า '+n+' รายการแล้ว');const b=$('#importBox');if(b)b.value='';render()}
+};
+function scoreAdd(k,n){const s=S.score;s.hist=s.hist||[];if(k==='team')s.team=(s.team||0)+n;else{const p=s.players[+k];if(!p)return;p.pts=(p.pts||0)+n}s.hist.push({k,n});persist();render()}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]');
+  if(!t){if(e.target.id==='sheet')closeSheet();return}
+  const fn=ACT[t.dataset.act];if(fn){e.preventDefault();fn(t,e)}
+});
+document.addEventListener('change',e=>{
+  const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
+  if(c==='qtype'){syncDraft();paintLessonForm()}
+  if(c==='unoStack'){S.uno.stack=e.target.checked;persist()}
+  if(c==='scLow'){S.score.low=e.target.checked;persist()}
+  if(c==='scGame'){S.score.game=e.target.value.trim();persist()}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
+
+/* hook for future games: House.registerTool({id,name,desc,view:()=>html}) */
+window.House={registerTool(def){if(def&&def.id&&typeof def.view==='function'){TOOLS[def.id]={view:def.view,name:def.name,desc:def.desc};render()}},store:Store,kids,act:ACT,render};
+
+render();
+Store.init();
+})();
+</script>
+
+</body>
+</html>
