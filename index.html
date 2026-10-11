@@ -123,13 +123,20 @@ button.pawn[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:3px
 .lane-pts{font:600 1.35rem/1 var(--f-head);text-align:right;font-variant-numeric:tabular-nums}
 .lane-pts small{display:block;font:400 .72rem var(--f-body);color:var(--muted)}
 .lead{font:600 .66rem/1 var(--f-head);background:var(--ink);color:var(--paper);padding:3px 6px;border-radius:5px;margin-left:4px;vertical-align:2px}
-@media (max-width:540px){.lane{grid-template-columns:56px minmax(0,1fr) 50px;gap:8px}.lane-who small{display:none}}
+@media (max-width:540px){.lane{grid-template-columns:66px minmax(0,1fr) 50px;gap:8px}.lane-who small{display:none}}
 
 .feed{display:grid;gap:0}
 .feed li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .feed li:last-child{border-bottom:0}
 .feed .pts{font:600 .95rem var(--f-head);font-variant-numeric:tabular-nums;color:var(--good)}
 .feed .pts.zero{color:var(--muted)}
+.feed .pts.neg,.lane-pts.neg{color:var(--bad)}
+.lane-who{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:center}
+.lane-who small{grid-column:2}
+.rk{grid-row:span 2;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--sunk);font:600 .85rem/1 var(--f-head);font-variant-numeric:tabular-nums;color:var(--muted)}
+.rk.top{background:var(--star);color:#fff}
+.secret-title{font-size:clamp(1.5rem,4.4vw,2.1rem);font-weight:700;letter-spacing:.01em}
+.pick.minus .opt input:checked+span{background:var(--bad);border-color:var(--bad);color:#fff}
 ul.plain{list-style:none;margin:0;padding:0}
 .two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:820px){.two{grid-template-columns:1fr}}
@@ -565,13 +572,13 @@ const playerName=p=>{const k=p.id&&kidById(p.id);return k?kidLabel(k):p.name};
 
 function totals(range){
   const t={};const n=new Date();const m0=new Date(n.getFullYear(),n.getMonth(),1).getTime();
-  for(const e of logs()){if(range==='month'&&(e.at||0)<m0)continue;t[e.kid]=(t[e.kid]||0)+(+e.pts||0)}
+  for(const e of logs()){if(e.kind==='secret')continue;if(range==='month'&&(e.at||0)<m0)continue;t[e.kid]=(t[e.kid]||0)+(+e.pts||0)}
   return t;
 }
 function stats(kid){
   const st={pts:0,quizzes:0,bySubj:{},perfect:0,perfectChem:0,wins:0,coop:0,showCorrect:0,stickers:new Set()};const seen=new Set();
   for(const e of logs()){
-    if(e.kid!==kid)continue;st.pts+=(+e.pts||0);
+    if(e.kid!==kid||e.kind==='secret')continue;st.pts+=(+e.pts||0);
     if(e.kind==='quiz'){if(!seen.has(e.lessonId)){seen.add(e.lessonId);st.quizzes++;st.bySubj[e.subject]=(st.bySubj[e.subject]||0)+1}
       if(e.perfect){st.perfect++;if(e.subject==='chem')st.perfectChem++}}
     if(e.kind==='game'){if(e.win&&!e.coop)st.wins++;if(e.coop)st.coop++;st.showCorrect+=(+e.correct||0)}
@@ -640,7 +647,7 @@ const typing=()=>{const a=document.activeElement;return a&&$('#view').contains(a
 function changed(){if(typing()){pending=true;return}render()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!typing()){pending=false;render()}},0));
 
-const TABS=[['home','หน้าบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
+const TABS=[['home','หน้าบ้าน'],['points','แต้มบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
 function render(){
   Store.checkAdmin();
   if(S.tab==='admin'&&!S.bro)S.tab='home';
@@ -666,39 +673,62 @@ function logText(e){
     case 'quiz':return `ควิซ${subjName(e.subject)} ${e.mode==='meq'?'MEQ':'MCQ'} “${esc(e.title||'')}” ได้ ${e.score}/${e.total}`;
     case 'game':return e.coop?`เล่น ${esc(e.game||'เกม')} แบบช่วยกัน${e.win?' · ผ่านด่าน':''}`:`เล่น ${esc(e.game||'เกม')}${e.win?' · ชนะ':''}${e.correct?` · ตอบถูก ${e.correct} ข้อ`:''}`;
     case 'award':return esc(e.note||'แต้มพิเศษจากพี่');
+    case 'secret':return esc(e.note||(+e.pts<0?'หักคะแนน':'ได้คะแนน'));
     case 'sticker':return `ได้สติกเกอร์ “${esc(stickerName(e.sticker))}”${e.note?' · '+esc(e.note):''}`;
     default:return esc(e.note||'');
   }
 }
+/* ---------- home: Secret Game board ---------- */
+const secretMeta=()=>Store.d.meta.secret||{};
+const secretTitle=()=>secretMeta().title||'Secret Game';
+function secretLogs(){const since=+secretMeta().since||0;return logs().filter(e=>e.kind==='secret'&&(e.at||0)>=since)}
+function secretTotals(){const t={};for(const e of secretLogs())t[e.kid]=(t[e.kid]||0)+(+e.pts||0);return t}
+function laneBoard(t,empty,unit){unit=unit||'คะแนน';
+  const lg=league();if(!lg.length)return `<p class="muted">${empty}</p>`;
+  const max=Math.max(1,...lg.map(k=>Math.max(0,t[k.id]||0)));
+  const sorted=lg.slice().sort((a,b)=>(t[b.id]||0)-(t[a.id]||0));
+  let rank=0,prev=null;
+  return sorted.map((k,i)=>{const p=t[k.id]||0;if(p!==prev){rank=i+1;prev=p}const r=(Math.max(0,p)/max).toFixed(3);
+    return `<div class="lane" style="--c:${okColor(k.color)};--p:${r}">
+    <div class="lane-who"><span class="rk ${rank===1&&p>0?'top':''}">${rank}</span><b>${esc(k.code)}</b><small>${esc(k.grade||'')}</small></div>
+    <div class="track" role="img" aria-label="อันดับ ${rank} ${esc(k.code)} ${p} ${unit}"><span class="fill"></span><span class="pawn" style="--c:${okColor(k.color)}">${esc(k.code)}</span></div>
+    <div class="lane-pts ${p<0?'neg':''}">${p}<small>${unit}</small></div></div>`}).join('');
+}
+function feedList(list,emptyMsg){
+  return list.length?`<ul class="plain feed">${list.map(e=>{const k=kidById(e.kid);const v=+e.pts||0;return `<li>${k?pawn(k,'sm'):'<span class="pawn sm">?</span>'}<div class="small"><span>${logText(e)}</span><br><span class="muted">${ago(e.at)}</span></div><span class="pts ${v<0?'neg':v?'':'zero'}">${v>0?'+':''}${v}</span></li>`}).join('')}</ul>`:`<p class="muted">${emptyMsg}</p>`;
+}
 function vHome(){
   const ks=kids();if(!ks.length)return emptyHouse();
-  const t=totals(S.lb);const lg=league();
-  const max=Math.max(1,...lg.map(k=>t[k.id]||0));
-  const sorted=lg.slice().sort((a,b)=>(t[b.id]||0)-(t[a.id]||0));
-  const top=t[sorted[0]&&sorted[0].id]||0;
-  const lanes=sorted.map(k=>{const p=t[k.id]||0;const r=(p/max).toFixed(3);return `<div class="lane" style="--c:${okColor(k.color)};--p:${r}">
-    <div class="lane-who"><b>${esc(k.code)}${p>0&&p===top?'<span class="lead">นำ</span>':''}</b><small>${esc(k.grade||'')}</small></div>
-    <div class="track" role="img" aria-label="${esc(k.code)} ${p} แต้ม"><span class="fill"></span><span class="pawn" style="--c:${okColor(k.color)}">${esc(k.code)}</span></div>
-    <div class="lane-pts">${p}<small>แต้ม</small></div></div>`}).join('');
-  const feed=logs().slice(0,8);
-  const lp=posts()[0];
+  const sm=secretMeta();const lp=posts()[0];
   return `<section class="sec">
-    <div class="sec-head"><div><h2>สนามแข่งในบ้าน</h2><p>แต้มจากควิซ เกม และแต้มพิเศษจากพี่</p></div>
-      <div class="btns"><div class="chips"><button class="chip" data-act="lb" data-id="month" aria-pressed="${S.lb==='month'}">เดือนนี้</button><button class="chip" data-act="lb" data-id="all" aria-pressed="${S.lb==='all'}">ทั้งหมด</button></div>
-      ${S.bro?'<button class="btn primary sm" data-act="awardForm">ให้แต้ม</button>':''}</div></div>
-    <div class="panel board">${lanes||'<p class="muted">ยังไม่มีใครอยู่ในสนามแข่ง เปิด “นับในสนามแข่ง” ให้สมาชิกในจัดการบ้าน</p>'}</div>
+    <div class="sec-head"><div><span class="label">อันดับตอนนี้</span><h2 class="secret-title">${esc(secretTitle())}</h2>${sm.since?`<p>นับตั้งแต่ ${dfmt(sm.since)}</p>`:''}</div>
+      ${S.bro?'<div class="btns"><button class="btn primary sm" data-act="secretForm">ให้ / หักคะแนน</button><button class="btn sm" data-act="secretSettings">ตั้งค่า</button></div>':''}</div>
+    <div class="panel board secret">${laneBoard(secretTotals(),'ยังไม่มีใครอยู่ในสนามแข่ง เปิด “นับในสนามแข่ง” ให้สมาชิกในจัดการบ้าน')}</div>
   </section>
   <section class="sec"><div class="sec-head"><h2>เล่นอะไรดีวันนี้</h2></div>
     <div class="quick">${TOOL_LIST.map(x=>`<button class="qcard" data-act="openTool" data-id="${x.id}"><b>${x.name}</b><span>${x.desc}</span></button>`).join('')}</div>
   </section>
   <div class="two">
-    <section class="sec"><div class="sec-head"><h2>ล่าสุดในบ้าน</h2></div>
-      <div class="panel">${feed.length?`<ul class="plain feed">${feed.map(e=>{const k=kidById(e.kid);return `<li>${k?pawn(k,'sm'):'<span class="pawn sm">?</span>'}<div class="small"><span>${logText(e)}</span><br><span class="muted">${ago(e.at)}</span></div><span class="pts ${(+e.pts||0)?'':'zero'}">${(+e.pts||0)>0?'+':''}${+e.pts||0}</span></li>`}).join('')}</ul>`:'<p class="muted">ยังไม่มีอะไรเกิดขึ้น ลองทำควิซในห้องเรียน หรือเล่นเกมโชว์ด้วยกัน</p>'}</div>
+    <section class="sec"><div class="sec-head"><h2>ล่าสุดใน ${esc(secretTitle())}</h2></div>
+      <div class="panel">${feedList(secretLogs().slice(0,8),'ยังไม่มีใครได้คะแนน'+(S.bro?' กด “ให้ / หักคะแนน” เพื่อเริ่ม':''))}</div>
     </section>
     <section class="sec"><div class="sec-head"><h2>กำแพงบ้าน</h2><button class="btn sm" data-act="tab" data-id="wall">ดูทั้งหมด</button></div>
       ${lp?postCard(lp):'<div class="empty">ยังไม่มีโพสต์ <button class="btn sm" data-act="postForm">เขียนโพสต์แรก</button></div>'}
     </section>
   </div>`;
+}
+/* ---------- points tab: the general house points ---------- */
+function vPoints(){
+  const ks=kids();if(!ks.length)return emptyHouse();
+  return `<section class="sec">
+    <div class="sec-head"><div><h2>แต้มบ้าน</h2><p>แต้มจากควิซ เกม และแต้มพิเศษจากพี่</p></div>
+      <div class="btns"><div class="chips"><button class="chip" data-act="lb" data-id="month" aria-pressed="${S.lb==='month'}">เดือนนี้</button><button class="chip" data-act="lb" data-id="all" aria-pressed="${S.lb==='all'}">ทั้งหมด</button></div>
+      ${S.bro?'<button class="btn primary sm" data-act="awardForm">ให้แต้ม</button>':''}</div></div>
+    <div class="panel board">${laneBoard(totals(S.lb),'ยังไม่มีใครอยู่ในสนามแข่ง เปิด “นับในสนามแข่ง” ให้สมาชิกในจัดการบ้าน','แต้ม')}</div>
+  </section>
+  <section class="sec"><div class="sec-head"><h2>ล่าสุด</h2></div>
+    <div class="panel">${feedList(logs().filter(e=>e.kind!=='secret').slice(0,12),'ยังไม่มีอะไรเกิดขึ้น ลองทำควิซในห้องเรียน หรือเล่นเกมแล้วบันทึกผล')}</div>
+  </section>`;
 }
 
 /* ---------- learn ---------- */
@@ -1241,7 +1271,7 @@ function vAdmin(){
   <section class="sec"><div class="panel small muted">ที่เก็บข้อมูลตอนนี้: ${Store.kind==='firebase'?'Firebase (ทุกเครื่องที่เปิดเว็บนี้เห็นข้อมูลเดียวกัน · โหมดพี่ต้องล็อกอิน)':Store.mode==='shared'?'ฐานข้อมูลของหน้านี้ (ทุกคนที่มีสิทธิ์เปิดเห็นข้อมูลเดียวกัน)':'เบราว์เซอร์ของเครื่องนี้'} ${Store.kind==='firebase'?'':'· โหมดพี่เป็นแค่สวิตช์ซ่อนปุ่มแก้ไข ไม่ใช่รหัสผ่าน'}</div></section>`;
 }
 
-const VIEWS={home:vHome,learn:vLearn,games:vGames,tools:vTools,wall:vWall,stickers:vStickers,admin:vAdmin};
+const VIEWS={home:vHome,points:vPoints,learn:vLearn,games:vGames,tools:vTools,wall:vWall,stickers:vStickers,admin:vAdmin};
 
 /* ---------- sheets (forms) ---------- */
 function openSheet(title,body,foot){
@@ -1408,6 +1438,23 @@ function awardForm(){
     <div class="field"><span>กี่แต้ม</span><div class="pick">${[1,2,3,5,10].map(n=>`<label class="opt"><input type="radio" name="awPts" value="${n}" ${n===1?'checked':''}><span>+${n}</span></label>`).join('')}</div></div>
     <label class="field"><span>เพราะอะไร</span><input type="text" id="awNote" placeholder="เช่น ช่วยล้างจาน, อ่านหนังสือครบชั่วโมง"></label>`,
     `<button class="btn primary" data-act="saveAward">ให้แต้ม</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+function secretForm(){
+  openSheet('ให้ / หักคะแนน '+esc(secretTitle()),`
+    <div class="field"><span>ใคร (เลือกได้หลายคน)</span>${kidPick('scKid','checkbox',[])}</div>
+    <div class="field"><span>ให้คะแนน</span><div class="pick">${[1,2,3,5,10].map(n=>`<label class="opt"><input type="radio" name="scPts" value="${n}" ${n===1?'checked':''}><span>+${n}</span></label>`).join('')}</div></div>
+    <div class="field"><span>หักคะแนน</span><div class="pick minus">${[-1,-2,-3,-5,-10].map(n=>`<label class="opt"><input type="radio" name="scPts" value="${n}"><span>${n}</span></label>`).join('')}</div></div>
+    <label class="mini"><span>หรือใส่เอง</span><input type="number" id="scCustom" placeholder="เช่น 15 หรือ -4" aria-label="คะแนนที่ใส่เอง"></label>
+    <label class="field"><span>เพราะอะไร (ไม่ใส่ก็ได้)</span><input type="text" id="scNote" placeholder="เช่น ผ่านภารกิจที่ 3"></label>`,
+    `<button class="btn primary" data-act="saveSecret">บันทึกคะแนน</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+function secretSettings(){
+  const sm=secretMeta();
+  openSheet('ตั้งค่า '+esc(secretTitle()),`
+    <label class="field"><span>ชื่อเกม</span><input type="text" id="stTitle" value="${esc(sm.title||'Secret Game')}"></label>
+    <div class="panel"><b style="font-family:var(--f-head);font-weight:600">เริ่มรอบใหม่</b><p class="small muted">คะแนนทุกคนกลับเป็น 0 แต่ประวัติเก่ายังอยู่ในจัดการบ้าน${sm.since?' · รอบนี้เริ่ม '+dfmt(sm.since):''}</p>
+      <div class="btns" style="margin-top:8px">${S.confirm==='secretReset'?'<button class="btn dangerfill" data-act="secretReset">ยืนยันเริ่มรอบใหม่</button><button class="btn ghost" data-act="secretSettingsBack">ไม่เริ่ม</button>':'<button class="btn danger" data-act="secretAskReset">เริ่มรอบใหม่</button>'}</div></div>`,
+    `<button class="btn primary" data-act="saveSecretSettings">บันทึก</button><button class="btn ghost" data-act="closeSheet">ปิด</button>`);
 }
 function stickerForm(){
   openSheet('มอบสติกเกอร์พิเศษ',`
@@ -1602,6 +1649,16 @@ const ACT={
   async saveSticker(){const kid=radio('skKid'),sid=radio('skId');if(!kid){toast('เลือกน้องก่อน');return}
     await Store.put('log',uid(),{kid,kind:'sticker',sticker:sid,note:val('skNote'),pts:0,at:Date.now()});closeSheet();S.stickerKid=kid;toast('มอบสติกเกอร์แล้ว');render()},
   awardForm,
+  secretForm,
+  secretSettings(){S.confirm=null;secretSettings()},
+  secretAskReset(){S.confirm='secretReset';secretSettings()},
+  secretSettingsBack(){S.confirm=null;secretSettings()},
+  async secretReset(){S.confirm=null;await Store.put('meta','secret',Object.assign({},secretMeta(),{since:Date.now()}));closeSheet();toast('เริ่มรอบใหม่แล้ว');render()},
+  async saveSecretSettings(){const title=val('stTitle')||'Secret Game';await Store.put('meta','secret',Object.assign({},secretMeta(),{title}));closeSheet();toast('บันทึกแล้ว');render()},
+  async saveSecret(){const ids=radios('scKid');const cu=val('scCustom');const n=cu!==''?Math.round(+cu):+radio('scPts');
+    if(!ids.length){toast('เลือกคนก่อน');return}if(!n||isNaN(n)){toast('ใส่คะแนนที่ไม่ใช่ 0');return}
+    const note=val('scNote');const at=Date.now();for(const kid of ids)await Store.put('log',uid(),{kid,kind:'secret',pts:n,note,at});
+    closeSheet();toast((n>0?'ให้ +':'หัก ')+n+' คะแนน '+ids.length+' คน');render()},
   async saveAward(){const ids=radios('awKid');const n=+radio('awPts')||1;if(!ids.length){toast('เลือกคนที่จะได้แต้มก่อน');return}
     const note=val('awNote');for(const kid of ids)await Store.put('log',uid(),{kid,kind:'award',pts:n,note,at:Date.now()});closeSheet();toast('ให้ '+n+' แต้มแล้ว');render()},
   async delLog(t){await Store.del('log',t.dataset.id);S.confirm=null;render()},
