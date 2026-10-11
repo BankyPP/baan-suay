@@ -465,7 +465,9 @@ const Store={
     let db=null;const cfg=window.FIREBASE_CONFIG;
     if(cfg&&cfg.apiKey&&!/ใส่/.test(cfg.apiKey)){
       if(!window.firebase){this.err='โหลด Firebase ไม่ได้ ตรวจอินเทอร์เน็ตแล้วเปิดหน้าใหม่'}
-      else{try{if(!firebase.apps.length)firebase.initializeApp(cfg);await firebase.auth().signInAnonymously();db=firebase.firestore();this.kind='firebase'}
+      else{try{if(!firebase.apps.length)firebase.initializeApp(cfg);const au=firebase.auth();
+          const u=await new Promise(r=>{const un=au.onAuthStateChanged(x=>{un();r(x)})});if(!u)await au.signInAnonymously();
+          db=firebase.firestore();this.kind='firebase'}
         catch(e){this.err='เข้าฐานข้อมูล Firebase ไม่ได้ ('+(e&&e.code||'error')+') ตรวจว่าเปิด Anonymous ใน Authentication แล้ว และวาง Rules ถูกต้อง'}}
     }else if(window.claude&&typeof window.claude.use==='function'){try{db=await window.claude.use('db')}catch(e){db=null}if(db)this.kind='claude'}
     if(db){
@@ -474,6 +476,9 @@ const Store={
         db.collection(c).onSnapshot(s=>{const m={};s.docs.forEach(x=>{m[x.id]=Object.assign({},x.data(),{id:x.id})});this.d[c]=m;changed()},
           ()=>toast('เชื่อมต่อข้อมูลบ้านไม่ได้ ลองเปิดหน้านี้ใหม่'));
       });
+      if(this.kind==='firebase'){this.d.adminRequests={};
+        db.collection('adminRequests').onSnapshot(s=>{const m={};s.docs.forEach(x=>{m[x.id]=Object.assign({},x.data(),{id:x.id})});this.d.adminRequests=m;changed()},()=>{});
+        await this.afterAuth();}
     }else{
       this.mode='local';
       COLS.forEach(c=>{let m={};try{m=JSON.parse(localStorage.getItem('house6:'+c)||'{}')||{}}catch(e){}
@@ -482,9 +487,27 @@ const Store={
     changed();
     try{await this.maybeSeed()}catch(e){}
   },
+  /* login: everyone is signed in anonymously; brother mode needs a Google account on the allowed list (meta/admins) */
+  user:null, admin:false, ownerClaim:false,
+  get isGoogle(){return !!(this.user&&!this.user.isAnonymous)},
+  admins(){return (this.d.meta.admins&&this.d.meta.admins.uids)||[]},
+  adminNames(){return (this.d.meta.admins&&this.d.meta.admins.names)||{}},
+  async afterAuth(){
+    const au=firebase.auth();this.user=au.currentUser;this.admin=false;this.ownerClaim=false;
+    if(this.isGoogle){const uid=this.user.uid;
+      try{const snap=await this.db.collection('meta').doc('admins').get();const a=snap.exists?snap.data():{};
+        if((a.uids||[]).includes(uid))this.admin=true;
+        else{await this.db.collection('meta').doc('admins').set({uids:(a.uids||[]).concat(uid),names:Object.assign({},a.names||{},{[uid]:this.user.displayName||'พี่'})});this.admin=true;this.ownerClaim=true}
+      }catch(e){this.admin=false}
+    }
+    if(!this.admin)S.bro=false;else if(LS.get('bro',false))S.bro=true;
+    changed();
+    if(this.admin){try{await this.maybeSeed()}catch(e){}}
+  },
+  checkAdmin(){if(this.kind!=='firebase')return;if(!this.user){this.admin=false;S.bro=false;return}const ok=this.isGoogle&&(this.ownerClaim||this.admins().includes(this.user.uid));this.admin=ok;if(!ok)S.bro=false},
   /* a fresh copy of the website starts with the house's starter data (window.HOUSE_SEED), once */
   async maybeSeed(){
-    const seed=window.HOUSE_SEED;if(!seed||this.kind==='claude')return;
+    const seed=window.HOUSE_SEED;if(!seed||this.kind==='claude')return;if(this.kind==='firebase'&&!this.admin)return;
     const data=seed.data||seed,ver=seed.ver||{},top=seed.v||1;
     const shared=this.mode==='shared';
     const exists=async(c,id)=>shared?(await this.db.collection(c).doc(id).get()).exists:!!(this.d[c]&&this.d[c][id]);
@@ -612,6 +635,7 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!typing()){
 
 const TABS=[['home','หน้าบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
 function render(){
+  Store.checkAdmin();
   if(S.tab==='admin'&&!S.bro)S.tab='home';
   $('#houseName').textContent=houseName();
   const mb=$('#modeBtn');mb.setAttribute('aria-pressed',S.bro?'true':'false');$('.mlabel',mb).textContent=S.bro?'โหมดพี่ เปิดอยู่':'โหมดพี่';
@@ -628,7 +652,7 @@ function render(){
 
 /* ---------- home ---------- */
 function emptyHouse(){
-  return `<div class="empty"><b>บ้านนี้ยังไม่มีสมาชิก</b><p>เพิ่มพี่น้องแต่ละคนก่อน แล้วสนามแข่ง ห้องเรียน และสติกเกอร์จะเริ่มทำงาน</p>${S.bro?'<button class="btn primary" data-act="kidForm">เพิ่มสมาชิกคนแรก</button>':'<button class="btn primary" data-act="toggleBro">เปิดโหมดพี่เพื่อเพิ่มสมาชิก</button>'}</div>`;
+  return `<div class="empty"><b>บ้านนี้ยังไม่มีสมาชิก</b><p>เพิ่มพี่น้องแต่ละคนก่อน แล้วสนามแข่ง ห้องเรียน และสติกเกอร์จะเริ่มทำงาน</p>${S.bro?'<button class="btn primary" data-act="kidForm">เพิ่มสมาชิกคนแรก</button>':`<button class="btn primary" data-act="toggleBro">${Store.kind==='firebase'?'ให้พี่ล็อกอินโหมดพี่ ข้อมูลบ้านจะขึ้นเอง':'เปิดโหมดพี่เพื่อเพิ่มสมาชิก'}</button>`}</div>`;
 }
 function logText(e){
   switch(e.kind){
@@ -1195,7 +1219,7 @@ function vStickers(){
 /* ---------- admin ---------- */
 function vAdmin(){
   const ks=kids();const lg=logs().slice(0,40);
-  return `<section class="sec"><div class="sec-head"><h2>ชื่อบ้าน</h2></div>
+  return adminAccess()+`<section class="sec"><div class="sec-head"><h2>ชื่อบ้าน</h2></div>
     <div class="panel row2"><label class="field"><span>ชื่อที่แสดงด้านบน</span><input type="text" id="adHouse" value="${esc(houseName())}"></label><div style="align-self:end"><button class="btn primary" data-act="saveHouse">บันทึกชื่อบ้าน</button></div></div></section>
   <section class="sec"><div class="sec-head"><div><h2>สมาชิกในบ้าน</h2><p>ปรับชั้นเรียนได้ทุกปี บทเรียนจะกรองตามช่วงชั้น</p></div><button class="btn primary" data-act="kidForm">เพิ่มสมาชิก</button></div>
     <div class="panel">${ks.length?ks.map(k=>`<div class="kidrow">${pawn(k,'lg')}<div><b>${esc(kidLabel(k))}</b><div class="small muted">${esc(k.grade||'')}${k.band?' · '+bandName(k.band):''}${k.league===false?' · ไม่นับในสนามแข่ง':''}</div></div><button class="btn sm" data-act="kidForm" data-id="${esc(k.id)}">แก้ไข</button></div>`).join(''):'<p class="muted">ยังไม่มีสมาชิก</p>'}</div></section>
@@ -1207,7 +1231,7 @@ function vAdmin(){
       <label class="field"><span>นำเข้าข้อมูล (วางข้อความที่คัดลอกไว้)</span><textarea id="importBox" placeholder='{"house":"house6", ...}'></textarea><small>รายการที่มีอยู่แล้วจะถูกแทนที่ด้วยรายการที่ id ตรงกัน รายการอื่นยังอยู่ครบ</small></label>
       <div class="btns"><button class="btn primary" data-act="importData">นำเข้า</button></div>
     </div></section>
-  <section class="sec"><div class="panel small muted">ที่เก็บข้อมูลตอนนี้: ${Store.kind==='firebase'?'Firebase (ทุกเครื่องที่เปิดเว็บนี้เห็นข้อมูลเดียวกัน)':Store.mode==='shared'?'ฐานข้อมูลของหน้านี้ (ทุกคนที่มีสิทธิ์เปิดเห็นข้อมูลเดียวกัน)':'เบราว์เซอร์ของเครื่องนี้'} · โหมดพี่เป็นแค่สวิตช์ซ่อนปุ่มแก้ไข ไม่ใช่รหัสผ่าน</div></section>`;
+  <section class="sec"><div class="panel small muted">ที่เก็บข้อมูลตอนนี้: ${Store.kind==='firebase'?'Firebase (ทุกเครื่องที่เปิดเว็บนี้เห็นข้อมูลเดียวกัน · โหมดพี่ต้องล็อกอิน)':Store.mode==='shared'?'ฐานข้อมูลของหน้านี้ (ทุกคนที่มีสิทธิ์เปิดเห็นข้อมูลเดียวกัน)':'เบราว์เซอร์ของเครื่องนี้'} ${Store.kind==='firebase'?'':'· โหมดพี่เป็นแค่สวิตช์ซ่อนปุ่มแก้ไข ไม่ใช่รหัสผ่าน'}</div></section>`;
 }
 
 const VIEWS={home:vHome,learn:vLearn,games:vGames,tools:vTools,wall:vWall,stickers:vStickers,admin:vAdmin};
@@ -1239,6 +1263,23 @@ function kidForm(id){
     `<button class="btn primary" data-act="saveKid" data-id="${esc(id||'')}">บันทึก</button>${id?(S.confirm===ck?`<button class="btn dangerfill" data-act="delKid" data-id="${esc(id)}">ยืนยันเอาออก (ประวัติแต้มยังอยู่)</button>`:`<button class="btn danger" data-act="askKid" data-id="${esc(id)}">เอาออกจากบ้าน</button>`):''}`);
 }
 
+function authSheet(){
+  const u=Store.user;const g=Store.isGoogle;const req=g&&Store.d.adminRequests&&Store.d.adminRequests[u.uid];
+  if(!g){openSheet('โหมดพี่',`<p>โหมดพี่ใช้เพิ่มบทเรียน ให้แต้ม และแก้ข้อมูลบ้าน เปิดได้เฉพาะบัญชี Google ที่ได้รับสิทธิ์</p><p class="muted small">น้องๆ เล่นเกม ทำควิซ และโพสต์ได้โดยไม่ต้องล็อกอิน</p>`,
+    `<button class="btn primary big" data-act="signIn">เข้าสู่ระบบด้วย Google</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);return}
+  if(Store.admin){openSheet('บัญชีพี่',`<p>ล็อกอินเป็น <b>${esc(u.displayName||'')}</b> เปิดโหมดพี่ได้</p>`,`<button class="btn" data-act="signOut">ออกจากระบบ</button><button class="btn ghost" data-act="closeSheet">ปิด</button>`);return}
+  openSheet('ยังไม่มีสิทธิ์โหมดพี่',`<p>ล็อกอินเป็น <b>${esc(u.displayName||'')}</b> แล้ว แต่บัญชีนี้ยังไม่ได้รับสิทธิ์เปิดโหมดพี่</p>
+    <p class="muted small">${req?'ส่งคำขอแล้ว รอพี่ที่มีสิทธิ์กดอนุมัติในหน้าจัดการบ้าน':'กดขอสิทธิ์ แล้วให้พี่ที่มีสิทธิ์กดอนุมัติในหน้าจัดการบ้าน'}</p>`,
+    `${req?'':'<button class="btn primary" data-act="reqAdmin">ขอสิทธิ์โหมดพี่</button>'}<button class="btn" data-act="signOut">ออกจากระบบ</button><button class="btn ghost" data-act="closeSheet">ปิด</button>`);
+}
+function adminAccess(){
+  if(Store.kind!=='firebase')return '';
+  const ids=Store.admins();const nm=Store.adminNames();const reqs=Object.values(Store.d.adminRequests||{}).sort((a,b)=>(a.at||0)-(b.at||0));const me=Store.user&&Store.user.uid;
+  return `<section class="sec"><div class="sec-head"><div><h2>คนที่เปิดโหมดพี่ได้</h2><p>ล็อกอินด้วย Google คนอื่นเล่นได้โดยไม่ต้องล็อกอิน</p></div><button class="btn sm" data-act="authSheet">บัญชีของฉัน</button></div>
+    <div class="panel">${ids.length?ids.map(id=>{const ck='adm:'+id;return `<div class="kidrow"><span class="pawn" style="--c:#4A5868">${esc((nm[id]||'?').slice(0,2))}</span><div><b>${esc(nm[id]||'ไม่มีชื่อ')}</b>${id===me?' <span class="tag">คุณ</span>':''}</div>${id===me?'<span></span>':S.confirm===ck?`<button class="btn sm dangerfill" data-act="removeAdmin" data-id="${esc(id)}">ยืนยันเอาสิทธิ์ออก</button>`:`<button class="btn sm ghost" data-act="ask" data-id="${ck}">เอาสิทธิ์ออก</button>`}</div>`}).join(''):'<p class="muted">ยังไม่มีรายชื่อ</p>'}</div>
+    ${reqs.length?`<div class="panel"><span class="label">คำขอสิทธิ์</span>${reqs.map(r=>`<div class="kidrow"><span class="pawn" style="--c:#8A6A3B">${esc((r.name||'?').slice(0,2))}</span><div><b>${esc(r.name||'ไม่มีชื่อ')}</b><div class="small muted">${ago(r.at)}</div></div><div class="btns"><button class="btn sm primary" data-act="approveAdmin" data-id="${esc(r.id)}">อนุมัติ</button><button class="btn sm ghost" data-act="rejectAdmin" data-id="${esc(r.id)}">ปฏิเสธ</button></div></div>`).join('')}</div>`:''}
+  </section>`;
+}
 function blankQ(type){return {type:type||'mcq',q:'',choices:['','','',''],answer:0,explain:'',key:'',max:2}}
 function blankT(){return {name:'',stars:0,goals:''}}
 function lessonForm(id){
@@ -1385,11 +1426,26 @@ function guestFrom(name){const n=name.trim();if(!n)return null;return {name:n,co
 
 const ACT={
   tab(t){S.tab=t.dataset.id;S.confirm=null;persist();render();window.scrollTo({top:0})},
-  toggleBro(){S.bro=!S.bro;S.confirm=null;persist();render();toast(S.bro?'เปิดโหมดพี่: แก้ไขได้':'ปิดโหมดพี่แล้ว')},
+  toggleBro(){if(Store.kind==='firebase'&&!S.bro&&!Store.admin){authSheet();return}S.bro=!S.bro;S.confirm=null;persist();render();toast(S.bro?'เปิดโหมดพี่: แก้ไขได้':'ปิดโหมดพี่แล้ว')},
   lb(t){S.lb=t.dataset.id;render()},
   ask(t){S.confirm=t.dataset.id;render()},
   cancelAsk(){S.confirm=null;render()},
   closeSheet,
+  /* login */
+  signIn(){const au=firebase.auth();const pv=new firebase.auth.GoogleAuthProvider();pv.setCustomParameters({prompt:'select_account'});
+    au.signInWithPopup(pv).then(async()=>{await Store.afterAuth();if(Store.admin){S.bro=true;persist();closeSheet();toast('เปิดโหมดพี่แล้ว');render()}else authSheet()})
+      .catch(e=>{const c=e&&e.code||'';if(c==='auth/popup-blocked'||c==='auth/operation-not-supported-in-this-environment'){au.signInWithRedirect(pv);return}
+        if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request')return;
+        toast(c==='auth/unauthorized-domain'?'Firebase ยังไม่อนุญาตโดเมนนี้ เพิ่ม bankypp.github.io ใน Authorized domains':'ล็อกอินไม่สำเร็จ ('+c+')')})},
+  async signOut(){const au=firebase.auth();S.bro=false;persist();await au.signOut();await au.signInAnonymously();await Store.afterAuth();closeSheet();toast('ออกจากระบบแล้ว');render()},
+  async reqAdmin(){const u=Store.user;if(!u||u.isAnonymous)return;try{await Store.db.collection('adminRequests').doc(u.uid).set({name:u.displayName||'ไม่มีชื่อ',at:Date.now()});toast('ส่งคำขอแล้ว รอพี่อนุมัติในจัดการบ้าน');authSheet()}catch(e){toast('ส่งคำขอไม่สำเร็จ ลองใหม่')}},
+  async approveAdmin(t){const r=Store.d.adminRequests[t.dataset.id];if(!r)return;const a=Store.d.meta.admins||{};
+    await Store.put('meta','admins',{uids:(a.uids||[]).filter(x=>x!==r.id).concat(r.id),names:Object.assign({},a.names||{},{[r.id]:r.name||'พี่'})});
+    try{await Store.db.collection('adminRequests').doc(r.id).delete()}catch(e){}toast('ให้สิทธิ์ '+(r.name||'')+' แล้ว')},
+  async rejectAdmin(t){try{await Store.db.collection('adminRequests').doc(t.dataset.id).delete()}catch(e){toast('ลบคำขอไม่สำเร็จ')}},
+  async removeAdmin(t){const a=Store.d.meta.admins||{};const id=t.dataset.id;S.confirm=null;
+    const names=Object.assign({},a.names||{});delete names[id];await Store.put('meta','admins',{uids:(a.uids||[]).filter(x=>x!==id),names});toast('เอาสิทธิ์ออกแล้ว')},
+  authSheet(){authSheet()},
   /* learn */
   subj(t){S.learn.subj=t.dataset.id;render()},
   lkid(t){S.learn.kid=S.learn.kid===t.dataset.id?'all':t.dataset.id;render()},

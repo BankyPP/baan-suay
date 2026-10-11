@@ -1,8 +1,26 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    function signedIn() { return request.auth != null; }
+    function google() { return signedIn() && request.auth.token.firebase.sign_in_provider == 'google.com'; }
+    // ใส่ Gmail ของเจ้าของบ้านแทน OWNER_GMAIL (คนนี้เปิดโหมดพี่ได้เสมอ และอนุมัติคนอื่นได้)
+    function isOwner() { return google() && request.auth.token.email_verified == true && request.auth.token.email == 'OWNER_GMAIL'; }
+    function isAdmin() {
+      return isOwner() || (google()
+        && exists(/databases/$(database)/documents/meta/admins)
+        && request.auth.uid in get(/databases/$(database)/documents/meta/admins).data.uids);
+    }
+    // คำขอสิทธิ์โหมดพี่: เจ้าของบัญชีส่งเองได้ พี่ลบได้
+    match /adminRequests/{uid} {
+      allow read: if signedIn();
+      allow create, update: if google() && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+    // ข้อมูลบ้าน: ทุกคนอ่านได้ น้องเพิ่มผลควิซ/เกม/โพสต์ได้ ที่เหลือแก้ได้เฉพาะพี่
+    match /{col}/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() && col in ['log', 'posts', 'sessions'];
+      allow write: if isAdmin();
     }
   }
 }
