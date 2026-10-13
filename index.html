@@ -49,7 +49,9 @@ button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
-.wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:16px 80px}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:16px 28px}
+.sitefoot{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-size:.84rem;color:var(--muted);text-align:center}
+.sitefoot time{font-variant-numeric:tabular-nums;color:var(--ink)}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
 .brand svg{width:46px;height:46px;flex:none;color:var(--ink)}
@@ -409,6 +411,7 @@ details.rules summary{cursor:pointer;font:500 .88rem var(--f-head);color:var(--m
   <nav class="tabs" id="tabs" aria-label="ห้องในบ้าน"></nav>
   <div id="banner"></div>
   <main id="view"></main>
+  <footer class="sitefoot" id="siteFoot"></footer>
 </div>
 <div class="sheet" id="sheet" hidden><div class="sheet-card" id="sheetCard" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" hidden role="status"></div>
@@ -1818,6 +1821,11 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
+/* footer: when the website itself was last updated (stamped at each release) */
+const SITE_UPDATED='2026-10-13T23:07:19+07:00';
+(function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
+  let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
+  el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
 /* hook for future games: House.registerTool({id,name,desc,view:()=>html}) */
 window.House={registerTool(def){if(def&&def.id&&typeof def.view==='function'){TOOLS[def.id]={view:def.view,name:def.name,desc:def.desc};render()}},store:Store,kids,act:ACT,render};
 
