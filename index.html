@@ -1416,10 +1416,12 @@ function lessonForm(id){
   const l=id?Store.d.lessons[id]:null;
   S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?(l.content||''):'',
     topics:l&&l.topics?l.topics.map(t=>({tid:t.tid||('t'+uid()),name:t.name||'',stars:+t.stars||0,goals:(t.goals||[]).join('\n')})):[blankT()],
-    midAfter:l?(l.midAfter||''):'',bulkTopic:'',hidden:l?(l.hidden||[]).slice():[],
+    midAfter:l?(l.midAfter||''):'',bulkTopic:'',hidden:null,
     questions:l?(l.questions||[]).map(q=>isMEQ(q)?{type:'meq',topic:q.topic||'',q:q.q||'',choices:['','','',''],answer:0,explain:q.explain||'',key:q.key!=null?q.key:(q.answer||''),max:qMax(q)}
       :{type:'mcq',topic:q.topic||'',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2}):[],
     example:l?!!l.example:false};
+  /* new quiz sets start hidden from the kids until the brother opens them */
+  S.draft.hidden=l?(l.hidden||[]).slice():['mid','final',...S.draft.topics.map(t=>t.tid)];
   paintLessonForm();
 }
 function starPick(i,cur){
@@ -1625,7 +1627,7 @@ const ACT={
   endQuiz(){clearInterval(qTick);const q=S.quiz;S.quiz=null;S.learn.open=q?q.lessonId:null;render()},
   lessonForm(t){lessonForm(t.dataset.id||null)},
   async delLesson(t){await Store.del('lessons',t.dataset.id);S.learn.open=null;S.confirm=null;toast('ลบบทเรียนแล้ว');render()},
-  tAdd(){syncDraft();S.draft.topics.push(blankT());paintLessonForm()},
+  tAdd(){syncDraft();const t=blankT();S.draft.topics.push(t);S.draft.hidden=(S.draft.hidden||[]).concat(t.tid);paintLessonForm()},
   tDel(t){syncDraft();S.draft.topics.splice(+t.dataset.id,1);paintLessonForm()},
   tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   tDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
@@ -1834,7 +1836,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-13T23:14:37+07:00';
+const SITE_UPDATED='2026-10-13T23:17:18+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
