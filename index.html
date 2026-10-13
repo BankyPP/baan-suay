@@ -228,6 +228,12 @@ ul.plain{list-style:none;margin:0;padding:0}
 .topic.exam .tno{background:var(--ink);color:var(--paper)}
 .topic.exam.final{border-color:var(--ink)}
 .chip.examchip{font-weight:600}
+.chip.hidchip{border-style:dashed;opacity:.75}
+.tfoot.hid>.muted{text-decoration:line-through}
+.tfoot .btn.eye{margin-left:auto}
+.tfoot .btn.eye+.btn{margin-left:0}
+.btn.eye{font-size:.82rem;color:var(--good);border-color:var(--good)}
+.btn.eye.off{color:var(--muted);border-color:var(--line);border-style:dashed}
 .qedit .mini{justify-self:start}
 .clock{font:600 1rem/1 var(--f-head);font-variant-numeric:tabular-nums;padding:8px 12px;border-radius:999px;background:var(--sunk);min-width:4.2em;text-align:center}
 .clock.warn{background:var(--bad-bg);color:var(--bad)}
@@ -754,10 +760,16 @@ function midTids(l){const tp=l.topics||[];const ix=l.midAfter?tp.findIndex(t=>t.
 const isFinalQ=q=>!q.topic||q.topic==='final';
 function scopeFilter(l,sc){if(!sc)return()=>true;if(sc==='final')return isFinalQ;if(sc==='mid')return q=>q.topic==='mid';return q=>q.topic===sc}
 const scopeCount=(l,sc)=>qsOf(l,'mcq',sc).length+qsOf(l,'meq',sc).length;
+/* brother can hide a quiz set (topic tid / 'mid' / 'final') until it has been taught */
+const setHidden=(l,sc)=>(l.hidden||[]).includes(sc);
+const setOpen=(l,sc)=>S.bro||!setHidden(l,sc);
+const lessonScopes=l=>[...(l.topics||[]).map(t=>t.tid).filter(Boolean),'mid','final'];
+const openQCount=(l,mode)=>{const keep=new Set();lessonScopes(l).forEach(sc=>{if(setOpen(l,sc))qsOf(l,mode,sc).forEach(i=>keep.add(i))});return keep.size};
 function scopeName(l,sc){if(!sc||sc==='final')return 'Final';if(sc==='mid')return 'Midterm';const i=(l.topics||[]).findIndex(t=>t.tid===sc);return i<0?'หัวข้อ':'หัวข้อ '+(i+1)}
 function curScope(l){const s0=S.learn.scope;let sc=s0&&s0.lid===l.id?s0.sc:null;
   if(sc&&sc!=='final'&&sc!=='mid'&&!(l.topics||[]).some(t=>t.tid===sc))sc=null;
-  if(!sc){const all=[...(l.topics||[]).map(t=>t.tid).filter(Boolean),'mid','final'];sc=all.find(x=>scopeCount(l,x))||'final'}
+  if(sc&&!setOpen(l,sc))sc=null;
+  if(!sc){sc=lessonScopes(l).find(x=>setOpen(l,x)&&scopeCount(l,x))||null}
   return sc}
 const qsOf=(l,mode,sc)=>{const keep=scopeFilter(l,sc);return (l.questions||[]).map((q,i)=>({q,i})).filter(x=>(mode==='meq'?isMEQ(x.q):!isMEQ(x.q))&&keep(x.q)).map(x=>x.i)};
 const STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.85 6.03 6.6.8-4.88 4.53 1.27 6.54L12 17.27 6.16 20.5l1.27-6.54L2.55 9.43l6.6-.8z"/></svg>';
@@ -773,7 +785,7 @@ function vLearn(){
   const list=all.filter(l=>(S.learn.subj==='all'||l.subject===S.learn.subj)&&(!fk||bandFits(l.levels,fk.band)));
   const cnt=id=>all.filter(l=>l.subject===id).length;
   const doneBy=l=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
-  const card=l=>{const tp=l.topics||[];const mx=tp.length?Math.max(...tp.map(t=>+t.stars||0)):0;const nm=qsOf(l,'mcq').length,ne=qsOf(l,'meq').length;
+  const card=l=>{const tp=l.topics||[];const mx=tp.length?Math.max(...tp.map(t=>+t.stars||0)):0;const nm=openQCount(l,'mcq'),ne=openQCount(l,'meq');
     const blurb=tp.length?tp.slice(0,3).map(t=>t.name).filter(Boolean).join(' · ')+(tp.length>3?' …':''):plain(l.content).slice(0,96)+(plain(l.content).length>96?'…':'');
     return `<button class="lcard" data-act="openLesson" data-id="${esc(l.id)}">
       <div class="meta"><span class="subj">${subjName(l.subject)}</span><span class="tag">${lv(l)}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
@@ -801,13 +813,15 @@ function vLesson(l){
   const ck='lesson:'+l.id;const tp=l.topics||[];
   const ks=kids();const sel=S.learn.player&&kidById(S.learn.player)?S.learn.player:null;
   const st=qset();const sc=curScope(l);
-  const nm=qsOf(l,'mcq',sc).length,ne=qsOf(l,'meq',sc).length;
+  const nm=sc?qsOf(l,'mcq',sc).length:0,ne=sc?qsOf(l,'meq',sc).length:0;
   if(st.mode==='mcq'&&!nm&&ne)st.mode='meq';if(st.mode==='meq'&&!ne&&nm)st.mode='mcq';
-  const n=st.mode==='meq'?ne:nm;const allQ=(l.questions||[]).length;const mt=midTids(l);
+  const n=st.mode==='meq'?ne:nm;const allQ=openQCount(l,'mcq')+openQCount(l,'meq');const mt=midTids(l);
   const setHint=st.timer==='q'?`จับเวลาข้อละ ${fmtDur(st.qSec)} หมดเวลาแล้วไปเฉลยทันที`:st.timer==='set'?`ทั้งชุด ${n} ข้อ ภายใน ${fmtDur(st.setSec)} หมดเวลาแล้วข้อที่เหลือนับเป็น 0`:'ทำตามสบาย ไม่มีนับถอยหลัง หน้าสรุปจะบอกเวลาที่ใช้';
   const doneIn=s=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id&&(e.scope||'final')===s).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
-  const foot=s=>{const a=qsOf(l,'mcq',s).length,b=qsOf(l,'meq',s).length;if(!a&&!b)return '';const dn=doneIn(s);
-    return `<div class="tfoot"><span class="muted small">${a?'MCQ '+a:''}${a&&b?' · ':''}${b?'MEQ '+b:''}</span>${dn.length?`<span class="stack">${dn.map(k=>pawn(k,'sm')).join('')}</span>`:''}<button class="btn sm" data-act="qsScope" data-id="${esc(s)}">ทำควิซ${s==='final'?' Final':s==='mid'?' Midterm':'หัวข้อนี้'}</button></div>`};
+  const foot=s=>{const a=qsOf(l,'mcq',s).length,b=qsOf(l,'meq',s).length;if(!a&&!b)return '';const dn=doneIn(s);const hid=setHidden(l,s);
+    if(!S.bro&&hid)return `<div class="tfoot"><span class="muted small">ควิซชุดนี้ยังไม่เปิดให้ทำ</span></div>`;
+    const eye=S.bro?`<button class="btn sm ghost eye ${hid?'off':''}" data-act="toggleSet" data-id="${esc(s)}" aria-pressed="${!hid}" title="${hid?'แตะเพื่อเปิดให้น้องเห็น':'แตะเพื่อซ่อนจากน้อง'}">${hid?'ซ่อนจากน้องอยู่':'น้องเห็นแล้ว'}</button>`:'';
+    return `<div class="tfoot ${hid?'hid':''}"><span class="muted small">${a?'MCQ '+a:''}${a&&b?' · ':''}${b?'MEQ '+b:''}</span>${dn.length?`<span class="stack">${dn.map(k=>pawn(k,'sm')).join('')}</span>`:''}${eye}<button class="btn sm" data-act="qsScope" data-id="${esc(s)}">ทำควิซ${s==='final'?' Final':s==='mid'?' Midterm':'หัวข้อนี้'}</button></div>`};
   const examCard=(s,label,sub)=>`<li class="topic exam ${s}"><span class="tno">${s==='mid'?'M':'F'}</span><div class="topic-head"><h3>${label}</h3><span class="muted small">${sub}</span></div>${foot(s)||'<p class="muted small">ยังไม่มีโจทย์ในชุดนี้</p>'}</li>`;
   let items='';
   tp.forEach((t,i)=>{const gs=(t.goals||[]).filter(g=>String(g).trim());
@@ -820,8 +834,9 @@ function vLesson(l){
   if(tp.length&&!mt&&scopeCount(l,'mid'))items+=examCard('mid','Midterm','ยังไม่ได้เลือกว่าอยู่หลังหัวข้อไหน');
   if(tp.length)items+=examCard('final','Final','ครอบคลุมทุกหัวข้อในบทนี้');
   const hasMid=scopeCount(l,'mid')>0,hasFin=scopeCount(l,'final')>0;
-  const ordered=[];tp.forEach(t=>{if(t.tid&&scopeCount(l,t.tid))ordered.push(t.tid);if(mt&&t.tid===l.midAfter&&hasMid)ordered.push('mid')});
+  let ordered=[];tp.forEach(t=>{if(t.tid&&scopeCount(l,t.tid))ordered.push(t.tid);if(mt&&t.tid===l.midAfter&&hasMid)ordered.push('mid')});
   if(hasMid&&!ordered.includes('mid'))ordered.push('mid');if(hasFin)ordered.push('final');
+  ordered=ordered.filter(x=>setOpen(l,x));
   return `<section class="sec">
     <button class="back" data-act="closeLesson">← กลับห้องเรียน</button>
     <div class="sec-head"><div class="chips"><span class="subj">${subjName(l.subject)}</span><span class="tag">${lv(l)}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
@@ -837,7 +852,7 @@ function vLesson(l){
   <section class="sec" id="quizPanel"><div class="panel qpanel">
     <div><h2>ควิซ</h2><p class="muted small">ทำครั้งแรกของแต่ละชุดและแต่ละแบบได้แต้มเข้าบ้าน MCQ ได้แต้มตามข้อที่ถูก MEQ ได้ตามคะแนนที่ได้</p></div>
     ${allQ?`
-    <div class="qgroup"><span class="label">ชุดข้อสอบ</span><div class="chips">${ordered.map(s=>`<button class="chip ${s==='mid'||s==='final'?'examchip':''}" data-act="qsScope" data-id="${esc(s)}" data-stay="1" aria-pressed="${sc===s}">${esc(scopeName(l,s))}</button>`).join('')}</div></div>
+    <div class="qgroup"><span class="label">ชุดข้อสอบ</span><div class="chips">${ordered.map(s=>`<button class="chip ${s==='mid'||s==='final'?'examchip':''} ${setHidden(l,s)?'hidchip':''}" data-act="qsScope" data-id="${esc(s)}" data-stay="1" aria-pressed="${sc===s}">${esc(scopeName(l,s))}${setHidden(l,s)?' · ซ่อน':''}</button>`).join('')}</div></div>
     <div class="qgroup"><span class="label">ใครทำ</span><div class="pawns">${ks.map(k=>pawnBtn(k,'quizKid',sel===k.id,'lg')).join('')}</div></div>
     <div class="qgroup"><span class="label">แบบข้อสอบ</span><div class="seg">
       <button type="button" data-act="qsMode" data-id="mcq" aria-pressed="${st.mode==='mcq'}" ${nm?'':'disabled'}><b>MCQ</b><span>ตัวเลือก · ${nm} ข้อ</span></button>
@@ -849,14 +864,14 @@ function vLesson(l){
       ${st.timer!=='none'?timeChips(st.timer,st.timer==='q'?st.qSec:st.setSec):''}
       <p class="muted small">${setHint}</p></div>
     <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&n?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+(st.mode==='meq'?'MEQ':'MCQ')+' ของ '+esc(kidById(sel).code)}</button></div>`
-    :`<p class="muted">บทนี้ยังไม่มีโจทย์${S.bro?' กดแก้ไขบทเรียนเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่หัวข้อไหน':''}</p>`}
+    :`<p class="muted">${(l.questions||[]).length&&!S.bro?'ยังไม่มีควิซที่เปิดให้ทำ รอพี่เปิดชุดข้อสอบก่อน':'บทนี้ยังไม่มีโจทย์'+(S.bro?' กดแก้ไขบทเรียนเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่หัวข้อไหน':'')}</p>`}
   </div></section>`;
 }
 
 /* quiz engine */
 function quizNow(){return Date.now()}
 function startQuizFor(lessonId,kid){
-  const l=Store.d.lessons[lessonId];const st=qset();const sc=curScope(l);const order=qsOf(l,st.mode,sc);if(!order.length)return;
+  const l=Store.d.lessons[lessonId];const st=qset();const sc=curScope(l);if(!sc)return;const order=qsOf(l,st.mode,sc);if(!order.length)return;
   const now=quizNow();
   S.quiz={lessonId,kid,scope:sc,mode:st.mode,timer:st.timer,qSec:st.qSec,setSec:st.setSec,order,i:0,res:[],picked:null,revealed:false,typed:'',
     startAt:now,qStart:now,qEnd:st.timer==='q'?now+st.qSec*1000:null,setEnd:st.timer==='set'?now+st.setSec*1000:null,setOver:false,done:false};
@@ -1579,6 +1594,8 @@ const ACT={
   openLesson(t){S.learn.open=t.dataset.id;S.confirm=null;render();window.scrollTo({top:0})},
   closeLesson(){S.learn.open=null;render()},
   quizKid(t){S.learn.player=t.dataset.id;render()},
+  async toggleSet(t){const l=Store.d.lessons[S.learn.open];if(!l||!S.bro)return;const sc=t.dataset.id;const h=new Set(l.hidden||[]);
+    if(h.has(sc))h.delete(sc);else h.add(sc);await Store.put('lessons',l.id,Object.assign({},l,{hidden:[...h]}));toast(h.has(sc)?'ซ่อน '+scopeName(l,sc)+' จากน้องแล้ว':'เปิด '+scopeName(l,sc)+' ให้น้องเห็นแล้ว')},
   qsScope(t){const l=Store.d.lessons[S.learn.open];if(!l)return;S.learn.scope={lid:l.id,sc:t.dataset.id};render();
     if(!t.dataset.stay){const el=document.getElementById('quizPanel');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}},
   qsMode(t){qset().mode=t.dataset.id;LS.set('qset',S.learn.qs);render()},
