@@ -831,10 +831,11 @@ function vLesson(l){
   const doneIn=s=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id&&(e.scope||'final')===s).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
   const foot=s=>{const a=qsOf(l,'mcq',s).length,b=qsOf(l,'meq',s).length;const hid=setHidden(l,s);
     const eye=S.bro?`<button class="btn sm ghost eye ${hid?'off':''}" data-act="toggleSet" data-id="${esc(s)}" aria-pressed="${!hid}" title="${hid?'แตะเพื่อเปิดให้น้องเห็น':'แตะเพื่อซ่อนจากน้อง'}">${hid?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>ซ่อนจากน้อง':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>น้องเห็นควิซนี้'}</button>`:'';
-    if(!a&&!b)return S.bro?`<div class="tfoot ${hid?'hid':''}"><span class="muted small">ยังไม่มีโจทย์</span>${eye}</div>`:'';
+    const ed=S.bro?`<button class="btn sm ghost" data-act="quizForm" data-id="${esc(l.id)}" data-set="${esc(s)}">${a||b?'แก้โจทย์':'เพิ่มโจทย์'}</button>`:'';
+    if(!a&&!b)return S.bro?`<div class="tfoot ${hid?'hid':''}"><span class="muted small">ยังไม่มีโจทย์</span>${eye}${ed}</div>`:'';
     const dn=doneIn(s);
     if(!S.bro&&hid)return `<div class="tfoot"><span class="muted small">ควิซชุดนี้ยังไม่เปิดให้ทำ</span></div>`;
-    return `<div class="tfoot ${hid?'hid':''}"><span class="muted small">${a?'MCQ '+a:''}${a&&b?' · ':''}${b?'MEQ '+b:''}</span>${dn.length?`<span class="stack">${dn.map(k=>pawn(k,'sm')).join('')}</span>`:''}${eye}<button class="btn sm" data-act="qsScope" data-id="${esc(s)}">ทำควิซ${s==='final'?' Final':s==='mid'?' Midterm':'หัวข้อนี้'}</button></div>`};
+    return `<div class="tfoot ${hid?'hid':''}"><span class="muted small">${a?'MCQ '+a:''}${a&&b?' · ':''}${b?'MEQ '+b:''}</span>${dn.length?`<span class="stack">${dn.map(k=>pawn(k,'sm')).join('')}</span>`:''}${eye}${ed}<button class="btn sm" data-act="qsScope" data-id="${esc(s)}">ทำควิซ${s==='final'?' Final':s==='mid'?' Midterm':'หัวข้อนี้'}</button></div>`};
   const examCard=(s,label,sub)=>`<li class="topic exam ${s}"><span class="tno">${s==='mid'?'M':'F'}</span><div class="topic-head"><h3>${label}</h3><span class="muted small">${sub}</span></div>${foot(s)||'<p class="muted small">ยังไม่มีโจทย์ในชุดนี้</p>'}</li>`;
   let items='';
   tp.forEach((t,i)=>{const gs=(t.goals||[]).filter(g=>String(g).trim());
@@ -853,7 +854,7 @@ function vLesson(l){
   return `<section class="sec">
     <button class="back" data-act="closeLesson">← กลับห้องเรียน</button>
     <div class="sec-head"><div class="chips"><span class="subj">${subjName(l.subject)}</span><span class="tag">${lv(l)}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
-    ${S.bro?`<div class="btns"><button class="btn sm" data-act="lessonForm" data-id="${esc(l.id)}">แก้ไขบทเรียน</button>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delLesson" data-id="${esc(l.id)}">ยืนยันลบบทเรียน</button><button class="btn sm ghost" data-act="cancelAsk">ไม่ลบ</button>`:`<button class="btn sm danger" data-act="ask" data-id="${ck}">ลบ</button>`}</div>`:''}</div>
+    ${S.bro?`<div class="btns"><button class="btn sm" data-act="lessonForm" data-id="${esc(l.id)}">แก้ไขบทเรียน</button><button class="btn sm" data-act="quizForm" data-id="${esc(l.id)}">แก้ไขควิซ</button>${S.confirm===ck?`<button class="btn sm dangerfill" data-act="delLesson" data-id="${esc(l.id)}">ยืนยันลบบทเรียน</button><button class="btn sm ghost" data-act="cancelAsk">ไม่ลบ</button>`:`<button class="btn sm danger" data-act="ask" data-id="${ck}">ลบ</button>`}</div>`:''}</div>
     <h2 class="ltitle">${esc(l.title)}</h2>
   </section>
   <section class="sec">
@@ -878,7 +879,7 @@ function vLesson(l){
       ${st.timer!=='none'?timeChips(st.timer,st.timer==='q'?st.qSec:st.setSec):''}
       <p class="muted small">${setHint}</p></div>
     <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&n?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+modeName(st.mode)+' ของ '+esc(kidById(sel).code)}</button></div>`
-    :`<p class="muted">${(l.questions||[]).length&&!S.bro?'ยังไม่มีควิซที่เปิดให้ทำ รอพี่เปิดชุดข้อสอบก่อน':'บทนี้ยังไม่มีโจทย์'+(S.bro?' กดแก้ไขบทเรียนเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่หัวข้อไหน':'')}</p>`}
+    :`<p class="muted">${(l.questions||[]).length&&!S.bro?'ยังไม่มีควิซที่เปิดให้ทำ รอพี่เปิดชุดข้อสอบก่อน':'บทนี้ยังไม่มีโจทย์'+(S.bro?' กดแก้ไขควิซเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่ชุดไหน':'')}</p>`}
   </div></section>`;
 }
 
@@ -1412,7 +1413,7 @@ function topicOpts(d,cur,withMid){
   const fin=!cur||cur==='final';
   return `${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${cur===t.tid?'selected':''}>หัวข้อ ${i+1}${t.name?' · '+esc(t.name):''}</option>`).join('')}<option value="mid" ${cur==='mid'?'selected':''}>Midterm</option><option value="final" ${fin?'selected':''}>Final</option>`;
 }
-function lessonForm(id){
+function lessonForm(id,part,qf){
   const l=id?Store.d.lessons[id]:null;
   S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?(l.content||''):'',
     topics:l&&l.topics?l.topics.map(t=>({tid:t.tid||('t'+uid()),name:t.name||'',stars:+t.stars||0,goals:(t.goals||[]).join('\n')})):[blankT()],
@@ -1422,19 +1423,26 @@ function lessonForm(id){
     example:l?!!l.example:false};
   /* new quiz sets start hidden from the kids until the brother opens them */
   S.draft.hidden=l?(l.hidden||[]).slice():['mid','final',...S.draft.topics.map(t=>t.tid)];
+  S.draft.part=part==='quiz'&&l?'quiz':'lesson';S.draft.qf=qf||'all';
   paintLessonForm();
 }
 function starPick(i,cur){
   return `<div class="starpick" role="radiogroup" aria-label="ความยากของหัวข้อ ${i+1}">${[5,4,3,2,1].map(n=>`<input type="radio" id="t${i}_s${n}" name="t${i}_star" value="${n}" ${cur===n?'checked':''}><label for="t${i}_s${n}" title="${n} ดาว">${STAR}</label>`).join('')}</div>`;
 }
+/* quiz editor: show one set at a time so there is less scrolling */
+function qfShow(d,q){const f=d.qf||'all';if(f==='all')return true;if(f==='final')return !q.topic||q.topic==='final';return q.topic===f}
+function qfBar(d){const f=d.qf||'all';const cnt=x=>d.questions.filter(q=>x==='all'||(x==='final'?(!q.topic||q.topic==='final'):q.topic===x)).length;
+  const sets=[['all','ทุกชุด'],...d.topics.map((t,i)=>[t.tid,'หัวข้อ '+(i+1)]),['mid','Midterm'],['final','Final']];
+  return `<div class="field"><span>ดูทีละชุด</span><div class="chips">${sets.map(([v,n])=>`<button type="button" class="chip" data-act="qfSet" data-id="${esc(v)}" aria-pressed="${f===v}">${n}<span class="n">${cnt(v)}</span></button>`).join('')}</div></div>`}
 function paintLessonForm(){
   const d=S.draft;const nm=d.questions.filter(q=>q.type!=='meq').length,ne=d.questions.length-nm;
-  openSheet(d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`${fmtBar()}
+  openSheet(d.part==='quiz'?'แก้ไขควิซ · '+esc(d.title):d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`${fmtBar()}
+${d.part!=='quiz'?`
     <div class="row2"><label class="field"><span>วิชา</span><select id="lfSubj">${SUBJECTS.map(([v,n])=>`<option value="${v}" ${d.subject===v?'selected':''}>${n}</option>`).join('')}</select></label>
     <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น เคมีไฟฟ้า"></label></div>
     <div class="field"><span>เหมาะกับช่วงชั้น (ไม่เลือก = ทุกระดับ)</span><div class="pick">${BANDS.map(([v,n])=>`<label class="opt"><input type="checkbox" name="lfLv" value="${v}" ${d.levels.includes(v)?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
     <h3>หัวข้อ ${d.topics.length} หัวข้อ</h3>
-    ${d.topics.map((t,i)=>`<fieldset class="qedit" data-drag="t"><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>หัวข้อ ${i+1}</legend>
+    ${d.topics.map((t,i)=>`<fieldset class="qedit" data-drag="t" data-ix="${i}"><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>หัวข้อ ${i+1}</legend>
       <input type="text" id="t${i}_name" value="${esc(t.name)}" placeholder="ชื่อหัวข้อ เช่น เลขออกซิเดชันและปฏิกิริยารีดอกซ์" aria-label="ชื่อหัวข้อ ${i+1}">
       <label class="check small"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}> น้องเห็นควิซของหัวข้อนี้</label>
       <div class="trow"><span class="small muted">ความยาก</span>${starPick(i,t.stars)}<div class="btns" style="margin-left:auto"><button class="btn sm ghost" data-act="tUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="tDown" data-id="${i}" ${i<d.topics.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="tDel" data-id="${i}">ลบหัวข้อ</button></div></div>
@@ -1447,8 +1455,10 @@ function paintLessonForm(){
     <details ${plain(d.content)?'open':''}><summary class="label" style="cursor:pointer">เนื้อหาเพิ่มเติม (ไม่ใส่ก็ได้)</summary>
       <label class="field" style="margin-top:10px"><textarea id="lfContent" style="min-height:120px" aria-label="เนื้อหาเพิ่มเติม">${esc(d.content)}</textarea>
       <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
+`:''}${d.part==='quiz'?`
     <h3>โจทย์ · MCQ ${nm} ข้อ · MEQ ${ne} ข้อ</h3>
-    ${d.questions.map((q,i)=>`<fieldset class="qedit" data-drag="q"><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
+    ${qfBar(d)}
+    ${d.questions.map((q,i)=>`<fieldset class="qedit" data-drag="q" data-ix="${i}" ${qfShow(d,q)?'':'hidden'}><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
       <div class="row2"><select id="q${i}_type" data-change="qtype" aria-label="แบบโจทย์"><option value="mcq" ${q.type!=='meq'?'selected':''}>MCQ ตัวเลือก</option><option value="meq" ${q.type==='meq'?'selected':''}>MEQ เขียนตอบ</option></select>
       <div class="btns" style="justify-content:flex-end"><button class="btn sm ghost" data-act="qUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="qDown" data-id="${i}" ${i<d.questions.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="qDel" data-id="${i}">ลบข้อนี้</button></div></div>
       <label class="mini wide"><span>อยู่ในชุด</span><select id="q${i}_topic" aria-label="โจทย์ข้อ ${i+1} อยู่หัวข้อไหน">${topicOpts(d,q.topic,true)}</select></label>
@@ -1463,16 +1473,16 @@ function paintLessonForm(){
     <details><summary class="label" style="cursor:pointer">วางโจทย์ทีละหลายข้อ</summary>
       <div class="form" style="margin-top:10px"><label class="mini wide"><span>ใส่ลงชุด</span><select id="bulkTopic">${topicOpts(d,d.bulkTopic||(d.topics[0]&&d.topics[0].tid),true)}</select></label><textarea id="bulkQ" style="min-height:160px" placeholder="1. ข้อใดเป็นตัวออกซิไดซ์ใน Zn + Cu^{2+} -> Zn^{2+} + Cu&#10;A) Zn&#10;*B) Cu^{2+}&#10;C) Zn^{2+}&#10;D) Cu&#10;E: Cu^{2+} รับอิเล็กตรอน จึงถูกรีดิวซ์&#10;&#10;2. อธิบายหน้าที่ของสะพานเกลือในเซลล์กัลวานิก&#10;ตอบ: รักษาสมดุลประจุในสารละลายทั้งสองครึ่งเซลล์&#10;คะแนน: 3"></textarea>
       <small class="muted">เว้นบรรทัดระหว่างข้อ · มีตัวเลือก = MCQ ใส่ * หน้าตัวที่ถูก · ไม่มีตัวเลือก = MEQ ใส่ ตอบ: แนวคำตอบ และ คะแนน: คะแนนเต็ม · E: คือคำอธิบาย</small>
-      <div class="btns"><button class="btn" data-act="bulkAdd">แปลงเป็นโจทย์</button></div></div></details>`,
+      <div class="btns"><button class="btn" data-act="bulkAdd">แปลงเป็นโจทย์</button></div></div></details>`:''}`,
     `<button class="btn primary" data-act="saveLesson">บันทึกบทเรียน</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
 }
 function syncDraft(){
   const d=S.draft;if(!d)return;
-  d.subject=val('lfSubj')||d.subject;d.title=val('lfTitle');const mid=document.getElementById('lfMid');if(mid)d.midAfter=mid.value;const bt=document.getElementById('bulkTopic');if(bt)d.bulkTopic=bt.value;const ct=document.getElementById('lfContent');if(ct)d.content=ct.value;d.levels=radios('lfLv');
+  d.subject=val('lfSubj')||d.subject;if(document.getElementById('lfTitle'))d.title=val('lfTitle');if($('#sheetCard input[name="lfLv"]'))d.levels=radios('lfLv');const mid=document.getElementById('lfMid');if(mid)d.midAfter=mid.value;const bt=document.getElementById('bulkTopic');if(bt)d.bulkTopic=bt.value;const ct=document.getElementById('lfContent');if(ct)d.content=ct.value;
   const hs=new Set(d.hidden||[]);const flag=(id,key)=>{const e=document.getElementById(id);if(e){if(e.checked)hs.delete(key);else hs.add(key)}};
   flag('lfShowMid','mid');flag('lfShowFin','final');d.topics.forEach((t,i)=>flag('t'+i+'_show',t.tid));d.hidden=[...hs];
-  d.topics.forEach((t,i)=>{t.name=val('t'+i+'_name');const s=radio('t'+i+'_star');t.stars=s?+s:0;const g=document.getElementById('t'+i+'_goals');if(g)t.goals=g.value});
-  d.questions.forEach((q,i)=>{
+  d.topics.forEach((t,i)=>{if(!document.getElementById('t'+i+'_name'))return;t.name=val('t'+i+'_name');const s=radio('t'+i+'_star');t.stars=s?+s:0;const g=document.getElementById('t'+i+'_goals');if(g)t.goals=g.value});
+  d.questions.forEach((q,i)=>{if(!document.getElementById('q'+i+'_q'))return;
     const t=document.getElementById('q'+i+'_type');if(t)q.type=t.value;const tp=document.getElementById('q'+i+'_topic');if(tp)q.topic=tp.value;
     q.q=(document.getElementById('q'+i+'_q')||{}).value||'';q.explain=val('q'+i+'_e');
     const k=document.getElementById('q'+i+'_k');if(k)q.key=k.value;
@@ -1631,7 +1641,9 @@ const ACT={
   tDel(t){syncDraft();S.draft.topics.splice(+t.dataset.id,1);paintLessonForm()},
   tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   tDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
-  qAdd(t){syncDraft();const a=S.draft.questions;const tp0=S.draft.topics[0];S.draft.questions.push(blankQ(t.dataset.id,a.length?a[a.length-1].topic:(tp0?tp0.tid:'final')));paintLessonForm()},
+  qAdd(t){syncDraft();const d=S.draft,a=d.questions;const tp0=d.topics[0];const cur=d.qf&&d.qf!=='all'?d.qf:(a.length?a[a.length-1].topic:(tp0?tp0.tid:'final'));a.push(blankQ(t.dataset.id,cur));paintLessonForm()},
+  qfSet(t){syncDraft();S.draft.qf=t.dataset.id;if(t.dataset.id!=='all')S.draft.bulkTopic=t.dataset.id;paintLessonForm();$('#sheetCard').scrollTop=0},
+  quizForm(t){S.confirm=null;lessonForm(t.dataset.id,'quiz',t.dataset.set||'all')},
   qDel(t){syncDraft();S.draft.questions.splice(+t.dataset.id,1);paintLessonForm()},
   qUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   qDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
@@ -1798,7 +1810,7 @@ document.addEventListener('click',e=>{
 /* drag a topic or question box by its grip to reorder it */
 function startDrag(e,grip){
   const item=grip.closest('[data-drag]');const list=item&&item.parentElement;if(!item||!list||!S.draft)return;
-  const kind=item.dataset.drag;const items=Array.from(list.children).filter(el=>el.dataset&&el.dataset.drag===kind);
+  const kind=item.dataset.drag;const items=Array.from(list.children).filter(el=>el.dataset&&el.dataset.drag===kind&&!el.hidden);
   const from=items.indexOf(item);if(from<0||items.length<2)return;
   const sc=$('#sheetCard');const s0=sc.scrollTop;const y0=e.clientY;
   const rs=items.map(el=>{const r=el.getBoundingClientRect();return {top:r.top+s0,h:r.height}});
@@ -1816,7 +1828,7 @@ function startDrag(e,grip){
   const move=ev=>{lastY=ev.clientY;layout();ev.preventDefault()};
   const up=()=>{cancelAnimationFrame(raf);grip.removeEventListener('pointermove',move);grip.removeEventListener('pointerup',up);grip.removeEventListener('pointercancel',up);
     items.forEach(el=>{el.style.transform='';el.classList.remove('dragging')});
-    if(to!==from){syncDraft();const a=kind==='t'?S.draft.topics:S.draft.questions;const [x]=a.splice(from,1);a.splice(to,0,x);paintLessonForm()}};
+    if(to!==from){syncDraft();const a=kind==='t'?S.draft.topics:S.draft.questions;const fr=+items[from].dataset.ix,tr=+items[to].dataset.ix;const [x]=a.splice(fr,1);a.splice(tr,0,x);paintLessonForm()}};
   grip.addEventListener('pointermove',move);grip.addEventListener('pointerup',up);grip.addEventListener('pointercancel',up);
 }
 document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('[data-grip]');if(g&&(e.button===0||e.pointerType!=='mouse')){e.preventDefault();startDrag(e,g)}});
@@ -1836,7 +1848,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-13T23:17:18+07:00';
+const SITE_UPDATED='2026-10-13T23:23:30+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
