@@ -213,6 +213,13 @@ ul.plain{list-style:none;margin:0;padding:0}
 .mini{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
 .mini input{width:92px;padding:8px 10px}
 .mini span{white-space:nowrap}
+.fmtbar{position:sticky;top:-20px;z-index:3;margin:-4px -20px 0;padding:22px 20px 10px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fmtbar button b{font-weight:600}
+.fmtbar button sub,.fmtbar button sup{font-size:.7em}
+.fmtbar button{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font:600 1rem/1 var(--f-body);cursor:pointer;color:var(--ink)}
+.fmtbar button span{font:500 .8rem/1 var(--f-head);color:var(--muted)}
+.fmtbar button:active{background:var(--sunk)}
+.fmtprev{flex:1 1 100%;min-width:0;font-size:.95rem;line-height:1.5;overflow-wrap:anywhere;min-height:1.5em}
 .mini.wide select{width:auto;max-width:100%;padding:8px 10px;min-width:0}
 .mini.wide{max-width:100%}
 .tfoot{grid-column:2;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:6px;border-top:1px dashed var(--line)}
@@ -1099,14 +1106,37 @@ function bsEnd(s,b){
 function bsCatForm(c){const b=bsBoardNow();const ck='bscol:'+c;
   openSheet('หัวข้อที่ '+(c+1),`<label class="field"><span>ชื่อหัวข้อ</span><input type="text" id="bsCatName" value="${esc(b.cats[c].name)}"></label>`,
   `<button class="btn primary" data-act="bsCatSave" data-c="${c}">บันทึก</button>${b.cats.length>1?(S.confirm===ck?`<button class="btn dangerfill" data-act="bsColDel" data-c="${c}">ยืนยันลบหัวข้อและคำถามทั้งคอลัมน์</button>`:`<button class="btn danger" data-act="bsColAsk" data-c="${c}">ลบหัวข้อนี้</button>`):''}`)}
+/* formatting bar for sub/superscript in editor sheets */
+function fmtBar(){return `<div class="fmtbar" role="toolbar" aria-label="จัดรูปแบบตัวอักษร">
+  <button type="button" data-fmt="sub" aria-label="ตัวห้อย"><b>X<sub>2</sub></b><span>ตัวห้อย</span></button>
+  <button type="button" data-fmt="sup" aria-label="ตัวยก"><b>X<sup>2</sup></b><span>ตัวยก</span></button>
+  <button type="button" data-fmt="arrow" aria-label="ลูกศร">→</button>
+  <button type="button" data-fmt="eq" aria-label="ลูกศรสมดุล">⇌</button>
+  <div class="fmtprev" id="fmtPrev"><span class="muted">เลือกข้อความในช่องที่พิมพ์ แล้วกดตัวห้อยหรือตัวยก</span></div></div>`}
+const FMT={el:null,start:0,end:0};
+function fmtTrack(el){if(!el||!$('#sheetCard').contains(el)||!(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&el.type==='text'))||el.id==='bsGuest')return;
+  FMT.el=el;try{FMT.start=el.selectionStart;FMT.end=el.selectionEnd}catch(e){}fmtPreview()}
+function fmtPreview(){const pv=$('#fmtPrev');if(!pv)return;const el=FMT.el;
+  if(!el||!document.body.contains(el)){pv.innerHTML='<span class="muted">เลือกข้อความในช่องที่พิมพ์ แล้วกดตัวห้อยหรือตัวยก</span>';return}
+  const v=el.value.trim();pv.innerHTML=v?'<span class="muted">ตัวอย่าง:</span> '+inline(esc(v.length>140?v.slice(0,140)+'…':v)).replace(/\n/g,' '):'<span class="muted">ตัวอย่างจะขึ้นตรงนี้ตอนพิมพ์</span>'}
+function fmtApply(kind){
+  const el=FMT.el;if(!el||!document.body.contains(el)){toast('แตะช่องที่จะพิมพ์ก่อน แล้วเลือกข้อความ');return}
+  const a=Math.min(FMT.start,FMT.end),b=Math.max(FMT.start,FMT.end);const sel=el.value.slice(a,b);
+  let ins,caret;
+  if(kind==='sub'||kind==='sup'){const m=kind==='sub'?'_':'^';ins=m+'{'+sel+'}';caret=sel?a+ins.length:a+2}
+  else{ins=kind==='arrow'?' -> ':' <=> ';caret=a+ins.length}
+  el.value=el.value.slice(0,a)+ins+el.value.slice(b);
+  try{el.focus({preventScroll:true});el.setSelectionRange(caret,caret)}catch(e){}
+  FMT.start=FMT.end=caret;fmtPreview();
+}
 function bsCellForm(c,r){const b=bsBoardNow();const cell=b.cats[c].qs[r];const v=bVal(b,c,r);
-  openSheet(esc(b.cats[c].name)+' · '+v,`
+  openSheet(esc(b.cats[c].name)+' · '+v,`${fmtBar()}
     <label class="field"><span>คำถาม</span><textarea id="bsQ">${esc(cell.q)}</textarea></label>
     <label class="field"><span>เฉลย</span><textarea id="bsA" style="min-height:80px">${esc(cell.a)}</textarea></label>
     ${b.ptsMode==='custom'?`<label class="field" style="max-width:200px"><span>คะแนนช่องนี้</span><input type="number" id="bsP" value="${esc(cell.pts===''||cell.pts==null?v:cell.pts)}"></label>`:`<small class="muted">คะแนนช่องนี้ ${v} ตั้งคะแนนเองทีละช่องได้ใน “ชื่อและคะแนน”</small>`}`,
   `<button class="btn primary" data-act="bsCellSave" data-c="${c}" data-r="${r}">บันทึก</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`)}
 function bsFinalForm(){const b=bsBoardNow();
-  openSheet('Final Question',`
+  openSheet('Final Question',`${fmtBar()}
     <label class="field"><span>หัวข้อ (บอกก่อนลงเดิมพัน)</span><input type="text" id="bsFC" value="${esc(b.final.cat)}"></label>
     <label class="field"><span>คำถาม</span><textarea id="bsFQ">${esc(b.final.q)}</textarea></label>
     <label class="field"><span>เฉลย</span><textarea id="bsFA" style="min-height:80px">${esc(b.final.a)}</textarea></label>`,
@@ -1363,7 +1393,7 @@ function starPick(i,cur){
 }
 function paintLessonForm(){
   const d=S.draft;const nm=d.questions.filter(q=>q.type!=='meq').length,ne=d.questions.length-nm;
-  openSheet(d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`
+  openSheet(d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`${fmtBar()}
     <div class="row2"><label class="field"><span>วิชา</span><select id="lfSubj">${SUBJECTS.map(([v,n])=>`<option value="${v}" ${d.subject===v?'selected':''}>${n}</option>`).join('')}</select></label>
     <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น เคมีไฟฟ้า"></label></div>
     <div class="field"><span>เหมาะกับช่วงชั้น (ไม่เลือก = ทุกระดับ)</span><div class="pick">${BANDS.map(([v,n])=>`<label class="opt"><input type="checkbox" name="lfLv" value="${v}" ${d.levels.includes(v)?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
@@ -1748,7 +1778,11 @@ function startDrag(e,grip){
   grip.addEventListener('pointermove',move);grip.addEventListener('pointerup',up);grip.addEventListener('pointercancel',up);
 }
 document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('[data-grip]');if(g&&(e.button===0||e.pointerType!=='mouse')){e.preventDefault();startDrag(e,g)}});
-document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz)S.quiz.typed=e.target.value});
+['focusin','select','keyup','mouseup','touchend'].forEach(ev=>document.addEventListener(ev,e=>{const t=ev==='focusin'||ev==='select'?e.target:document.activeElement;fmtTrack(t)},true));
+document.addEventListener('selectionchange',()=>fmtTrack(document.activeElement));
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-fmt]');if(b)e.preventDefault()},true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-fmt]');if(b){e.preventDefault();fmtApply(b.dataset.fmt)}});
+document.addEventListener('input',e=>{if(e.target===FMT.el)fmtTrack(e.target);if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz)S.quiz.typed=e.target.value});
 document.addEventListener('change',e=>{
   const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
   if(c==='qtype'){syncDraft();paintLessonForm()}
