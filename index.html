@@ -749,11 +749,16 @@ function vPoints(){
 /* ---------- learn ---------- */
 const isMEQ=q=>q&&(q.type==='meq'||q.type==='open');
 const qMax=q=>Math.max(1,Math.round(+q.max||1));
-/* quiz sets: each topic (by tid), Midterm (topics up to l.midAfter + Midterm-only questions), Final (everything) */
+/* quiz sets: each topic (by tid), Midterm and Final each have their own questions (topic 'mid' / 'final'; untagged counts as Final) */
 function midTids(l){const tp=l.topics||[];const ix=l.midAfter?tp.findIndex(t=>t.tid&&t.tid===l.midAfter):-1;return ix<0?null:tp.slice(0,ix+1).map(t=>t.tid)}
-function scopeFilter(l,sc){if(!sc||sc==='final')return()=>true;if(sc==='mid'){const m=midTids(l);return m?q=>q.topic==='mid'||m.includes(q.topic):()=>false}return q=>q.topic===sc}
+const isFinalQ=q=>!q.topic||q.topic==='final';
+function scopeFilter(l,sc){if(!sc)return()=>true;if(sc==='final')return isFinalQ;if(sc==='mid')return q=>q.topic==='mid';return q=>q.topic===sc}
+const scopeCount=(l,sc)=>qsOf(l,'mcq',sc).length+qsOf(l,'meq',sc).length;
 function scopeName(l,sc){if(!sc||sc==='final')return 'Final';if(sc==='mid')return 'Midterm';const i=(l.topics||[]).findIndex(t=>t.tid===sc);return i<0?'หัวข้อ':'หัวข้อ '+(i+1)}
-function curScope(l){const s0=S.learn.scope;let sc=s0&&s0.lid===l.id?s0.sc:'final';if(sc==='mid'&&!midTids(l))sc='final';if(sc!=='final'&&sc!=='mid'&&!(l.topics||[]).some(t=>t.tid===sc))sc='final';return sc}
+function curScope(l){const s0=S.learn.scope;let sc=s0&&s0.lid===l.id?s0.sc:null;
+  if(sc&&sc!=='final'&&sc!=='mid'&&!(l.topics||[]).some(t=>t.tid===sc))sc=null;
+  if(!sc){const all=[...(l.topics||[]).map(t=>t.tid).filter(Boolean),'mid','final'];sc=all.find(x=>scopeCount(l,x))||'final'}
+  return sc}
 const qsOf=(l,mode,sc)=>{const keep=scopeFilter(l,sc);return (l.questions||[]).map((q,i)=>({q,i})).filter(x=>(mode==='meq'?isMEQ(x.q):!isMEQ(x.q))&&keep(x.q)).map(x=>x.i)};
 const STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.85 6.03 6.6.8-4.88 4.53 1.27 6.54L12 17.27 6.16 20.5l1.27-6.54L2.55 9.43l6.6-.8z"/></svg>';
 function stars(n,cls){n=Math.max(0,Math.min(5,Math.round(+n||0)));return `<span class="stars ${cls||''}" role="img" aria-label="ความยาก ${n} จาก 5">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}">${STAR}</i>`).join('')}</span>`}
@@ -810,11 +815,13 @@ function vLesson(l){
       <div class="topic-head"><h3>${esc(t.name||'หัวข้อที่ '+(i+1))}</h3>${stars(t.stars)}</div>
       ${gs.length?`<div class="goalwrap"><span class="label">จุดประสงค์ ต้องรู้ / ทำได้</span><ul class="goals">${gs.map(g=>`<li>${inline(esc(g))}</li>`).join('')}</ul></div>`:'<p class="muted small">ยังไม่ได้ใส่จุดประสงค์</p>'}
       ${t.tid?foot(t.tid):''}</li>`;
-    if(mt&&t.tid===l.midAfter)items+=examCard('mid','Midterm',i===0?'ออกหัวข้อ 1':'ออกหัวข้อ 1–'+(i+1));
+    if(mt&&t.tid===l.midAfter)items+=examCard('mid','Midterm',i===0?'ครอบคลุมหัวข้อ 1':'ครอบคลุมหัวข้อ 1–'+(i+1));
   });
-  if(tp.length&&allQ)items+=examCard('final','Final','รวมทุกหัวข้อในบทนี้');
-  const scopes=[...tp.filter(t=>t.tid&&(qsOf(l,'mcq',t.tid).length+qsOf(l,'meq',t.tid).length)).map(t=>t.tid),...(mt&&(qsOf(l,'mcq','mid').length+qsOf(l,'meq','mid').length)?['mid']:[]),'final'];
-  const ordered=[];tp.forEach(t=>{if(scopes.includes(t.tid))ordered.push(t.tid);if(t.tid===l.midAfter&&scopes.includes('mid'))ordered.push('mid')});ordered.push('final');
+  if(tp.length&&!mt&&scopeCount(l,'mid'))items+=examCard('mid','Midterm','ยังไม่ได้เลือกว่าอยู่หลังหัวข้อไหน');
+  if(tp.length)items+=examCard('final','Final','ครอบคลุมทุกหัวข้อในบทนี้');
+  const hasMid=scopeCount(l,'mid')>0,hasFin=scopeCount(l,'final')>0;
+  const ordered=[];tp.forEach(t=>{if(t.tid&&scopeCount(l,t.tid))ordered.push(t.tid);if(mt&&t.tid===l.midAfter&&hasMid)ordered.push('mid')});
+  if(hasMid&&!ordered.includes('mid'))ordered.push('mid');if(hasFin)ordered.push('final');
   return `<section class="sec">
     <button class="back" data-act="closeLesson">← กลับห้องเรียน</button>
     <div class="sec-head"><div class="chips"><span class="subj">${subjName(l.subject)}</span><span class="tag">${lv(l)}</span>${l.example?'<span class="tag ex">ตัวอย่าง</span>':''}</div>
@@ -1376,7 +1383,8 @@ function adminAccess(){
 function blankQ(type,topic){return {type:type||'mcq',topic:topic||'',q:'',choices:['','','',''],answer:0,explain:'',key:'',max:2}}
 function blankT(){return {tid:'t'+uid(),name:'',stars:0,goals:''}}
 function topicOpts(d,cur,withMid){
-  return `<option value="" ${!cur?'selected':''}>Final เท่านั้น (ไม่อยู่ในหัวข้อไหน)</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${cur===t.tid?'selected':''}>หัวข้อ ${i+1}${t.name?' · '+esc(t.name):''}</option>`).join('')}${withMid?`<option value="mid" ${cur==='mid'?'selected':''}>Midterm เท่านั้น</option>`:''}`;
+  const fin=!cur||cur==='final';
+  return `${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${cur===t.tid?'selected':''}>หัวข้อ ${i+1}${t.name?' · '+esc(t.name):''}</option>`).join('')}<option value="mid" ${cur==='mid'?'selected':''}>Midterm</option><option value="final" ${fin?'selected':''}>Final</option>`;
 }
 function lessonForm(id){
   const l=id?Store.d.lessons[id]:null;
@@ -1405,7 +1413,7 @@ function paintLessonForm(){
     </fieldset>`).join('')}
     <div class="btns"><button class="btn" data-act="tAdd">เพิ่มหัวข้อ</button></div>
     <label class="field"><span>Midterm</span><select id="lfMid"><option value="">ไม่มี Midterm</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${d.midAfter===t.tid?'selected':''}>หลังหัวข้อ ${i+1}${i+1<d.topics.length?' (ก่อนหัวข้อ '+(i+2)+')':''}${t.name?' · '+esc(t.name):''}</option>`).join('')}</select>
-      <small>Midterm ออกโจทย์ของหัวข้อตั้งแต่ 1 จนถึงหัวข้อที่เลือก รวมกับโจทย์ที่ตั้งเป็น "Midterm เท่านั้น" · Final ออกโจทย์ทุกข้อในบท</small></label>
+      <small>เลือกว่า Midterm อยู่ตรงไหนในบท · โจทย์ Midterm และ Final เป็นชุดของตัวเอง ตั้งในช่อง "อยู่ในชุด" ของแต่ละข้อ ไม่ดึงโจทย์จากหัวข้อมารวม</small></label>
     <details ${plain(d.content)?'open':''}><summary class="label" style="cursor:pointer">เนื้อหาเพิ่มเติม (ไม่ใส่ก็ได้)</summary>
       <label class="field" style="margin-top:10px"><textarea id="lfContent" style="min-height:120px" aria-label="เนื้อหาเพิ่มเติม">${esc(d.content)}</textarea>
       <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
@@ -1423,7 +1431,7 @@ function paintLessonForm(){
     <div class="btns"><button class="btn" data-act="qAdd" data-id="mcq">เพิ่ม MCQ</button><button class="btn" data-act="qAdd" data-id="meq">เพิ่ม MEQ</button></div>
     <small class="muted">โจทย์ใหม่จะอยู่ในชุดเดียวกับข้อล่าสุด เปลี่ยนได้ที่ช่อง "อยู่ในชุด"</small>
     <details><summary class="label" style="cursor:pointer">วางโจทย์ทีละหลายข้อ</summary>
-      <div class="form" style="margin-top:10px"><label class="mini wide"><span>ใส่ลงชุด</span><select id="bulkTopic">${topicOpts(d,d.bulkTopic,true)}</select></label><textarea id="bulkQ" style="min-height:160px" placeholder="1. ข้อใดเป็นตัวออกซิไดซ์ใน Zn + Cu^{2+} -> Zn^{2+} + Cu&#10;A) Zn&#10;*B) Cu^{2+}&#10;C) Zn^{2+}&#10;D) Cu&#10;E: Cu^{2+} รับอิเล็กตรอน จึงถูกรีดิวซ์&#10;&#10;2. อธิบายหน้าที่ของสะพานเกลือในเซลล์กัลวานิก&#10;ตอบ: รักษาสมดุลประจุในสารละลายทั้งสองครึ่งเซลล์&#10;คะแนน: 3"></textarea>
+      <div class="form" style="margin-top:10px"><label class="mini wide"><span>ใส่ลงชุด</span><select id="bulkTopic">${topicOpts(d,d.bulkTopic||(d.topics[0]&&d.topics[0].tid),true)}</select></label><textarea id="bulkQ" style="min-height:160px" placeholder="1. ข้อใดเป็นตัวออกซิไดซ์ใน Zn + Cu^{2+} -> Zn^{2+} + Cu&#10;A) Zn&#10;*B) Cu^{2+}&#10;C) Zn^{2+}&#10;D) Cu&#10;E: Cu^{2+} รับอิเล็กตรอน จึงถูกรีดิวซ์&#10;&#10;2. อธิบายหน้าที่ของสะพานเกลือในเซลล์กัลวานิก&#10;ตอบ: รักษาสมดุลประจุในสารละลายทั้งสองครึ่งเซลล์&#10;คะแนน: 3"></textarea>
       <small class="muted">เว้นบรรทัดระหว่างข้อ · มีตัวเลือก = MCQ ใส่ * หน้าตัวที่ถูก · ไม่มีตัวเลือก = MEQ ใส่ ตอบ: แนวคำตอบ และ คะแนน: คะแนนเต็ม · E: คือคำอธิบาย</small>
       <div class="btns"><button class="btn" data-act="bulkAdd">แปลงเป็นโจทย์</button></div></div></details>`,
     `<button class="btn primary" data-act="saveLesson">บันทึกบทเรียน</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
@@ -1464,7 +1472,7 @@ async function saveLesson(){
   syncDraft();const d=S.draft;
   if(!d.title){toast('ใส่ชื่อบทก่อนบันทึก');return}
   const topics=d.topics.filter(t=>t.name.trim()||t.goals.trim()).map(t=>({tid:t.tid,name:t.name.trim(),stars:t.stars||0,goals:t.goals.split('\n').map(s=>s.replace(/^\s*[-•]\s*/,'').trim()).filter(Boolean)}));
-  const tids=topics.map(t=>t.tid);const okTopic=x=>x==='mid'||tids.includes(x)?x:'';
+  const tids=topics.map(t=>t.tid);const okTopic=x=>x==='mid'||x==='final'||tids.includes(x)?x:'final';
   const qs=d.questions.filter(q=>q.q.trim()).map(q=>{
     if(q.type==='meq')return {type:'meq',topic:okTopic(q.topic),q:q.q.trim(),key:(q.key||'').trim(),max:Math.max(1,+q.max||1),explain:q.explain};
     const kept=q.choices.map((c,j)=>({c:c.trim(),j})).filter(x=>x.c);
@@ -1589,13 +1597,13 @@ const ACT={
   tDel(t){syncDraft();S.draft.topics.splice(+t.dataset.id,1);paintLessonForm()},
   tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   tDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
-  qAdd(t){syncDraft();const a=S.draft.questions;S.draft.questions.push(blankQ(t.dataset.id,a.length?a[a.length-1].topic:''));paintLessonForm()},
+  qAdd(t){syncDraft();const a=S.draft.questions;const tp0=S.draft.topics[0];S.draft.questions.push(blankQ(t.dataset.id,a.length?a[a.length-1].topic:(tp0?tp0.tid:'final')));paintLessonForm()},
   qDel(t){syncDraft();S.draft.questions.splice(+t.dataset.id,1);paintLessonForm()},
   qUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   qDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.questions;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
   cAdd(t){syncDraft();S.draft.questions[+t.dataset.id].choices.push('');paintLessonForm()},
   cDel(t){syncDraft();const q=S.draft.questions[+t.dataset.id];q.choices.pop();if(q.answer>=q.choices.length)q.answer=0;paintLessonForm()},
-  bulkAdd(){syncDraft();const got=parseBulk(val('bulkQ'));got.forEach(q=>q.topic=S.draft.bulkTopic||'');if(!got.length){toast('ไม่พบโจทย์ ตรวจรูปแบบอีกครั้ง');return}
+  bulkAdd(){syncDraft();const got=parseBulk(val('bulkQ'));const tp0=S.draft.topics[0];got.forEach(q=>q.topic=S.draft.bulkTopic||(tp0?tp0.tid:'final'));if(!got.length){toast('ไม่พบโจทย์ ตรวจรูปแบบอีกครั้ง');return}
     S.draft.questions=S.draft.questions.filter(q=>q.q.trim()).concat(got);paintLessonForm();toast('เพิ่ม '+got.length+' ข้อแล้ว')},
   saveLesson,
   /* games */
