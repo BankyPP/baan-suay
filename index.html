@@ -231,6 +231,7 @@ ul.plain{list-style:none;margin:0;padding:0}
 .topic.exam .tno{background:var(--ink);color:var(--paper)}
 .topic.exam.final{border-color:var(--ink)}
 .chip.examchip{font-weight:600}
+.qsettings{display:grid;gap:12px;background:var(--sunk);border-style:dashed}
 .chip.hidchip{border-style:dashed;opacity:.75}
 .tfoot.hid>.muted{text-decoration:line-through}
 .tfoot .btn.eye{margin-left:auto}
@@ -1444,18 +1445,20 @@ ${d.part!=='quiz'?`
     <h3>หัวข้อ ${d.topics.length} หัวข้อ</h3>
     ${d.topics.map((t,i)=>`<fieldset class="qedit" data-drag="t" data-ix="${i}"><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>หัวข้อ ${i+1}</legend>
       <input type="text" id="t${i}_name" value="${esc(t.name)}" placeholder="ชื่อหัวข้อ เช่น เลขออกซิเดชันและปฏิกิริยารีดอกซ์" aria-label="ชื่อหัวข้อ ${i+1}">
-      <label class="check small"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}> น้องเห็นควิซของหัวข้อนี้</label>
       <div class="trow"><span class="small muted">ความยาก</span>${starPick(i,t.stars)}<div class="btns" style="margin-left:auto"><button class="btn sm ghost" data-act="tUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="tDown" data-id="${i}" ${i<d.topics.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="tDel" data-id="${i}">ลบหัวข้อ</button></div></div>
       <textarea id="t${i}_goals" style="min-height:96px" placeholder="จุดประสงค์ บรรทัดละ 1 ข้อ เช่น&#10;หาเลขออกซิเดชันของธาตุในสารประกอบได้&#10;บอกได้ว่าสารใดเป็นตัวรีดิวซ์และตัวออกซิไดซ์" aria-label="จุดประสงค์ของหัวข้อ ${i+1}">${esc(t.goals)}</textarea>
     </fieldset>`).join('')}
     <div class="btns"><button class="btn" data-act="tAdd">เพิ่มหัวข้อ</button></div>
-    <label class="field"><span>Midterm</span><select id="lfMid"><option value="">ไม่มี Midterm</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${d.midAfter===t.tid?'selected':''}>หลังหัวข้อ ${i+1}${i+1<d.topics.length?' (ก่อนหัวข้อ '+(i+2)+')':''}${t.name?' · '+esc(t.name):''}</option>`).join('')}</select>
-      <span class="pick" style="margin-top:4px"><label class="check small"><input type="checkbox" id="lfShowMid" ${d.hidden.includes('mid')?'':'checked'}> น้องเห็น Midterm</label><label class="check small"><input type="checkbox" id="lfShowFin" ${d.hidden.includes('final')?'':'checked'}> น้องเห็น Final</label></span>
-      <small>เลือกว่า Midterm อยู่ตรงไหนในบท · โจทย์ Midterm และ Final เป็นชุดของตัวเอง ตั้งในช่อง "อยู่ในชุด" ของแต่ละข้อ ไม่ดึงโจทย์จากหัวข้อมารวม</small></label>
     <details ${plain(d.content)?'open':''}><summary class="label" style="cursor:pointer">เนื้อหาเพิ่มเติม (ไม่ใส่ก็ได้)</summary>
       <label class="field" style="margin-top:10px"><textarea id="lfContent" style="min-height:120px" aria-label="เนื้อหาเพิ่มเติม">${esc(d.content)}</textarea>
       <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
 `:''}${d.part==='quiz'?`
+    <div class="panel qsettings">
+      <b class="label">ตั้งค่าชุดข้อสอบ</b>
+      <label class="field"><span>Midterm อยู่ตรงไหน</span><select id="lfMid"><option value="">ไม่มี Midterm</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${d.midAfter===t.tid?'selected':''}>หลังหัวข้อ ${i+1}${i+1<d.topics.length?' (ก่อนหัวข้อ '+(i+2)+')':''}${t.name?' · '+esc(t.name):''}</option>`).join('')}</select>
+      <small>โจทย์ Midterm และ Final เป็นชุดของตัวเอง ตั้งในช่อง "อยู่ในชุด" ของแต่ละข้อ ไม่ดึงโจทย์จากหัวข้อมารวม</small></label>
+      <div class="field"><span>น้องเห็นชุดไหนบ้าง · แตะเพื่อสลับ (สีเข้ม = น้องเห็น · สีขาว = ซ่อนไว้)</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}><span>หัวข้อ ${i+1}</span></label>`).join('')}<label class="opt"><input type="checkbox" id="lfShowMid" ${d.hidden.includes('mid')?'':'checked'}><span>Midterm</span></label><label class="opt"><input type="checkbox" id="lfShowFin" ${d.hidden.includes('final')?'':'checked'}><span>Final</span></label></div></div>
+    </div>
     <h3>โจทย์ · MCQ ${nm} ข้อ · MEQ ${ne} ข้อ</h3>
     ${qfBar(d)}
     ${d.questions.map((q,i)=>`<fieldset class="qedit" data-drag="q" data-ix="${i}" ${qfShow(d,q)?'':'hidden'}><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
@@ -1848,7 +1851,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-13T23:23:30+07:00';
+const SITE_UPDATED='2026-10-13T23:26:18+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
