@@ -473,6 +473,63 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-erow.del input[type=text],.f7-erow.del .v{opacity:.4;text-decoration:line-through}
 .f7-erow .check{font-size:.9rem}
 
+
+/* poker helper: chips and betting only */
+.pb{display:grid;gap:14px;min-width:0}
+.pb-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px 16px;flex-wrap:wrap}
+.pb-street{font:600 clamp(1.55rem,6vw,2.2rem)/1.1 var(--f-head);margin-top:4px}
+.pb-pot{text-align:right;margin-left:auto}
+.pb-pot b{display:block;font:700 clamp(2.1rem,9vw,3.2rem)/1 var(--f-head);font-variant-numeric:tabular-nums;margin-top:4px}
+.pb-deal{background:var(--sunk);border-radius:12px;padding:10px 14px;font-size:.95rem;line-height:1.5}
+.pb-deal b{font-family:var(--f-head);font-weight:600}
+.pb-turn{--c:#6B7785;background:var(--surface);border:2px solid var(--c);border-radius:20px;padding:clamp(14px,3.5vw,22px);display:grid;gap:14px;box-shadow:var(--shadow);min-width:0}
+.pb-who{display:flex;gap:14px;align-items:center;min-width:0}
+.pb-who .turnname{overflow-wrap:anywhere;font-size:clamp(1.5rem,6vw,2.2rem)}
+.pb-need{font:500 1.05rem/1.4 var(--f-head)}
+.pb-need b{font-weight:700;font-size:1.3rem;font-variant-numeric:tabular-nums}
+.pb-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pb-acts .btn{min-height:58px;font-size:1.08rem;padding:0 10px}
+.pb-allin{border-color:var(--star);color:var(--ink);background:color-mix(in srgb,var(--star) 18%,var(--surface))}
+.pb-rz{display:grid;gap:10px;padding:12px;border-radius:14px;background:var(--sunk)}
+.pb-rz .field>span{line-height:1.45}
+.pb-rzrow{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;gap:8px}
+.pb-rzrow .btn{min-height:52px;font-size:1.4rem;padding:0}
+.pb-rzrow input{font:600 1.45rem/1 var(--f-head);text-align:center;font-variant-numeric:tabular-nums;background:var(--surface)}
+.pb-quick{display:flex;gap:6px;flex-wrap:wrap}
+.pb-seats{display:grid;gap:6px}
+.pb-seat{--c:#6B7785;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--c)}
+.pb-seat.now{border-color:var(--c);border-width:2px 2px 2px 5px;box-shadow:var(--shadow)}
+.pb-seat.off{opacity:.5}
+.pb-nm{min-width:0;display:grid;gap:3px;justify-items:start}
+.pb-nm b{font:600 1rem/1.2 var(--f-head);overflow-wrap:anywhere}
+.pb-role{display:inline-grid;place-items:center;min-width:26px;height:22px;padding:0 6px;border-radius:11px;font:600 .7rem/1 var(--f-head);background:var(--sunk);color:var(--muted);margin-left:6px;vertical-align:2px}
+.pb-role.d{background:var(--ink);color:var(--paper)}
+.pb-st{font:500 .76rem/1 var(--f-head);padding:4px 7px;border-radius:6px;background:var(--sunk);color:var(--muted)}
+.pb-st.now{background:var(--c);color:#fff}
+.pb-st.hot{background:color-mix(in srgb,var(--star) 26%,var(--surface));color:var(--ink)}
+.pb-chips{text-align:right;font:600 1.2rem/1 var(--f-head);font-variant-numeric:tabular-nums}
+.pb-chips small{display:block;font:500 .74rem/1.2 var(--f-head);color:var(--muted);margin-top:4px}
+.pb-tap{background:none;border:0;padding:0;cursor:pointer;border-radius:50%}
+.pb-potbox{display:grid;gap:10px;padding:14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.pb-pothead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.pb-pothead b{font:700 1.5rem/1 var(--f-head);font-variant-numeric:tabular-nums}
+.pb-picks{display:flex;gap:8px;flex-wrap:wrap}
+.pb-pick{display:inline-flex;gap:8px;align-items:center;min-height:44px;padding:6px 14px 6px 6px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;font:500 .98rem var(--f-head);color:var(--ink)}
+.pb-pick[aria-pressed="true"]{border-color:var(--good);background:var(--good-bg);box-shadow:inset 0 0 0 1px var(--good)}
+.pb-last{display:grid;gap:8px;padding:14px;border-radius:16px;background:var(--good-bg);border:1px solid color-mix(in srgb,var(--good) 40%,transparent)}
+.pb-lastrow{font-size:1rem}
+.pb-lastrow b{font-family:var(--f-head);font-weight:600}
+.pb-nets{display:flex;gap:6px 12px;flex-wrap:wrap}
+.pb-net{display:inline-flex;align-items:center;gap:5px;font:600 .95rem var(--f-head);font-variant-numeric:tabular-nums}
+.pb-net.up,.pb-sub.up{color:var(--good)}
+.pb-net.down,.pb-sub.down{color:var(--bad)}
+.pb-sub{display:block;font:500 .78rem var(--f-head);color:var(--muted)}
+.pb-log{margin:8px 0 0;padding-left:1.4em;font-size:.9rem;color:var(--muted);display:grid;gap:2px}
+.pb-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:360px}
+.pb-crow{display:grid;grid-template-columns:auto minmax(0,1fr) 110px auto auto;gap:8px;align-items:center}
+.pb-crow b{font:600 .98rem var(--f-head);overflow-wrap:anywhere}
+.pb-crow input{font-variant-numeric:tabular-nums;text-align:right}
+@media (max-width:480px){.pb-crow{grid-template-columns:auto minmax(0,1fr) 92px;row-gap:6px}.pb-crow .btn{grid-column:span 1}.pb-crow .btn:first-of-type{grid-column:2}}
 </style>
 </head>
 <body>
@@ -508,7 +565,7 @@ window.FIREBASE_CONFIG = {
 <!-- ===== จบส่วนตั้งค่า ===== -->
 <script>
 /* ข้อมูลตั้งต้นของบ้าน: ใส่ตอนฐานข้อมูลยังว่าง และเพิ่มเฉพาะของใหม่ (ver สูงกว่าที่เคยใส่) */
-window.HOUSE_SEED = {"v": 5, "ver": {"lessons/chem-electro": 2, "games/flip7": 5}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/flip7"]};
+window.HOUSE_SEED = {"v": 6, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 6}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก หมอบ, เช็ค, ตาม หรือเพิ่ม\n- คนที่ไม่หมอบจนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่นหมอบหมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้องตามเท่าไร เพิ่มได้ขั้นต่ำเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/flip7"]};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -536,7 +593,7 @@ const kindName=id=>(KINDS.find(k=>k[0]===id)||[0,'เกม'])[1];
 const POSTTYPES=[['news','ข่าวในบ้าน'],['plan','นัดหมาย'],['memory','ความทรงจำ'],['story','เรื่องเล่า']];
 const postType=id=>(POSTTYPES.find(k=>k[0]===id)||[0,'โพสต์'])[1];
 const SWATCHES=['#2F5BD3','#D23F77','#D9940F','#23935F','#7650CC','#E5612A','#0E8C9C','#8A6A3B','#C2416B','#4A5868'];
-const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['flip7','ตัวช่วย Flip 7'],['timer','จับเวลาและสุ่ม']];
+const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['flip7','ตัวช่วย Flip 7'],['poker','ตัวช่วยโป๊กเกอร์'],['timer','จับเวลาและสุ่ม']];
 
 function bandFits(levels,band){
   if(!levels||!levels.length||!band) return true;
@@ -737,11 +794,11 @@ const S={
   tab:LS.get('tab','home'), bro:LS.get('bro',false), lb:'month',
   learn:{subj:'all',kid:'all',open:null}, quiz:null, confirm:null,
   gameKind:'all', stickerKid:null, tool:LS.get('tool',null),
-  bs:LS.get('bs',null), uno:LS.get('uno',null), score:LS.get('score',null), flip:LS.get('flip',null),
+  bs:LS.get('bs',null), uno:LS.get('uno',null), score:LS.get('score',null), flip:LS.get('flip',null), poker:LS.get('poker',null),
   timer:{total:60,left:60,run:false,endAt:0,done:false}, rnd:{pool:null,pick:null,spinning:false}, dice:{n:2,vals:[3,5]}, coin:null,
   draft:null
 };
-const persist=()=>{LS.set('tab',S.tab);LS.set('bro',S.bro);LS.set('tool',S.tool);LS.set('bs',S.bs);LS.set('uno',S.uno);LS.set('score',S.score);LS.set('flip',S.flip)};
+const persist=()=>{LS.set('tab',S.tab);LS.set('bro',S.bro);LS.set('tool',S.tool);LS.set('bs',S.bs);LS.set('uno',S.uno);LS.set('score',S.score);LS.set('flip',S.flip);LS.set('poker',S.poker)};
 
 /* ---------- render ---------- */
 let pending=false;
@@ -1089,10 +1146,11 @@ const TOOL_LIST=[
   {id:'bsgs',name:'Baan Suay Game Show',desc:'กระดานเกมโชว์แบบ Jeopardy เลือกหัวข้อและคะแนน มี Final Question'},
   {id:'uno',name:'ตัวช่วย UNO',desc:'บอกว่าตาใคร หมุนทางไหน ต้องจั่วกี่ใบ'},
   {id:'flip7',name:'Flip 7',desc:'นับแต้มแยกคน เรียงตามคะแนน ใส่หลายเลขแล้ว Enter ทีเดียว มีปุ่มเลข ×2 และ +15 ตั้งเป้าได้'},
+  {id:'poker',name:'โป๊กเกอร์',desc:'นับชิปและเดิมพัน Texas Hold\'em บอกตาใคร ต้องตามเท่าไร แบ่งกองย่อยตอน All-in ให้เอง'},
   {id:'score',name:'กระดานคะแนน',desc:'เก็บแต้มบอร์ดเกม แบบแข่งกันหรือช่วยกัน'},
   {id:'timer',name:'จับเวลาและสุ่ม',desc:'นับถอยหลัง สุ่มคนเริ่ม ทอยลูกเต๋า โยนเหรียญ'}
 ];
-const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},flip7:{view:vFlip7},timer:{view:vTimer}};
+const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},flip7:{view:vFlip7},poker:{view:vPoker},timer:{view:vTimer}};
 function vTools(){
   if(S.tool&&TOOLS[S.tool]){const t=TOOL_LIST.find(x=>x.id===S.tool)||TOOLS[S.tool];
     return `<section class="sec"><div class="sec-head"><div><button class="back" data-act="closeTool">← ตัวช่วยทั้งหมด</button><h2>${esc(t.name||'')}</h2></div></div>${TOOLS[S.tool].view()}</section>`}
@@ -2101,6 +2159,304 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.f7-key'))e.preventDefault()});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
   f.draft[f7key(p)]=t.value;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+t.dataset.f7);if(pv)pv.innerHTML=f7PrevHTML(f,p)});
+/* Poker (No-Limit Texas Hold'em): only chips and betting. Cards are dealt for real on the table */
+const PB_STREETS=['ก่อน Flop','Flop','Turn','River'];
+const PB_DEAL=['<b>แจกไพ่คนละ 2 ใบ</b> แล้วเริ่มเดิมพัน','<b>เปิดไพ่กลาง 3 ใบ</b> แล้วเดิมพันรอบ Flop','<b>เปิดไพ่กลางใบที่ 4</b> แล้วเดิมพันรอบ Turn','<b>เปิดไพ่กลางใบที่ 5</b> แล้วเดิมพันรอบสุดท้าย'];
+const PB_CHIPS=[500,1000,2000,5000];
+const PB_BLINDS=[[5,10],[10,20],[25,50],[50,100],[100,200]];
+const pbN=n=>Math.round(+n||0).toLocaleString('en-US');
+const pbInt=v=>{const s=String(v==null?'':v).replace(/[๐-๙]/g,d=>String(d.charCodeAt(0)-0x0E50)).replace(/[,\s]/g,'');if(!/^\d+$/.test(s))return NaN;return parseInt(s,10)};
+function pb(){
+  if(!S.poker)S.poker={phase:'setup',players:[],start:1000,sb:10,bb:20,dealer:0,fixD:true,hands:0,h:null,last:null,hist:[],ui:{},award:2,saved:false};
+  const P=S.poker;P.hist=P.hist||[];P.ui=P.ui||{};P.players.forEach(p=>{if(!(p.chips>=0))p.chips=0;if(!(p.buyin>=0))p.buyin=p.chips});return P;
+}
+function pbSnap(P,label){P.hist.push({label,s:clone({players:P.players,h:P.h,phase:P.phase,dealer:P.dealer,fixD:P.fixD,hands:P.hands,last:P.last,sb:P.sb,bb:P.bb})});if(P.hist.length>60)P.hist.shift()}
+const pbHas=(P,i)=>!!(P.players[i]&&P.players[i].chips>0);
+function pbNext(P,from,ok){const n=P.players.length;for(let k=1;k<=n;k++){const j=((from+k)%n+n)%n;if(ok(j))return j}return -1}
+/* who is dealer / small blind / big blind for the coming hand. Heads-up: the dealer posts the small blind */
+function pbRoles(P){
+  const n=P.players.length;const ok=i=>pbHas(P,i);const cnt=P.players.filter((p,i)=>ok(i)).length;if(cnt<2)return null;
+  let d=P.dealer;if(!(d>=0&&d<n))d=0;d=P.fixD?pbNext(P,d-1,ok):pbNext(P,d,ok);
+  const sb=cnt===2?d:pbNext(P,d,ok);const bb=pbNext(P,sb,ok);return {d,sb,bb,heads:cnt===2};
+}
+const pbPot=h=>h.ps.reduce((a,s)=>a+s.tot,0);
+const pbLive=h=>h.ps.map((s,i)=>i).filter(i=>h.ps[i].in&&!h.ps[i].fold);
+const pbActor=(h,i)=>{const s=h.ps[i];return !!(s&&s.in&&!s.fold&&!s.allin)};
+function pbMove(P,i,amt){const h=P.h,s=h.ps[i],p=P.players[i];const a=Math.max(0,Math.min(Math.floor(amt),p.chips));p.chips-=a;s.bet+=a;s.tot+=a;if(p.chips===0)s.allin=true;return a}
+function pbCanRaise(P,i){const h=P.h,s=h.ps[i],p=P.players[i];if(!s||!p)return false;const need=Math.max(0,h.curBet-s.bet);
+  return !s.lock&&p.chips>need&&pbLive(h).some(j=>j!==i&&!h.ps[j].allin)}
+function pbMinTo(P,i){const h=P.h,s=h.ps[i],p=P.players[i];const max=s.bet+p.chips;const mi=h.curBet>0?h.curBet+h.minR:Math.max(1,P.bb);return {min:Math.min(mi,max),max}}
+/* a bet nobody matched goes back to whoever made it */
+function pbRefund(P){
+  const h=P.h;const idx=h.ps.map((s,i)=>i).filter(i=>h.ps[i].bet>0).sort((a,b)=>h.ps[b].bet-h.ps[a].bet);if(!idx.length)return;
+  const top=h.ps[idx[0]].bet,sec=idx.length>1?h.ps[idx[1]].bet:0;if(top<=sec)return;
+  const i=idx[0],x=top-sec,s=h.ps[i];s.bet-=x;s.tot-=x;P.players[i].chips+=x;if(P.players[i].chips>0)s.allin=false;
+  h.log.push(`คืน ${pbN(x)} ที่ไม่มีใครตามให้ ${playerName(P.players[i])}`);
+}
+function pbStartHand(P){
+  const r=pbRoles(P);if(!r)return false;
+  pbSnap(P,'เริ่มมือที่ '+(P.hands+1));P.dealer=r.d;P.fixD=false;
+  P.h={no:P.hands+1,d:r.d,sbI:r.sb,bbI:r.bb,street:0,curBet:P.bb,minR:Math.max(1,P.bb),cur:-1,runout:false,log:[],
+    ps:P.players.map((p,i)=>({in:pbHas(P,i),bet:0,tot:0,fold:false,allin:false,acted:false,lock:false,say:''}))};
+  const h=P.h;const a=pbMove(P,r.sb,P.sb),b=pbMove(P,r.bb,P.bb);
+  h.log.push(`${playerName(P.players[r.sb])} ลง Small blind ${pbN(a)}${h.ps[r.sb].allin?' (All-in)':''}`,`${playerName(P.players[r.bb])} ลง Big blind ${pbN(b)}${h.ps[r.bb].allin?' (All-in)':''}`);
+  P.phase='hand';P.ui={};
+  pbAdvance(P,r.heads?r.sb:r.bb+1);return true;
+}
+/* after every action: hand over? betting round over? otherwise whose turn (searching from seat `from`) */
+function pbAdvance(P,from){
+  const h=P.h;const n=P.players.length;const live=pbLive(h);
+  if(live.length<=1){pbFoldWin(P,live[0]);return}
+  const actors=live.filter(i=>!h.ps[i].allin);
+  const done=!actors.length||(actors.length===1&&h.ps[actors[0]].bet>=h.curBet)||actors.every(i=>h.ps[i].acted&&h.ps[i].bet===h.curBet);
+  if(!done){
+    for(let k=0;k<n;k++){const j=((from+k)%n+n)%n;const s=h.ps[j];if(pbActor(h,j)&&(!s.acted||s.bet<h.curBet)){h.cur=j;return}}
+    h.cur=actors[0];return;
+  }
+  pbRefund(P);h.ps.forEach(s=>{s.bet=0;s.acted=false;s.lock=false;if(!s.fold&&!s.allin)s.say=''});h.curBet=0;h.minR=Math.max(1,P.bb);
+  const still=pbLive(h).filter(i=>!h.ps[i].allin);
+  if(h.street>=3||still.length<=1){h.runout=h.street<3;h.cur=-1;P.phase='show';P.ui={win:{}};pbAutoWin(P);return}
+  h.street++;h.log.push('— '+PB_STREETS[h.street]+' —');
+  pbAdvance(P,h.d+1);
+}
+function pbNet(h,won){const net={};h.ps.forEach((s,i)=>{if(s.in){const v=(won[i]||0)-s.tot;if(v)net[i]=v}});return net}
+function pbFoldWin(P,w){
+  const h=P.h;pbRefund(P);const pot=pbPot(h);P.players[w].chips+=pot;
+  P.last={no:h.no,fold:true,pots:[{amt:pot,win:[w],each:[pot]}],net:pbNet(h,{[w]:pot}),log:h.log.concat(`${playerName(P.players[w])} ได้ ${pbN(pot)} เพราะคนอื่นหมอบหมด`)};
+  P.hands++;P.h=null;P.phase='ready';P.ui={};
+}
+/* main pot and side pots: one layer per all-in level; folded chips stay in, but only live players can win */
+function pbPots(h){
+  const live=pbLive(h);const lv=[...new Set(live.map(i=>h.ps[i].tot))].filter(v=>v>0).sort((a,b)=>a-b);
+  const pots=[];let prev=0;
+  for(const L of lv){let amt=0;h.ps.forEach(s=>{amt+=Math.max(0,Math.min(s.tot,L)-prev)});const el=live.filter(i=>h.ps[i].tot>=L);
+    if(amt>0){const last=pots[pots.length-1];if(last&&last.el.join()===el.join())last.amt+=amt;else pots.push({amt,el})}prev=L}
+  const rest=pbPot(h)-pots.reduce((a,p)=>a+p.amt,0);if(rest>0){if(pots.length)pots[pots.length-1].amt+=rest;else pots.push({amt:rest,el:live})}
+  return pots;
+}
+function pbAutoWin(P){const h=P.h;if(!h)return;P.ui.win=P.ui.win||{};pbPots(h).forEach((pt,k)=>{if(pt.el.length===1)P.ui.win[k]=[pt.el[0]]})}
+/* split pots: equal shares, odd chips go to the winner sitting closest to the dealer's left */
+function pbPay(P){
+  const h=P.h;const n=P.players.length;const pots=pbPots(h);const w=P.ui.win||{};
+  if(!pots.every((pt,k)=>(w[k]||[]).some(i=>pt.el.includes(i)))){toast('เลือกคนชนะให้ครบทุกกองก่อน');return}
+  pbSnap(P,'จ่ายชิปมือที่ '+h.no);
+  const won={};const out=[];const lg=h.log.slice();
+  pots.forEach((pt,k)=>{const ws=(w[k]||[]).filter(i=>pt.el.includes(i)).sort((a,b)=>((a-h.d-1+n)%n)-((b-h.d-1+n)%n));
+    const share=Math.floor(pt.amt/ws.length);let rem=pt.amt-share*ws.length;const each=ws.map(()=>share+(rem-->0?1:0));
+    ws.forEach((i,x)=>{P.players[i].chips+=each[x];won[i]=(won[i]||0)+each[x]});out.push({amt:pt.amt,win:ws,each});
+    lg.push(`${ws.map(i=>playerName(P.players[i])).join(' & ')} ได้${pots.length>1?(k?' กองย่อย '+k:' กองหลัก'):''} ${pbN(pt.amt)}`)});
+  P.last={no:h.no,fold:false,pots:out,net:pbNet(h,won),log:lg};P.hands++;P.h=null;P.phase='ready';P.ui={};
+}
+const PB_SAY={fold:'หมอบ',check:'เช็ค',call:'ตาม',raise:'เพิ่ม'};
+function pbAct(P,kind,to){
+  const h=P.h;if(!h||P.phase!=='hand'||h.cur<0)return;
+  const i=h.cur,s=h.ps[i],p=P.players[i];const nm=playerName(p);const need=Math.max(0,h.curBet-s.bet);
+  if(kind==='allin'){if(pbCanRaise(P,i)&&s.bet+p.chips>h.curBet){kind='raise';to=s.bet+p.chips}else kind='call'}
+  if(kind==='check'&&need>0)return;
+  if(kind==='raise'){if(!pbCanRaise(P,i))return;const r=pbMinTo(P,i);to=Math.floor(+to);
+    if(!(to>=r.min&&to<=r.max)){toast(`ใส่ได้ตั้งแต่ ${pbN(r.min)} ถึง ${pbN(r.max)}`);return}}
+  pbSnap(P,nm+' '+PB_SAY[kind]);
+  if(kind==='fold'){s.fold=true;s.say='หมอบ';h.log.push(nm+' หมอบ')}
+  else if(kind==='check'){s.say='เช็ค';h.log.push(nm+' เช็ค')}
+  else if(kind==='call'){const a=pbMove(P,i,need);s.say=s.allin?'All-in':'ตาม '+pbN(a);h.log.push(`${nm} ตาม ${pbN(a)}${s.allin?' (All-in)':''}`)}
+  else{const inc=to-h.curBet;const bet0=h.curBet===0;pbMove(P,i,to-s.bet);
+    if(inc>=h.minR){h.minR=inc;h.ps.forEach((x,j)=>{if(j!==i&&pbActor(h,j)){x.acted=false;x.lock=false}})}
+    else h.ps.forEach((x,j)=>{if(j!==i&&pbActor(h,j)&&x.acted){x.lock=true;x.acted=false}});
+    h.curBet=to;s.say=s.allin?'All-in':(bet0?'เดิมพัน ':'เพิ่มเป็น ')+pbN(to);
+    h.log.push(`${nm} ${bet0?'เดิมพัน':'เพิ่มเป็น'} ${pbN(to)}${s.allin?' (All-in)':''}`)}
+  s.acted=true;s.lock=false;P.ui={};
+  pbAdvance(P,i+1);
+}
+function pbQuickTo(P,kind){
+  const h=P.h,i=h.cur,s=h.ps[i];const r=pbMinTo(P,i);const need=Math.max(0,h.curBet-s.bet);const pot=pbPot(h);const u=Math.max(1,P.sb||P.bb||1);
+  let v=kind==='min'?r.min:kind==='max'?r.max:h.curBet+(pot+need)*(kind==='half'?.5:1);
+  if(kind==='half'||kind==='pot')v=Math.round(v/u)*u;return Math.max(r.min,Math.min(r.max,Math.floor(v)));
+}
+const pbRzLabel=(P,v)=>{const h=P.h;const r=pbMinTo(P,h.cur);return (h.curBet>0?'เพิ่มเป็น ':'เดิมพัน ')+(Number.isFinite(v)?pbN(v):'…')+(v>=r.max?' (All-in)':'')};
+function pbSeat(P,i,o){
+  const p=P.players[i];const h=P.h;const s=h&&h.ps[i];const r=o.roles||{};const on=s&&s.in;
+  const tags=(i===r.d?'<span class="pb-role d" title="Dealer">D</span>':'')+(i===r.sb?'<span class="pb-role">SB</span>':'')+(i===r.bb?'<span class="pb-role">BB</span>':'');
+  let st='',cls='';
+  if(h){if(!on){st=`<span class="pb-st">${p.chips>0?'รอมือหน้า':'หมดชิป'}</span>`;cls='off'}
+    else if(s.fold){st='<span class="pb-st">หมอบ</span>';cls='off'}
+    else if(i===h.cur&&P.phase==='hand'){st='<span class="pb-st now">ถึงตา</span>';cls='now'}
+    else if(s.allin)st='<span class="pb-st hot">All-in</span>';
+    else if(s.say)st=`<span class="pb-st">${esc(s.say)}</span>`}
+  else if(p.chips<=0){st='<span class="pb-st">หมดชิป</span>';cls='off'}
+  const bet=on&&s.bet>0?`<small>ลงรอบนี้ ${pbN(s.bet)}</small>`:'';
+  const who=o.tap?`<button type="button" class="pb-tap" data-act="${o.tap}" data-id="${i}" aria-label="ให้ ${esc(playerName(p))} เป็น Dealer">${playerPawn(p)}</button>`:playerPawn(p);
+  return `<div class="pb-seat ${cls}" style="--c:${f7Color(p)}">${who}<div class="pb-nm"><b>${esc(playerName(p))}${tags}</b>${st}</div><div class="pb-chips">${pbN(p.chips)}${bet}</div></div>`;
+}
+function vPoker(){const P=pb();if(P.phase==='hand'&&P.h)return pbHandView(P);if(P.phase==='show'&&P.h)return pbShowView(P);if(P.phase==='end')return pbEndView(P);if(P.phase==='ready'&&P.players.length)return pbReadyView(P);return pbSetupView(P)}
+function pbSetupView(P){
+  const o=P.players;const customC=!PB_CHIPS.includes(P.start);
+  return `<div class="stage">
+    <div><h3>เลือกคนเล่น</h3><p class="muted small">แตะเรียงตามที่นั่งรอบโต๊ะ วนตามเข็มนาฬิกา แตะซ้ำเพื่อเอาออก ใช้ไพ่จริงบนโต๊ะ จอช่วยแค่นับชิปกับเดิมพัน</p></div>
+    <div class="pawns">${kids().map(k=>pawnBtn(k,'pbPick',o.some(p=>p.id===k.id),'lg')).join('')}</div>
+    <div class="row2"><label class="field"><span>เพื่อนหรือแขก</span><input type="text" id="pbGuestIn" placeholder="ชื่อ เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="pbGuest">เพิ่มแขก</button></div></div>
+    <div class="order" aria-label="ลำดับที่นั่ง">${o.length?o.map((p,i)=>`<span class="item">${i+1}${playerPawn(p,'sm')}${p.id?'':`<button type="button" class="btn sm ghost" data-act="pbDrop" data-id="${i}" aria-label="เอา ${esc(p.name)} ออก" style="min-height:26px;padding:0 6px">×</button>`}</span>`).join('<span class="muted">→</span>'):'<span class="muted small">ยังไม่มีคนเล่น</span>'}</div>
+    <div class="field"><span>ชิปเริ่มต้นคนละ</span>
+      <div class="chips">${PB_CHIPS.map(c=>`<button class="chip" data-act="pbStartC" data-id="${c}" aria-pressed="${P.start===c}">${pbN(c)}</button>`).join('')}<label class="mini"><span>ตั้งเอง</span><input type="text" inputmode="numeric" id="pbStartIn" value="${customC?P.start:''}" placeholder="เช่น 1500" data-change="pbSetup"></label></div></div>
+    <div class="field"><span>Blind (Small / Big) ลงบังคับก่อนแจกไพ่ทุกมือ</span>
+      <div class="chips">${PB_BLINDS.map(([a,b])=>`<button class="chip" data-act="pbBlindC" data-id="${a}/${b}" aria-pressed="${P.sb===a&&P.bb===b}">${a}/${b}</button>`).join('')}</div>
+      <div class="pb-two"><label class="field"><span>Small blind</span><input type="text" inputmode="numeric" id="pbSBIn" value="${P.sb}" data-change="pbSetup"></label><label class="field"><span>Big blind</span><input type="text" inputmode="numeric" id="pbBBIn" value="${P.bb}" data-change="pbSetup"></label></div></div>
+    <div class="btns"><button class="btn primary big" data-act="pbGo" ${o.length>=2?'':'disabled'}>${o.length>=2?`เข้าโต๊ะ ${o.length} คน · คนละ ${pbN(P.start)}`:'ต้องมีอย่างน้อย 2 คน'}</button>${o.length?'<button class="btn ghost" data-act="pbClear">ล้างคนเล่น</button>':''}</div>
+  </div>`;
+}
+function pbLastHTML(P){
+  const L=P.last;if(!L)return '';const many=L.pots.length>1;
+  const rows=L.pots.map((pt,k)=>`<div class="pb-lastrow"><b>${esc(pt.win.map(i=>P.players[i]?playerName(P.players[i]):'?').join(' & '))}</b> ได้${many?(k?' กองย่อย '+k:' กองหลัก'):''} ${pbN(pt.amt)}${pt.win.length>1?' แบ่งกัน':''}${L.fold?' · คนอื่นหมอบหมด':''}</div>`).join('');
+  const ids=Object.keys(L.net).map(Number).filter(i=>P.players[i]).sort((a,b)=>L.net[b]-L.net[a]);
+  return `<div class="pb-last"><span class="label">ผลมือที่ ${L.no}</span>${rows}
+    ${ids.length?`<div class="pb-nets">${ids.map(i=>`<span class="pb-net ${L.net[i]>0?'up':'down'}">${playerPawn(P.players[i],'sm')}${L.net[i]>0?'+':'−'}${pbN(Math.abs(L.net[i]))}</span>`).join('')}</div>`:''}
+    ${L.log&&L.log.length?`<details class="rules"><summary>ดูทุกอย่างที่เกิดในมือนั้น</summary><ol class="pb-log">${L.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>`:''}</div>`;
+}
+function pbReadyView(P){
+  const r=pbRoles(P);const total=P.players.reduce((a,p)=>a+p.chips,0);
+  return `<div class="pb">
+    ${pbLastHTML(P)}
+    <div class="pb-top"><div><span class="label">Blind ${pbN(P.sb)}/${pbN(P.bb)}${P.hands?' · เล่นไปแล้ว '+P.hands+' มือ':''}</span><div class="pb-street">${P.hands?'มือที่ '+(P.hands+1):'พร้อมเริ่มมือแรก'}</div></div><div class="pb-pot"><span class="label">ชิปทั้งโต๊ะ</span><b>${pbN(total)}</b></div></div>
+    <p class="muted small" style="margin:0">เรียงตามที่นั่ง แตะตัวคนเพื่อย้ายปุ่ม Dealer (D) ปกติปุ่มเลื่อนไปทางซ้ายเองทุกมือ</p>
+    <div class="pb-seats">${P.players.map((p,i)=>pbSeat(P,i,{roles:r||{},tap:'pbDealer'})).join('')}</div>
+    ${r?`<button class="btn primary big" data-act="pbDeal">เริ่มมือที่ ${P.hands+1}</button>`:'<div class="f7-goal" role="status"><b>เหลือคนมีชิปไม่ถึง 2 คน</b> · ซื้อชิปเพิ่มให้ใครสักคน หรือกดจบเกม</div>'}
+    <div class="btns"><button class="btn sm" data-act="pbChipsForm">ชิปและซื้อเพิ่ม</button><button class="btn sm" data-act="pbBlindForm">เปลี่ยน Blind</button><button class="btn sm" data-act="pbAddForm">+ เพิ่มคนเล่น</button><button class="btn sm" data-act="pbUndo" ${P.hist.length?'':'disabled'}>ย้อนกลับ</button></div>
+    <div class="btns"><button class="btn" data-act="pbEnd">จบเกม</button>${S.confirm==='pbnew'?'<button class="btn dangerfill" data-act="pbNew">ยืนยัน: ล้างชิปแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="pbnew">เริ่มเกมใหม่</button>'}</div>
+  </div>`;
+}
+function pbHandView(P){
+  const h=P.h;const i=h.cur;const p=P.players[i];const s=h.ps[i];if(!p||!s)return pbReadyView(P);
+  const need=Math.max(0,h.curBet-s.bet);const callA=Math.min(need,p.chips);const can=pbCanRaise(P,i);const r=pbMinTo(P,i);
+  const rz=Number.isFinite(P.ui.rz)?P.ui.rz:r.min;const roles={d:h.d,sb:h.sbI,bb:h.bbI};
+  return `<div class="pb">
+    <div class="pb-top"><div><span class="label">มือที่ ${h.no} · Blind ${pbN(P.sb)}/${pbN(P.bb)}</span><div class="pb-street">${PB_STREETS[h.street]}</div></div><div class="pb-pot"><span class="label">กองกลาง</span><b>${pbN(pbPot(h))}</b></div></div>
+    <div class="pb-deal">${PB_DEAL[h.street]}</div>
+    <div class="pb-turn" style="--c:${f7Color(p)}">
+      <div class="pb-who">${playerPawn(p,'lg')}<div style="min-width:0"><span class="label">ถึงตา</span><div class="turnname">${esc(playerName(p))}</div><div class="muted small">มีชิป ${pbN(p.chips)}${s.bet?' · ลงรอบนี้แล้ว '+pbN(s.bet):''}</div></div></div>
+      <div class="pb-need">${need>0?`ต้องตาม <b>${pbN(callA)}</b>${callA<need?' ชิปไม่พอ ตามได้เท่าที่มี':''}`:'ยังไม่ต้องจ่ายเพิ่ม เช็คได้'}${s.lock?'<span class="muted small"> · คนก่อน All-in เพิ่มไม่ถึงขั้นต่ำ ตาเราตามหรือหมอบได้อย่างเดียว</span>':''}</div>
+      <div class="pb-acts">
+        <button class="btn big danger" data-act="pbDo" data-id="fold">หมอบ</button>
+        ${need>0?`<button class="btn big primary" data-act="pbDo" data-id="call">${callA>=p.chips?'ตาม All-in '+pbN(callA):'ตาม '+pbN(callA)}</button>`:'<button class="btn big primary" data-act="pbDo" data-id="check">เช็ค</button>'}
+        ${can?`<button class="btn big" data-act="pbRz" aria-expanded="${P.ui.open?'true':'false'}">${h.curBet>0?'เพิ่ม':'เดิมพัน'}</button><button class="btn big pb-allin" data-act="pbDo" data-id="allin">All-in ${pbN(p.chips)}</button>`:''}
+      </div>
+      ${can&&P.ui.open?`<div class="pb-rz">
+        <label class="field" for="pbRzIn"><span>${h.curBet>0?'เพิ่มเป็น':'เดิมพัน'} (ยอดรวมของเราในรอบนี้) · ต่ำสุด ${pbN(r.min)} · สูงสุด ${pbN(r.max)}</span></label>
+        <div class="pb-rzrow"><button type="button" class="btn" data-act="pbStep" data-id="-1" aria-label="ลดลง ${pbN(P.bb)}">−</button><input type="text" inputmode="numeric" id="pbRzIn" value="${rz}" autocomplete="off" enterkeyhint="done"><button type="button" class="btn" data-act="pbStep" data-id="1" aria-label="เพิ่มขึ้น ${pbN(P.bb)}">+</button></div>
+        <div class="pb-quick"><button type="button" class="chip" data-act="pbQuick" data-id="min">ขั้นต่ำ</button><button type="button" class="chip" data-act="pbQuick" data-id="half">ครึ่งกอง</button><button type="button" class="chip" data-act="pbQuick" data-id="pot">เต็มกอง</button><button type="button" class="chip" data-act="pbQuick" data-id="max">All-in</button></div>
+        <button type="button" class="btn primary big" id="pbRzGo" data-act="pbRaiseGo">${pbRzLabel(P,rz)}</button>
+      </div>`:''}
+    </div>
+    <div class="pb-seats">${P.players.map((x,j)=>pbSeat(P,j,{roles})).join('')}</div>
+    <div class="btns"><button class="btn" data-act="pbUndo" ${P.hist.length?'':'disabled'} title="${esc(P.hist.length?'ย้อน: '+P.hist[P.hist.length-1].label:'')}">ย้อนกลับ</button>${S.confirm==='pbcancel'?'<button class="btn dangerfill" data-act="pbCancel">ยืนยัน: คืนชิปทุกคนแล้วยกเลิกมือนี้</button><button class="btn ghost" data-act="cancelAsk">ไม่ยกเลิก</button>':'<button class="btn ghost" data-act="ask" data-id="pbcancel">ยกเลิกมือนี้</button>'}</div>
+    <details class="rules"><summary>สิ่งที่เกิดในมือนี้</summary><ol class="pb-log">${h.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>
+  </div>`;
+}
+function pbShowView(P){
+  const h=P.h;const pots=pbPots(h);const w=P.ui.win||{};const ok=pots.every((pt,k)=>(w[k]||[]).length);const many=pots.length>1;
+  return `<div class="pb">
+    <div class="pb-top"><div><span class="label">มือที่ ${h.no}</span><div class="pb-street">เปิดไพ่โชว์</div></div><div class="pb-pot"><span class="label">กองกลาง</span><b>${pbN(pbPot(h))}</b></div></div>
+    <div class="pb-deal">${h.runout?'<b>ไม่มีใครเดิมพันต่อได้แล้ว</b> เปิดไพ่กลางให้ครบ 5 ใบ แล้ว':''}ทุกคนที่ยังไม่หมอบเปิดไพ่ แตะเลือกคนชนะ${many?'ของแต่ละกอง':''} ถ้าเสมอแตะได้หลายคน ชิปจะแบ่งเท่ากัน</div>
+    ${many?'<p class="muted small" style="margin:0">มีกองย่อยเพราะมีคน All-in ด้วยชิปน้อยกว่าคนอื่น คนนั้นชนะได้เฉพาะกองที่ตัวเองลงถึง</p>':''}
+    ${pots.map((pt,k)=>`<div class="pb-potbox"><div class="pb-pothead"><h3>${many?(k?'กองย่อย '+k:'กองหลัก'):'กองกลาง'}</h3><b>${pbN(pt.amt)}</b></div>
+      ${pt.el.length>1?`<div class="pb-picks" role="group" aria-label="คนชนะ">${pt.el.map(i=>`<button type="button" class="pb-pick" data-act="pbWin" data-k="${k}" data-id="${i}" aria-pressed="${(w[k]||[]).includes(i)}">${playerPawn(P.players[i],'sm')}<span>${esc(playerName(P.players[i]))}</span></button>`).join('')}</div>${many?`<p class="muted small" style="margin:0">ลุ้นกองนี้ได้ ${pt.el.length} คน</p>`:''}`
+        :`<p class="small" style="margin:0">เป็นของ <b>${esc(playerName(P.players[pt.el[0]]))}</b> ไม่ต้องเลือก</p>`}</div>`).join('')}
+    <div class="btns"><button class="btn primary big" data-act="pbPay" ${ok?'':'disabled'}>${ok?'จ่ายชิป':'เลือกคนชนะให้ครบก่อน'}</button><button class="btn" data-act="pbUndo" ${P.hist.length?'':'disabled'}>ย้อนกลับ</button></div>
+    <details class="rules"><summary>สิ่งที่เกิดในมือนี้</summary><ol class="pb-log">${h.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>
+  </div>`;
+}
+function pbEndView(P){
+  const r=P.players.map(p=>({p,c:p.chips,net:p.chips-p.buyin})).sort((a,b)=>b.c-a.c);const best=r.length?r[0].c:0;const win=r.filter(x=>x.c===best);
+  return `<div class="stage center"><span class="label">โป๊กเกอร์ · ${P.hands} มือ</span>
+    <div class="turnname">${r.length?esc(win.map(x=>playerName(x.p)).join(' & '))+' ชนะ':'จบเกม'}</div>
+    <div class="rank">${r.map((x,k)=>`<div><span class="no">${k+1}</span>${playerPawn(x.p)}<span>${esc(playerName(x.p))}<small class="pb-sub ${x.net>0?'up':x.net<0?'down':''}">${x.net>0?'ได้เพิ่ม +'+pbN(x.net):x.net<0?'เสียไป −'+pbN(-x.net):'เท่าทุน'}</small></span><span class="v">${pbN(x.c)}</span></div>`).join('')}</div>
+    ${P.saved?'<p class="muted">บันทึกผลเข้าบ้านแล้ว</p>':`<label class="check"><input type="checkbox" id="pbAward" checked> ให้แต้มบ้านกับคนชิปมากสุด</label><label class="field" style="max-width:180px"><span>กี่แต้ม</span><input type="number" id="pbAwardN" value="${esc(P.award)}" min="0" max="50"></label><button class="btn primary big" data-act="pbSave">บันทึกผลเข้าบ้าน</button>`}
+    <div class="btns" style="justify-content:center"><button class="btn" data-act="pbBack">กลับไปเล่นต่อ</button><button class="btn" data-act="pbAgain">เล่นใหม่ คนเดิม</button><button class="btn ghost" data-act="pbNew">ตั้งค่าใหม่</button></div></div>`;
+}
+function pbSyncSetup(){const P=pb();const c=pbInt(val('pbStartIn'));if(c>0)P.start=c;const a=pbInt(val('pbSBIn')),b=pbInt(val('pbBBIn'));if(a>=0&&b>0&&a<=b){P.sb=a;P.bb=b}}
+function pbGuest(name,P){const n=String(name||'').trim();if(!n)return null;if(P.players.some(p=>!p.id&&p.name===n)){toast('มีชื่อนี้ในเกมแล้ว');return null}
+  return {name:n,code:n.slice(0,2),color:GUEST_COLORS[P.players.filter(p=>!p.id).length%GUEST_COLORS.length],chips:P.start,buyin:P.start}}
+function pbJoinNew(P,pl){pbSnap(P,'เพิ่ม '+playerName(pl));pl.chips=P.start;pl.buyin=P.start;P.players.push(pl);if(P.h)P.h.ps.push({in:false,bet:0,tot:0,fold:false,allin:false,acted:false,lock:false,say:''})}
+function pbReset(P){P.players.forEach(p=>{p.chips=P.start;p.buyin=P.start});Object.assign(P,{dealer:0,fixD:true,hands:0,h:null,last:null,hist:[],ui:{},saved:false})}
+function pbChipsForm(){
+  const P=pb();if(!S.pbc||S.pbc.length!==P.players.length)S.pbc=P.players.map(p=>String(p.chips));
+  openSheet('ชิปของแต่ละคน',`
+    <p class="small muted">ซื้อชิปเพิ่มหรือแก้จำนวนชิป ส่วนที่เปลี่ยนนับเป็นชิปที่ซื้อเข้า ไม่นับเป็นได้หรือเสียตอนจบเกม</p>
+    ${P.players.map((p,i)=>`<div class="pb-crow">${playerPawn(p,'sm')}<b>${esc(playerName(p))}</b><input type="text" inputmode="numeric" id="pbC_${i}" value="${esc(S.pbc[i])}" aria-label="ชิปของ ${esc(playerName(p))}"><button type="button" class="btn sm" data-act="pbRebuy" data-id="${i}">+${pbN(P.start)}</button>${P.players.length>2?(S.confirm==='pbk:'+i?`<button type="button" class="btn sm dangerfill" data-act="pbKick" data-id="${i}">ยืนยันเอาออก</button>`:`<button type="button" class="btn sm ghost" data-act="pbKickAsk" data-id="${i}" aria-label="เอา ${esc(playerName(p))} ออกจากโต๊ะ">ออก</button>`):''}</div>`).join('')}`,
+    `<button class="btn primary" data-act="pbChipsSave">บันทึก</button><button class="btn ghost" data-act="pbChipsCancel">ยกเลิก</button>`);
+}
+function pbCSync(){if(!S.pbc)return;S.pbc=S.pbc.map((v,i)=>{const el=document.getElementById('pbC_'+i);return el?el.value:v})}
+function pbBlindForm(){
+  const P=pb();
+  openSheet('เปลี่ยน Blind',`<p class="small muted">ใช้ตั้งแต่มือถัดไป เล่นนานๆ แล้วชิปเยอะ ขึ้น Blind ให้เกมเร็วขึ้นได้</p>
+    <div class="chips">${PB_BLINDS.map(([a,b])=>`<button class="chip" data-act="pbBlindPick" data-id="${a}/${b}">${a}/${b}</button>`).join('')}<button class="chip" data-act="pbBlindPick" data-id="${P.sb*2}/${P.bb*2}">ขึ้น ×2</button></div>
+    <div class="pb-two"><label class="field"><span>Small blind</span><input type="text" inputmode="numeric" id="pbSB2" value="${P.sb}"></label><label class="field"><span>Big blind</span><input type="text" inputmode="numeric" id="pbBB2" value="${P.bb}"></label></div>`,
+    `<button class="btn primary" data-act="pbBlindSave">บันทึก</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+}
+function pbAddForm(){
+  const P=pb();const ins=new Set(P.players.filter(p=>p.id).map(p=>p.id));const out=kids().filter(k=>!ins.has(k.id));
+  openSheet('เพิ่มคนเล่น',`
+    ${out.length?`<div class="field"><span>แตะเพื่อเพิ่ม ได้ชิป ${pbN(P.start)} นั่งต่อท้าย และเริ่มเล่นมือถัดไป</span><div class="pawns">${out.map(k=>pawnBtn(k,'pbJoin',false,'lg')).join('')}</div></div>`:''}
+    <div class="row2"><label class="field"><span>เพื่อนหรือแขก</span><input type="text" id="pbJoinIn" placeholder="ชื่อ"></label><div style="align-self:end"><button class="btn" data-act="pbJoinGuest">เพิ่มแขก</button></div></div>`,
+    `<button class="btn ghost" data-act="closeSheet">เสร็จแล้ว</button>`);
+}
+Object.assign(ACT,{
+  pbPick(t){const P=pb(),id=t.dataset.id;if(!kidById(id))return;const i=P.players.findIndex(p=>p.id===id);if(i>=0)P.players.splice(i,1);else P.players.push({id,chips:P.start,buyin:P.start});persist();render()},
+  pbGuest(){const P=pb();pbSyncSetup();const g=pbGuest(val('pbGuestIn'),P);if(!g)return;P.players.push(g);persist();render()},
+  pbDrop(t){pb().players.splice(+t.dataset.id,1);persist();render()},
+  pbClear(){pb().players=[];persist();render()},
+  pbStartC(t){const P=pb();pbSyncSetup();P.start=+t.dataset.id;const el=document.getElementById('pbStartIn');if(el)el.value='';persist();render()},
+  pbBlindC(t){const P=pb();const c=pbInt(val('pbStartIn'));if(c>0)P.start=c;const [a,b]=t.dataset.id.split('/').map(Number);P.sb=a;P.bb=b;persist();render()},
+  pbGo(){const P=pb();pbSyncSetup();if(P.players.length<2)return;if(!(P.bb>0)){toast('ใส่ Big blind ก่อน');return}
+    if(P.bb>P.start){toast('Big blind ต้องไม่มากกว่าชิปเริ่มต้น');return}
+    pbReset(P);P.phase='ready';S.confirm=null;persist();render();window.scrollTo({top:0})},
+  pbDealer(t){const P=pb();const i=+t.dataset.id;if(!pbHas(P,i)){toast('คนนี้หมดชิปแล้ว');return}P.dealer=i;P.fixD=true;persist();render()},
+  pbDeal(){const P=pb();S.confirm=null;if(!pbStartHand(P)){toast('ต้องมีคนมีชิปอย่างน้อย 2 คน');return}persist();render();window.scrollTo({top:0})},
+  pbDo(t){const P=pb();S.confirm=null;const k=t.dataset.id;pbAct(P,k);persist();render()},
+  pbRz(){const P=pb();P.ui.open=!P.ui.open;if(P.ui.open&&!Number.isFinite(P.ui.rz))P.ui.rz=pbMinTo(P,P.h.cur).min;persist();render();
+    if(P.ui.open){const el=document.getElementById('pbRzIn');if(el&&window.innerWidth>700){el.focus();el.select()}}},
+  pbStep(t){const P=pb();const h=P.h;if(!h)return;const r=pbMinTo(P,h.cur);const cur=pbInt(val('pbRzIn'));const base=Number.isFinite(cur)?cur:r.min;
+    P.ui.rz=Math.max(r.min,Math.min(r.max,base+(+t.dataset.id)*Math.max(1,P.bb)));persist();render()},
+  pbQuick(t){const P=pb();if(!P.h)return;P.ui.rz=pbQuickTo(P,t.dataset.id);persist();render()},
+  pbRaiseGo(){const P=pb();if(!P.h)return;const v=pbInt(val('pbRzIn'));if(!Number.isFinite(v)){toast('ใส่จำนวนชิปเป็นตัวเลข');return}pbAct(P,'raise',v);persist();render()},
+  pbWin(t){const P=pb();const k=+t.dataset.k,i=+t.dataset.id;const w=P.ui.win=P.ui.win||{};const a=w[k]||[];w[k]=a.includes(i)?a.filter(x=>x!==i):a.concat(i);persist();render()},
+  pbPay(){const P=pb();pbPay(P);persist();render();window.scrollTo({top:0})},
+  pbUndo(){const P=pb();const x=P.hist.pop();if(!x){toast('ไม่มีอะไรให้ย้อนแล้ว');return}Object.assign(P,x.s);P.ui={};if(P.phase==='show'){P.ui.win={};pbAutoWin(P)}S.confirm=null;persist();render();toast('ย้อนกลับ: '+x.label)},
+  pbCancel(){const P=pb();const h=P.h;S.confirm=null;if(!h)return;pbSnap(P,'ยกเลิกมือที่ '+h.no);h.ps.forEach((s,i)=>{if(P.players[i])P.players[i].chips+=s.tot});
+    P.dealer=h.d;P.fixD=true;P.h=null;P.phase='ready';P.ui={};persist();render();toast('คืนชิปแล้ว เริ่มมือนี้ใหม่ได้')},
+  pbChipsForm(){S.confirm=null;S.pbc=null;pbChipsForm()},
+  pbRebuy(t){const i=+t.dataset.id;const el=document.getElementById('pbC_'+i);if(!el)return;const v=pbInt(el.value);el.value=String((Number.isFinite(v)?v:0)+pb().start)},
+  pbKickAsk(t){pbCSync();S.confirm='pbk:'+t.dataset.id;pbChipsForm()},
+  pbKick(t){const P=pb();const i=+t.dataset.id;const p=P.players[i];pbCSync();S.confirm=null;if(!p||P.h)return;
+    pbSnap(P,'เอา '+playerName(p)+' ออก');P.players.splice(i,1);S.pbc.splice(i,1);if(P.dealer>i)P.dealer--;if(P.dealer>=P.players.length)P.dealer=0;
+    if(P.last)P.last=null;persist();render();pbChipsForm();toast('เอา '+playerName(p)+' ออกแล้ว')},
+  pbChipsCancel(){S.pbc=null;S.confirm=null;closeSheet()},
+  pbChipsSave(){const P=pb();pbCSync();const vals=S.pbc||[];const bad=vals.some(v=>!Number.isFinite(pbInt(v)));if(bad){toast('ใส่ชิปเป็นตัวเลข 0 ขึ้นไป');return}
+    const ch=P.players.some((p,i)=>pbInt(vals[i])!==p.chips);S.pbc=null;S.confirm=null;closeSheet();if(!ch)return;
+    pbSnap(P,'แก้ชิป');P.players.forEach((p,i)=>{const v=pbInt(vals[i]);p.buyin+=v-p.chips;p.chips=v});persist();render();toast('บันทึกชิปแล้ว')},
+  pbBlindForm(){pbBlindForm()},
+  pbBlindPick(t){const [a,b]=t.dataset.id.split('/');const x=document.getElementById('pbSB2'),y=document.getElementById('pbBB2');if(x)x.value=a;if(y)y.value=b},
+  pbBlindSave(){const P=pb();const a=pbInt(val('pbSB2')),b=pbInt(val('pbBB2'));if(!(a>=0&&b>0&&a<=b)){toast('Big blind ต้องมากกว่า 0 และไม่น้อยกว่า Small blind');return}
+    closeSheet();if(a===P.sb&&b===P.bb)return;pbSnap(P,'เปลี่ยน Blind');P.sb=a;P.bb=b;persist();render();toast(`Blind ใหม่ ${pbN(a)}/${pbN(b)}`)},
+  pbAddForm(){pbAddForm()},
+  pbJoin(t){const P=pb();const id=t.dataset.id;if(P.players.some(p=>p.id===id))return;pbJoinNew(P,{id});persist();render();pbAddForm();toast('เพิ่ม '+playerName({id})+' แล้ว')},
+  pbJoinGuest(){const P=pb();const g=pbGuest(val('pbJoinIn'),P);if(!g)return;pbJoinNew(P,g);persist();render();pbAddForm();toast('เพิ่ม '+g.name+' แล้ว')},
+  pbEnd(){const P=pb();if(P.h)return;S.confirm=null;P.phase='end';persist();render();window.scrollTo({top:0})},
+  pbBack(){pb().phase='ready';persist();render()},
+  pbAgain(){const P=pb();pbReset(P);P.phase='ready';persist();render();window.scrollTo({top:0})},
+  pbNew(){const P=pb();S.confirm=null;pbReset(P);P.phase='setup';persist();render();window.scrollTo({top:0})},
+  async pbSave(){const P=pb();if(P.saved)return;const aw=checked('pbAward');const n=Math.max(0,Math.min(50,Math.floor(+val('pbAwardN')||0)));P.award=n;P.saved=true;persist();
+    const best=Math.max(...P.players.map(p=>p.chips));const winners=P.players.filter(p=>p.chips===best);
+    const pts={};if(aw)winners.forEach(p=>{if(p.id)pts[p.id]=n});
+    await saveGameSession({game:'โป๊กเกอร์',players:P.players,winners,pts});toast('บันทึกผลเข้าบ้านแล้ว');render()}
+});
+document.addEventListener('keydown',e=>{
+  if(!(S.tab==='tools'&&S.tool==='poker'&&S.poker)||!$('#sheet').hidden||e.isComposing)return;
+  const a=document.activeElement;
+  if(a&&a.id==='pbRzIn'){if(e.key==='Enter'){e.preventDefault();ACT.pbRaiseGo()}return}
+  if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+  if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.pbUndo()}
+});
+document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.id==='pbRzIn'&&S.poker&&S.poker.h))return;const v=pbInt(t.value);S.poker.ui.rz=Number.isFinite(v)?v:null;LS.set('poker',S.poker);
+  const b=document.getElementById('pbRzGo');if(b)b.textContent=pbRzLabel(S.poker,v)});
 function scoreAdd(k,n){const s=S.score;s.hist=s.hist||[];if(k==='team')s.team=(s.team||0)+n;else{const p=s.players[+k];if(!p)return;p.pts=(p.pts||0)+n}s.hist.push({k,n});persist();render()}
 
 document.addEventListener('click',e=>{
@@ -2145,12 +2501,13 @@ document.addEventListener('change',e=>{
   if(c==='unoStack'){S.uno.stack=e.target.checked;persist()}
   if(c==='scLow'){S.score.low=e.target.checked;persist()}
   if(c==='scGame'){S.score.game=e.target.value.trim();persist()}
+  if(c==='pbSetup'){pbSyncSetup();persist()}
   if(c==='f7Target'){const v=parseInt(e.target.value,10);if(v>0){f7().target=v;persist();render()}}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-24T01:02:19+07:00';
+const SITE_UPDATED='2026-10-24T02:44:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
