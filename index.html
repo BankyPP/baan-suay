@@ -448,7 +448,10 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-add .btn{min-height:42px;white-space:nowrap}
 .f7-x2{font-weight:600}
 .f7-x2[aria-pressed="true"]{background:var(--star);border-color:var(--star);color:#fff}
-.f7-b15{font-weight:600}
+.f7-b15,.f7-mod{font-weight:600}
+.f7-mod[aria-pressed="true"]{background:var(--btn);border-color:var(--btn);color:var(--btn-ink)}
+.f7-special .f7-key{font-size:.95rem}
+.f7-add .f7-go{order:1}.f7-add .f7-pad{order:2}.f7-add .f7-special{order:3}.f7-add .f7-prev{order:4}
 .f7-b15[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
 .f7-chip em.b{color:var(--good)}
 .f7-rk{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--sunk);font:600 .78rem/1 var(--f-head);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:7px;vertical-align:2px}
@@ -456,12 +459,13 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-pad{flex-basis:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
 .f7-pad .f7-key{min-height:40px;padding:0;font:600 1rem/1 var(--f-head);font-variant-numeric:tabular-nums}
 .f7-pad .f7-key:active{background:var(--sunk)}
-@media (max-width:480px){.f7-row .f7-pad{order:1}.f7-row .f7-add>.btn{order:2}.f7-row .f7-prev{order:3}}
+@media (max-width:480px){.f7-row .f7-pad{order:1}.f7-row .f7-special{order:2}.f7-row .f7-add>.btn{order:3}.f7-row .f7-prev{order:4}}
 .f7-prev{flex-basis:100%;font-size:.86rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .f7-prev:empty{display:none}
 .f7-prev b{font-family:var(--f-head);font-weight:600;color:var(--ink)}
 .f7-keys{font-size:.84rem;color:var(--muted);display:flex;gap:6px 14px;flex-wrap:wrap}
 .f7-keys span{white-space:nowrap}
+.f7-keys span.w{white-space:normal}
 .f7-erow{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
 .f7-erow input[type=text]{flex:1 1 150px;width:auto}
 .f7-erow .no{font:600 .9rem var(--f-head);color:var(--muted);font-variant-numeric:tabular-nums}
@@ -504,7 +508,7 @@ window.FIREBASE_CONFIG = {
 <!-- ===== จบส่วนตั้งค่า ===== -->
 <script>
 /* ข้อมูลตั้งต้นของบ้าน: ใส่ตอนฐานข้อมูลยังว่าง และเพิ่มเฉพาะของใหม่ (ver สูงกว่าที่เคยใส่) */
-window.HOUSE_SEED = {"v": 3, "ver": {"lessons/chem-electro": 2, "games/flip7": 3}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- ใส่แต้มหลายเลขทีเดียว เช่น 3 7 12 แล้วกด Enter\n- ได้การ์ด ×2 กดปุ่ม ×2 ก่อน Enter ถ้ามีการ์ด + ด้วย ใส่แยกอีกครั้ง\n- ได้ Flip 7 กดปุ่ม +15 แทนการพิมพ์ 15 (กด ×2 ด้วย ก็คูณ 2 ทั้งหมด)\n- รายชื่อเรียงจากแต้มมากสุดอยู่บน"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}};
+window.HOUSE_SEED = {"v": 3, "ver": {"lessons/chem-electro": 2, "games/flip7": 3}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- ใส่แต้มหลายเลขทีเดียว เช่น 3 7 12 แล้วกด Enter\n- กดปุ่มการ์ดพิเศษ ×2, +2, +4, +6, +8, +10 และ +15 (โบนัส Flip 7) ก่อน Enter\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- มีการ์ด +8 สองใบ แตะ +8 ซ้ำได้\n- รายชื่อเรียงจากแต้มมากสุดอยู่บน"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1911,19 +1915,25 @@ function f7Parse(raw){
 const f7Tot=p=>(p.entries||[]).reduce((a,e)=>a+(+e.n||0),0);
 const f7Fmt=n=>(n>0?'+':n<0?'−':'')+Math.abs(n);
 function f7(){
-  if(!S.flip)S.flip={phase:'setup',players:[],target:200,cur:0,hist:[],draft:{},x2:{},b15:{},award:2,saved:false};
-  const f=S.flip;f.draft=f.draft||{};f.x2=f.x2||{};f.b15=f.b15||{};f.hist=f.hist||[];f.target=+f.target||200;
+  if(!S.flip)S.flip={phase:'setup',players:[],target:200,cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},award:2,saved:false};
+  const f=S.flip;f.draft=f.draft||{};f.x2=f.x2||{};f.b15=f.b15||{};f.mods=f.mods||{};f.hist=f.hist||[];f.target=+f.target||200;
   f.players.forEach(p=>{p.entries=p.entries||[]});if(!(f.cur>=0&&f.cur<f.players.length))f.cur=0;return f;
 }
 function f7Snap(f,label){f.hist.push({players:clone(f.players),cur:f.cur,label});if(f.hist.length>80)f.hist.shift()}
+/* official order: number cards, then x2 on numbers only, then +2..+10 cards and the +15 bonus (never doubled) */
+const F7_MODS=[2,4,6,8,10];
+const f7Sum=a=>(a||[]).reduce((x,y)=>x+y,0);
+const f7Score=(base,x2,mods,b15)=>base*(x2?2:1)+f7Sum(mods)+(b15?15:0);
 function f7PrevHTML(f,p){
-  const k=f7key(p);const r=f7Parse(f.draft[k]);const b15=!!f.b15[k];const nums=r.nums.concat(b15?[15]:[]);const x2=r.x2||!!f.x2[k];
-  if(!nums.length)return x2?'×2 เปิดอยู่ พิมพ์แต้มแล้วกด Enter':'';
-  const base=nums.reduce((a,b)=>a+b,0);const many=nums.length>1;
-  let ex=many?nums.map((n,i)=>i===0?String(n).replace('-','−'):(n<0?'− '+(-n):'+ '+n)).join(' '):String(base).replace('-','−');
-  if(x2)ex=(many?'('+ex+')':ex)+' × 2';
-  const n=base*(x2?2:1);
-  return (many||x2?ex+' = ':'')+`<b>${f7Fmt(n)}</b> → รวม ${f7Tot(p)+n}${!r.nums.length?' · กด Enter ได้เลย':''}`;
+  const k=f7key(p);const r=f7Parse(f.draft[k]);const b15=!!f.b15[k];const mods=f.mods[k]||[];const x2=r.x2||!!f.x2[k];
+  if(!r.nums.length&&!mods.length&&!b15)return x2?'×2 เปิดอยู่ พิมพ์แต้มแล้วกด Enter':'';
+  const parts=[];
+  if(r.nums.length){const many=r.nums.length>1;let ex=many?r.nums.map((n,i)=>i===0?String(n).replace('-','−'):(n<0?'− '+(-n):'+ '+n)).join(' '):String(r.base).replace('-','−');
+    if(x2)ex=(many?'('+ex+')':ex)+' × 2';parts.push(ex)}
+  mods.forEach(m=>parts.push(String(m)));if(b15)parts.push('15');
+  const n=f7Score(r.base,x2&&r.nums.length>0,mods,b15);
+  const show=parts.length>1||(x2&&r.nums.length);
+  return (show?parts.join(' + ')+' = ':'')+`<b>${f7Fmt(n)}</b> → รวม ${f7Tot(p)+n}${!r.nums.length?' · กด Enter ได้เลย':''}`;
 }
 function vFlip7(){const f=f7();if(f.phase==='end')return f7EndView(f);if(f.phase==='play'&&f.players.length)return f7PlayView(f);return f7SetupView(f)}
 function f7SetupView(f){
@@ -1945,7 +1955,7 @@ function f7PlayView(f){
   return `<div class="f7">
     <div class="f7-head"><h3>เป้าหมาย ${f.target} แต้ม</h3><div class="btns"><button class="btn sm" data-act="f7Undo" ${f.hist.length?'':'disabled'} title="${esc(last?'ย้อน: '+last:'')}">ย้อนกลับ</button><button class="btn sm" data-act="f7PlayerForm">+ เพิ่มคนเล่น</button><button class="btn sm" data-act="f7TargetForm">เปลี่ยนเป้า</button></div></div>
     ${hit.length?`<div class="f7-goal" role="status"><b>${esc(hit.map(playerName).join(', '))} ถึง ${f.target} แล้ว</b> · เล่นให้จบรอบนี้ แล้วกดจบเกม ตอนนี้ ${esc(lead.map(playerName).join(' & '))} นำอยู่ที่ ${top}</div>`:''}
-    <div class="f7-rows">${f.players.map((p,i)=>i).sort((a,b)=>tots[b]-tots[a]||a-b).map(i=>{const p=f.players[i];const t=tots[i];const k=f7key(p);const es=p.entries;const x2=!!f.x2[k];const b15=!!f.b15[k];const rk=1+tots.filter(v=>v>t).length;
+    <div class="f7-rows">${f.players.map((p,i)=>i).sort((a,b)=>tots[b]-tots[a]||a-b).map(i=>{const p=f.players[i];const t=tots[i];const k=f7key(p);const es=p.entries;const x2=!!f.x2[k];const b15=!!f.b15[k];const mods=f.mods[k]||[];const rk=1+tots.filter(v=>v>t).length;
       return `<div class="f7-row" data-row="${i}" style="--c:${f7Color(p)}">
         <button type="button" class="f7-who" data-act="f7SetTurn" data-id="${i}" aria-label="ให้เป็นตาของ ${esc(playerName(p))}">${playerPawn(p)}</button>
         <div class="f7-name"><b><span class="f7-rk ${rk===1&&t>0?'top':''}" aria-label="อันดับ ${rk}">${rk}</span>${esc(playerName(p))}${t>=f.target?'<span class="f7-tag hit">ถึงเป้า</span>':''}</b>
@@ -1954,15 +1964,18 @@ function f7PlayView(f){
         <div class="f7-tot ${t<0?'neg':''}">${t}<small>เหลือ ${Math.max(0,f.target-t)}</small></div>
         <div class="f7-add">
           <input type="text" id="f7In_${i}" data-f7="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="เช่น 3 7 12 แล้วกด Enter" value="${esc(f.draft[k]||'')}" aria-label="ใส่แต้มของ ${esc(playerName(p))} หลายเลขเว้นวรรคได้">
-          <button type="button" class="btn sm f7-x2" data-act="f7X2" data-id="${i}" aria-pressed="${x2}" aria-label="คูณ 2 แต้มครั้งนี้">×2</button>
-          <button type="button" class="btn sm f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="ใส่ 15 ให้ ไม่ต้องพิมพ์">+15</button>
-          <button type="button" class="btn sm primary" data-act="f7AddPts" data-id="${i}">บวกแต้ม</button>
-          <button type="button" class="btn sm ghost" data-act="f7Edit" data-id="${i}" ${es.length?'':'disabled'}>แก้</button>
+          <button type="button" class="btn sm primary f7-go" data-act="f7AddPts" data-id="${i}">บวกแต้ม</button>
+          <button type="button" class="btn sm ghost f7-go" data-act="f7Edit" data-id="${i}" ${es.length?'':'disabled'}>แก้</button>
           <div class="f7-pad" role="group" aria-label="กดเลขแทนการพิมพ์">${Array.from({length:13},(_,n)=>`<button type="button" class="btn sm f7-key" data-act="f7Num" data-id="${i}" data-n="${n}">${n}</button>`).join('')}<button type="button" class="btn sm f7-key ghost" data-act="f7Num" data-id="${i}" data-n="del" aria-label="ลบเลขตัวท้าย">⌫</button></div>
+          <div class="f7-pad f7-special" role="group" aria-label="การ์ดพิเศษ">
+            <button type="button" class="btn sm f7-key f7-x2" data-act="f7X2" data-id="${i}" aria-pressed="${x2}" aria-label="การ์ด ×2 คูณเฉพาะเลข">×2</button>
+            ${F7_MODS.map(m=>{const c=mods.filter(v=>v===m).length;return `<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${c>0}" aria-label="การ์ด +${m}${m===8?' (มี 2 ใบ แตะซ้ำได้)':''}">${c>1?'+8+8':'+'+m}</button>`}).join('')}
+            <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15</button>
+          </div>
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys"><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span>พิมพ์ x2 ต่อท้าย = คูณ 2</span><span>ปุ่ม +15 = ใส่ 15 ให้ไม่ต้องพิมพ์</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys"><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span><span>มี +8 สองใบ แตะ +8 ซ้ำได้</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
@@ -1977,28 +1990,28 @@ function f7EndView(f){
 function f7Paint(focusIdx){render();if(focusIdx==null)return;const el=document.getElementById('f7In_'+focusIdx);if(el){try{el.focus({preventScroll:true});const l=el.value.length;el.setSelectionRange(l,l)}catch(e){}}}
 function f7AddFor(i){
   const f=f7();const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);
-  const raw=el?el.value:(f.draft[k]||'');const r=f7Parse(raw);const b15=!!f.b15[k];
-  if(!r.nums.length&&!b15){toast('พิมพ์แต้มก่อน เช่น 3 7 12');if(el)el.focus();return}
-  const x2=r.x2||!!f.x2[k];const base=r.base+(b15?15:0);const n=base*(x2?2:1);const before=f7Tot(p);
+  const raw=el?el.value:(f.draft[k]||'');const r=f7Parse(raw);const b15=!!f.b15[k];const mods=(f.mods[k]||[]).slice();
+  if(!r.nums.length&&!b15&&!mods.length){toast('พิมพ์แต้มก่อน เช่น 3 7 12');if(el)el.focus();return}
+  const x2=(r.x2||!!f.x2[k])&&r.nums.length>0;const n=f7Score(r.base,x2,mods,b15);const before=f7Tot(p);
   f7Snap(f,f7Fmt(n)+' ให้ '+playerName(p));
-  p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base,x2,b15,n,at:Date.now()});
-  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.lastRow=null;persist();
+  p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,n,at:Date.now()});
+  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.lastRow=null;persist();
   const a=document.activeElement;if(a&&a.blur)a.blur();render();
   const t=f7Tot(p);toast(before<f.target&&t>=f.target?`${playerName(p)} ถึง ${f.target} แล้ว! เล่นให้จบรอบนี้`:`${playerName(p)} ${f7Fmt(n)} รวม ${t}`);
 }
 function f7Step(d){const f=f7();const n=f.players.length;if(n<2)return;f.cur=((f.cur+d)%n+n)%n;persist();render()}
 function f7EditForm(i){
   const f=f7();const p=f.players[i];if(!p)return;
-  if(!S.f7e||S.f7e.i!==i)S.f7e={i,rows:p.entries.map(e=>({raw:e.raw!=null&&e.raw!==''?e.raw:String(e.base!=null?e.base:e.n),x2:!!e.x2,b15:!!e.b15,del:false}))};
-  const d=S.f7e;const val2=row=>{const r=f7Parse(row.raw);return (r.base+(row.b15?15:0))*((row.x2||r.x2)?2:1)};
+  if(!S.f7e||S.f7e.i!==i)S.f7e={i,rows:p.entries.map(e=>({raw:e.raw!=null&&e.raw!==''?e.raw:String(e.base!=null?e.base:e.n),x2:!!e.x2,b15:!!e.b15,mods:(e.mods||[]).join(' '),del:false}))};
+  const d=S.f7e;const val2=row=>{const r=f7Parse(row.raw);return f7Score(r.base,(row.x2||r.x2)&&r.nums.length>0,f7Parse(row.mods).nums,row.b15)};
   const tot=d.rows.reduce((a,row)=>a+(row.del?0:val2(row)),0);const ck='f7rm:'+i;
   openSheet('แก้แต้ม '+esc(playerName(p)),`
-    <p class="small muted">แก้เลขในแต่ละครั้งได้ ใส่หลายเลขเว้นวรรค ติ๊ก ×2 เพื่อคูณ 2 ติ๊ก +15 เพื่อบวก 15 (ถ้าติ๊ก ×2 ด้วย 15 ก็คูณ 2) · กดบันทึกแล้วยังกดย้อนกลับได้</p>
-    ${d.rows.length?d.rows.map((row,j)=>`<div class="f7-erow ${row.del?'del':''}"><span class="no">${j+1}</span><input type="text" id="f7E_${j}" value="${esc(row.raw)}" aria-label="ครั้งที่ ${j+1}" ${row.del?'disabled':''}><label class="check"><input type="checkbox" id="f7EX_${j}" ${row.x2?'checked':''} ${row.del?'disabled':''}> ×2</label><label class="check"><input type="checkbox" id="f7EB_${j}" ${row.b15?'checked':''} ${row.del?'disabled':''}> +15</label><span class="v">${f7Fmt(val2(row))}</span><button type="button" class="btn sm ${row.del?'':'danger'}" data-act="f7EDel" data-id="${j}">${row.del?'เอาคืน':'ลบ'}</button></div>`).join(''):'<p class="muted">ยังไม่มีแต้ม</p>'}
+    <p class="small muted">แก้เลขในแต่ละครั้งได้ ใส่หลายเลขเว้นวรรค ติ๊ก ×2 เพื่อคูณ 2 ติ๊ก +15 เพื่อบวกโบนัส ช่องการ์ด + ใส่ได้หลายใบ เช่น 4 8 (×2 คูณเฉพาะเลข) · กดบันทึกแล้วยังกดย้อนกลับได้</p>
+    ${d.rows.length?d.rows.map((row,j)=>`<div class="f7-erow ${row.del?'del':''}"><span class="no">${j+1}</span><input type="text" id="f7E_${j}" value="${esc(row.raw)}" aria-label="ครั้งที่ ${j+1}" ${row.del?'disabled':''}><label class="check"><input type="checkbox" id="f7EX_${j}" ${row.x2?'checked':''} ${row.del?'disabled':''}> ×2</label><label class="check"><input type="checkbox" id="f7EB_${j}" ${row.b15?'checked':''} ${row.del?'disabled':''}> +15</label><label class="mini"><span>การ์ด +</span><input type="text" id="f7EM_${j}" value="${esc(row.mods||'')}" placeholder="เช่น 4 8" aria-label="การ์ดบวกของครั้งที่ ${j+1}" ${row.del?'disabled':''}></label><span class="v">${f7Fmt(val2(row))}</span><button type="button" class="btn sm ${row.del?'':'danger'}" data-act="f7EDel" data-id="${j}">${row.del?'เอาคืน':'ลบ'}</button></div>`).join(''):'<p class="muted">ยังไม่มีแต้ม</p>'}
     <p><b style="font-family:var(--f-head);font-weight:600">รวม ${tot}</b> <span class="muted small">(ตัวเลขรวมอัปเดตตอนกดลบหรือบันทึก)</span></p>`,
     `<button class="btn primary" data-act="f7ESave">บันทึก</button><button class="btn ghost" data-act="f7ECancel">ยกเลิก</button>${S.confirm===ck?`<button class="btn dangerfill" data-act="f7Remove">ยืนยันเอา ${esc(playerName(p))} ออกจากเกม</button>`:`<button class="btn danger" data-act="f7RemoveAsk">เอาออกจากเกม</button>`}`);
 }
-function f7ESync(){const d=S.f7e;if(!d)return;d.rows.forEach((row,j)=>{const a=document.getElementById('f7E_'+j),b=document.getElementById('f7EX_'+j),c=document.getElementById('f7EB_'+j);if(a&&!a.disabled)row.raw=a.value;if(b&&!b.disabled)row.x2=b.checked;if(c&&!c.disabled)row.b15=c.checked})}
+function f7ESync(){const d=S.f7e;if(!d)return;d.rows.forEach((row,j)=>{const a=document.getElementById('f7E_'+j),b=document.getElementById('f7EX_'+j),c=document.getElementById('f7EB_'+j),m=document.getElementById('f7EM_'+j);if(a&&!a.disabled)row.raw=a.value;if(b&&!b.disabled)row.x2=b.checked;if(c&&!c.disabled)row.b15=c.checked;if(m&&!m.disabled)row.mods=m.value})}
 function f7PlayerForm(){
   const f=f7();const ins=new Set(f.players.filter(p=>p.id).map(p=>p.id));const out=kids().filter(k=>!ins.has(k.id));
   openSheet('เพิ่มคนเล่น',`
@@ -2021,16 +2034,20 @@ Object.assign(ACT,{
   f7Clear(){f7().players=[];persist();render()},
   f7Target(t){f7().target=+t.dataset.id;persist();render()},
   f7Start(){const f=f7();if(!f.players.length)return;const tv=parseInt(val('f7TargetIn'),10);if(tv>0)f.target=tv;
-    f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},saved:false});S.confirm=null;persist();render();window.scrollTo({top:0})},
+    f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},saved:false});S.confirm=null;persist();render();window.scrollTo({top:0})},
   f7Turn(t){f7Step(+t.dataset.id)},
   f7SetTurn(t){const f=f7();f.cur=+t.dataset.id;persist();render()},
   f7X2(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
-    f.x2[k]=!f.x2[k];persist();f7Paint(f.draft[k]?i:null)},
+    f.x2[k]=!f.x2[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7B15(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
-    f.b15[k]=!f.b15[k];persist();f7Paint(f.draft[k]?i:null)},
+    f.b15[k]=!f.b15[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7Num(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];const el=document.getElementById('f7In_'+i);if(!p||!el)return;
     let v=el.value.replace(/\s+$/,'');v=t.dataset.n==='del'?v.replace(/\s*\S+$/,''):(v?v+' ':'')+t.dataset.n;
     el.value=v;f.draft[f7key(p)]=v;f.lastRow=i;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+i);if(pv)pv.innerHTML=f7PrevHTML(f,p)},
+  f7Mod(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
+    const m=+t.dataset.n;let a=(f.mods[k]||[]).slice();const c=a.filter(v=>v===m).length;
+    if(m===8&&c===1)a.push(8);else if(c)a=a.filter(v=>v!==m);else a.push(m);
+    f.mods[k]=a.sort((x,y)=>x-y);f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7AddPts(t){f7AddFor(+t.dataset.id)},
   f7Undo(){const f=f7();const h=f.hist.pop();if(!h){toast('ไม่มีอะไรให้ย้อนแล้ว');return}f.players=h.players;f.cur=Math.min(h.cur,Math.max(0,f.players.length-1));persist();render();toast('ย้อนกลับ: '+h.label)},
   f7Edit(t){S.confirm=null;S.f7e=null;f7EditForm(+t.dataset.id)},
@@ -2038,9 +2055,9 @@ Object.assign(ACT,{
   f7ECancel(){S.f7e=null;S.confirm=null;closeSheet()},
   f7ESave(){f7ESync();const f=f7();const d=S.f7e;const p=d&&f.players[d.i];if(!p){closeSheet();return}
     const before=f7Tot(p);const ents=[];
-    d.rows.forEach((row,j)=>{if(row.del)return;const r=f7Parse(row.raw);if(!r.nums.length&&!row.b15)return;const old=p.entries[j]||{};const x2=row.x2||r.x2;const b15=!!row.b15;const base=r.base+(b15?15:0);
-      ents.push({id:old.id||uid(),raw:row.raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base,x2,b15,n:base*(x2?2:1),at:old.at||Date.now()})});
-    const after=ents.reduce((a,e)=>a+e.n,0);const same=JSON.stringify(ents.map(e=>[e.raw,e.x2,e.b15]))===JSON.stringify(p.entries.map(e=>[e.raw,!!e.x2,!!e.b15]));
+    d.rows.forEach((row,j)=>{if(row.del)return;const r=f7Parse(row.raw);const mods=f7Parse(row.mods).nums.filter(v=>v>0);if(!r.nums.length&&!row.b15&&!mods.length)return;const old=p.entries[j]||{};const x2=(row.x2||r.x2)&&r.nums.length>0;const b15=!!row.b15;
+      ents.push({id:old.id||uid(),raw:row.raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,n:f7Score(r.base,x2,mods,b15),at:old.at||Date.now()})});
+    const after=ents.reduce((a,e)=>a+e.n,0);const same=JSON.stringify(ents.map(e=>[e.raw,e.x2,e.b15,e.mods,e.n]))===JSON.stringify(p.entries.map(e=>[e.raw,!!e.x2,!!e.b15,e.mods||[],e.n]));
     S.f7e=null;closeSheet();if(same){render();return}
     f7Snap(f,'แก้แต้ม '+playerName(p));p.entries=ents;persist();render();toast(`แก้แต้ม ${playerName(p)} แล้ว ${before} → ${after}`)},
   f7RemoveAsk(){f7ESync();S.confirm='f7rm:'+S.f7e.i;f7EditForm(S.f7e.i)},
@@ -2054,8 +2071,8 @@ Object.assign(ACT,{
   f7TargetSave(){const f=f7();const v=parseInt(val('f7TIn'),10)||+radio('f7T');if(!(v>0)){toast('ใส่เป้าหมายที่มากกว่า 0');return}f.target=v;persist();closeSheet();render();toast('เป้าหมายใหม่ '+v+' แต้ม')},
   f7End(){const f=f7();f.phase='end';S.confirm=null;persist();render();window.scrollTo({top:0})},
   f7Back(){f7().phase='play';persist();render()},
-  f7Again(){const f=f7();f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},saved:false});persist();render();window.scrollTo({top:0})},
-  f7New(){const f=f7();S.confirm=null;f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'setup',cur:0,hist:[],draft:{},x2:{},b15:{},saved:false});persist();render();window.scrollTo({top:0})},
+  f7Again(){const f=f7();f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},saved:false});persist();render();window.scrollTo({top:0})},
+  f7New(){const f=f7();S.confirm=null;f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'setup',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},saved:false});persist();render();window.scrollTo({top:0})},
   async f7Save(){const f=f7();if(f.saved)return;const aw=checked('f7Award');const n=Math.max(0,Math.min(50,Math.floor(+val('f7AwardN')||0)));f.award=n;f.saved=true;persist();
     const r=f.players.map(p=>Object.assign({},p,{pts:f7Tot(p)}));const best=Math.max(...r.map(p=>p.pts));const winners=r.filter(p=>p.pts===best);
     const pts={};if(aw)winners.forEach(p=>{if(p.id)pts[p.id]=n});
@@ -2079,7 +2096,7 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.f7Undo();return}
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==='Enter'){const r=a&&a.closest&&a.closest('[data-row]');const i=r?+r.dataset.row:S.flip.lastRow;const p=S.flip.players[i];
-    if(p&&(r||String(S.flip.draft[f7key(p)]||'').trim()||S.flip.b15[f7key(p)])){e.preventDefault();f7AddFor(i)}return}
+    if(p&&(r||String(S.flip.draft[f7key(p)]||'').trim()||S.flip.b15[f7key(p)]||(S.flip.mods[f7key(p)]||[]).length)){e.preventDefault();f7AddFor(i)}return}
 });
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.f7-key'))e.preventDefault()});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
@@ -2133,7 +2150,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-23T21:31:22+07:00';
+const SITE_UPDATED='2026-10-24T00:45:54+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
