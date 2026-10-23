@@ -453,6 +453,10 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-chip em.b{color:var(--good)}
 .f7-rk{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--sunk);font:600 .78rem/1 var(--f-head);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:7px;vertical-align:2px}
 .f7-rk.top{background:var(--star);color:#fff}
+.f7-pad{flex-basis:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
+.f7-pad .f7-key{min-height:40px;padding:0;font:600 1rem/1 var(--f-head);font-variant-numeric:tabular-nums}
+.f7-pad .f7-key:active{background:var(--sunk)}
+@media (max-width:480px){.f7-row .f7-pad{order:1}.f7-row .f7-add>.btn{order:2}.f7-row .f7-prev{order:3}}
 .f7-prev{flex-basis:100%;font-size:.86rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .f7-prev:empty{display:none}
 .f7-prev b{font-family:var(--f-head);font-weight:600;color:var(--ink)}
@@ -1947,7 +1951,7 @@ function f7PlayView(f){
       <button class="btn primary big" data-act="f7Turn" data-id="1" ${n>1?'':'disabled'}>ตาต่อไป <kbd>Space</kbd></button>
     </div>
     <div class="f7-rows">${f.players.map((p,i)=>i).sort((a,b)=>tots[b]-tots[a]||a-b).map(i=>{const p=f.players[i];const t=tots[i];const k=f7key(p);const es=p.entries;const x2=!!f.x2[k];const b15=!!f.b15[k];const rk=1+tots.filter(v=>v>t).length;
-      return `<div class="f7-row ${i===f.cur?'on':''}" style="--c:${f7Color(p)}">
+      return `<div class="f7-row ${i===f.cur?'on':''}" data-row="${i}" style="--c:${f7Color(p)}">
         <button type="button" class="f7-who" data-act="f7SetTurn" data-id="${i}" aria-label="ให้เป็นตาของ ${esc(playerName(p))}">${playerPawn(p)}</button>
         <div class="f7-name"><b><span class="f7-rk ${rk===1&&t>0?'top':''}" aria-label="อันดับ ${rk}">${rk}</span>${esc(playerName(p))}${i===f.cur?'<span class="f7-tag">ถึงตา</span>':''}${t>=f.target?'<span class="f7-tag hit">ถึงเป้า</span>':''}</b>
           <div class="f7-bar" role="img" aria-label="${t} จาก ${f.target}"><i style="width:${Math.max(0,Math.min(100,t/f.target*100)).toFixed(1)}%"></i></div>
@@ -1959,10 +1963,11 @@ function f7PlayView(f){
           <button type="button" class="btn sm f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="ใส่ 15 ให้ ไม่ต้องพิมพ์">+15</button>
           <button type="button" class="btn sm primary" data-act="f7AddPts" data-id="${i}">บวกแต้ม</button>
           <button type="button" class="btn sm ghost" data-act="f7Edit" data-id="${i}" ${es.length?'':'disabled'}>แก้</button>
+          <div class="f7-pad" role="group" aria-label="กดเลขแทนการพิมพ์">${Array.from({length:13},(_,n)=>`<button type="button" class="btn sm f7-key" data-act="f7Num" data-id="${i}" data-n="${n}">${n}</button>`).join('')}<button type="button" class="btn sm f7-key ghost" data-act="f7Num" data-id="${i}" data-n="del" aria-label="ลบเลขตัวท้าย">⌫</button></div>
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys"><span><kbd>Space</kbd> ตาต่อไป</span><span><kbd>Shift</kbd>+<kbd>Space</kbd> ย้อนตา</span><span>พิมพ์เลขได้เลย = ใส่แต้มให้คนที่ถึงตา</span><span><kbd>Enter</kbd> บวกแต้ม</span><span>พิมพ์ x2 ต่อท้าย = คูณ 2</span><span>ปุ่ม +15 = ใส่ 15 ให้ไม่ต้องพิมพ์</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys"><span><kbd>Space</kbd> ตาต่อไป</span><span><kbd>Shift</kbd>+<kbd>Space</kbd> ย้อนตา</span><span>พิมพ์เลขได้เลย = ใส่แต้มให้คนที่ถึงตา</span><span>หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span>พิมพ์ x2 ต่อท้าย = คูณ 2</span><span>ปุ่ม +15 = ใส่ 15 ให้ไม่ต้องพิมพ์</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
@@ -1982,7 +1987,7 @@ function f7AddFor(i){
   const x2=r.x2||!!f.x2[k];const base=r.base+(b15?15:0);const n=base*(x2?2:1);const before=f7Tot(p);
   f7Snap(f,f7Fmt(n)+' ให้ '+playerName(p));
   p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base,x2,b15,n,at:Date.now()});
-  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;persist();
+  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.lastRow=null;persist();
   const a=document.activeElement;if(a&&a.blur)a.blur();render();
   const t=f7Tot(p);toast(before<f.target&&t>=f.target?`${playerName(p)} ถึง ${f.target} แล้ว! เล่นให้จบรอบนี้`:`${playerName(p)} ${f7Fmt(n)} รวม ${t}`);
 }
@@ -2028,6 +2033,9 @@ Object.assign(ACT,{
     f.x2[k]=!f.x2[k];persist();f7Paint(f.draft[k]?i:null)},
   f7B15(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
     f.b15[k]=!f.b15[k];persist();f7Paint(f.draft[k]?i:null)},
+  f7Num(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];const el=document.getElementById('f7In_'+i);if(!p||!el)return;
+    let v=el.value.replace(/\s+$/,'');v=t.dataset.n==='del'?v.replace(/\s*\S+$/,''):(v?v+' ':'')+t.dataset.n;
+    el.value=v;f.draft[f7key(p)]=v;f.lastRow=i;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+i);if(pv)pv.innerHTML=f7PrevHTML(f,p)},
   f7AddPts(t){f7AddFor(+t.dataset.id)},
   f7Undo(){const f=f7();const h=f.hist.pop();if(!h){toast('ไม่มีอะไรให้ย้อนแล้ว');return}f.players=h.players;f.cur=Math.min(h.cur,Math.max(0,f.players.length-1));persist();render();toast('ย้อนกลับ: '+h.label)},
   f7Edit(t){S.confirm=null;S.f7e=null;f7EditForm(+t.dataset.id)},
@@ -2075,10 +2083,13 @@ document.addEventListener('keydown',e=>{
   }
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.f7Undo();return}
   if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='Enter'){const r=a&&a.closest&&a.closest('[data-row]');const i=r?+r.dataset.row:S.flip.lastRow;const p=S.flip.players[i];
+    if(p&&(r||String(S.flip.draft[f7key(p)]||'').trim()||S.flip.b15[f7key(p)])){e.preventDefault();f7AddFor(i)}return}
   if(e.code==='Space'||e.key===' '){e.preventDefault();if(!e.repeat)f7Step(e.shiftKey?-1:1);return}
   const ch=dig&&!e.shiftKey?dig[2]:(/^[0-9-]$/.test(e.key)?e.key:(e.code==='Minus'||e.code==='NumpadSubtract'?'-':null));
   if(ch){const el=document.getElementById('f7In_'+S.flip.cur);if(el){e.preventDefault();el.focus();f7Insert(el,ch)}}
 });
+document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.f7-key'))e.preventDefault()});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
   f.draft[f7key(p)]=t.value;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+t.dataset.f7);if(pv)pv.innerHTML=f7PrevHTML(f,p)});
 function scoreAdd(k,n){const s=S.score;s.hist=s.hist||[];if(k==='team')s.team=(s.team||0)+n;else{const p=s.players[+k];if(!p)return;p.pts=(p.pts||0)+n}s.hist.push({k,n});persist();render()}
@@ -2130,7 +2141,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-23T21:09:24+07:00';
+const SITE_UPDATED='2026-10-23T21:28:08+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
