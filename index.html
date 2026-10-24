@@ -611,6 +611,45 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .tb-pill.dark.warn{background:#F2806E;color:#10161C}
 .tb-timeup{font:600 1.05rem var(--f-head);color:var(--bad)}
 .tb .mini input[type=text]{width:84px;text-align:center}
+/* rounds, kills, guessing, score table, game master */
+.tb-mybtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tb-mybtns .btn{min-height:56px}
+.tb-killers{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.tb-killer{--c:#6B7785;display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 12px 6px 6px;border-radius:14px;border:1.5px solid var(--line);border-left:6px solid var(--c);background:var(--paper);color:var(--ink);cursor:pointer;text-align:left;font:500 1rem/1.2 var(--f-head)}
+.tb-killer>span:not(.pawn){flex:1;min-width:0;overflow-wrap:anywhere}
+.tb-killer small{display:block;font:400 .82rem var(--f-body);color:var(--muted)}
+.tb-killer kbd{opacity:.55}
+.tb-killer.on{border-color:var(--good);background:var(--good-bg)}
+.tb-killer:active{transform:scale(.98)}
+@media (hover:none){.tb-killer kbd,.tb-mybtns kbd,#sheetCard .btn kbd{display:none}}
+.tb-full .tb-outbtn{background:#F2806E;border-color:#F2806E;color:#10161C}
+.tb-gst{display:inline-block;font:500 .74rem/1 var(--f-head);padding:5px 8px;border-radius:6px;background:var(--sunk);color:var(--muted);margin-top:2px}
+.tb-gst.ok{background:var(--good-bg);color:var(--good)}
+.tb-gst.no{background:var(--bad-bg);color:var(--bad)}
+.tb-chips{display:flex;gap:4px;flex-wrap:wrap}
+.tb-rpts{font:700 1.5rem/1 var(--f-head);font-variant-numeric:tabular-nums;color:var(--good);padding-right:4px}
+.tb-row.dim .tb-who b{color:var(--muted)}
+.tb-row.gm{border-left-style:dashed;background:var(--sunk)}
+.tb-tag.gm,.tb-pill.gm{background:var(--star);color:#17212B}
+.tb-scorebox{display:grid;gap:8px;min-width:0}
+.tb-tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);-webkit-overflow-scrolling:touch}
+.tb-table{border-collapse:separate;border-spacing:0;min-width:100%;font-variant-numeric:tabular-nums}
+.tb-table th,.tb-table td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap;background:var(--surface);vertical-align:middle}
+.tb-table tbody tr:last-child th,.tb-table tbody tr:last-child td{border-bottom:0}
+.tb-table thead th{font:500 .82rem/1.2 var(--f-head);color:var(--muted);background:var(--sunk)}
+.tb-table thead th small{display:block;font:400 .7rem var(--f-body);opacity:.85}
+.tb-table td b{display:block;font:600 1.15rem/1.1 var(--f-head)}
+.tb-table td small{display:block;font-size:.7rem;color:var(--muted);margin-top:2px}
+.tb-table td.tb-na{color:var(--muted)}
+.tb-table .nm{position:sticky;left:0;z-index:1;text-align:left;box-shadow:1px 0 0 var(--line);min-width:150px}
+.tb-table thead .nm{z-index:2}
+.tb-nm{display:flex;align-items:center;gap:8px}
+.tb-nm .n{flex:1;font:600 .98rem var(--f-head);white-space:normal;overflow-wrap:anywhere}
+.tb-tot{font:700 1.3rem/1 var(--f-head);min-width:2ch;text-align:right}
+.tb-table tr.tb-best .tb-tot{color:var(--star)}
+@media (max-width:480px){.tb-row.res{grid-template-columns:6px auto minmax(0,1fr) auto}.tb-row.res .tb-acts{grid-column:1/-1}}
+.tb-row.res .tb-no{width:0}
+.tb-gst{justify-self:start}
 </style>
 </head>
 <body>
@@ -646,7 +685,7 @@ window.FIREBASE_CONFIG = {
 <!-- ===== จบส่วนตั้งค่า ===== -->
 <script>
 /* ข้อมูลตั้งต้นของบ้าน: ใส่ตอนฐานข้อมูลยังว่าง และเพิ่มเฉพาะของใหม่ (ver สูงกว่าที่เคยใส่) */
-window.HOUSE_SEED = {"v": 8, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 6, "games/taboo": 8}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก หมอบ, เช็ค, ตาม หรือเพิ่ม\n- คนที่ไม่หมอบจนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่นหมอบหมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้องตามเท่าไร เพิ่มได้ขั้นต่ำเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}, "taboo": {"at": 1792850000000, "helper": "taboo", "kind": "party", "min": 3, "max": 12, "minutes": 15, "name": "คำต้องห้าม", "props": "มือถือหรือไอแพดคนละเครื่อง", "rules": "## เล่นยังไง\n- ทุกคนเปิดตัวช่วยคำต้องห้ามในเครื่องของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลัก\n- เริ่มเกมแล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเอง แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร\n- คุยกันไปเรื่อยๆ หลอกล่อให้คนอื่นเผลอพูดคำของเขา\n- ใครเผลอพูด ใครก็ได้กด “โดน” ที่ชื่อคนนั้น คนนั้นตกรอบ คนสุดท้ายที่เหลือชนะ\n- ตั้งเวลาได้: ไม่จับเวลา 3 นาที 5 นาที หรือพิมพ์เอง หมดเวลาแล้วคนที่ยังไม่ตกรอบชนะร่วมกัน\n\n## นั่งยังไง\n- นั่งเป็นวงกลม: จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น\n- นั่งเป็นแถวหรืออยู่คนละที่: จอโชว์คำของทุกคน ยกเว้นของตัวเอง\n\n## คีย์ลัด\n- Space เริ่ม/พักเกม · 1–9 คนที่โดน · H ซ่อนคำ · R เปลี่ยนคำ\n- ⌘/Ctrl + Z ย้อนคนล่าสุดที่โดน · ⌘/Ctrl + Enter จบเกม"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/taboo"]};
+window.HOUSE_SEED = {"v": 9, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 6, "games/taboo": 9}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก หมอบ, เช็ค, ตาม หรือเพิ่ม\n- คนที่ไม่หมอบจนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่นหมอบหมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้องตามเท่าไร เพิ่มได้ขั้นต่ำเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}, "taboo": {"at": 1792850000000, "helper": "taboo", "kind": "party", "min": 3, "max": 12, "minutes": 15, "name": "คำต้องห้าม", "props": "มือถือหรือไอแพดคนละเครื่อง", "rules": "## เล่นยังไง\n- ทุกคนเปิดตัวช่วยคำต้องห้ามในเครื่องของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลัก\n- เริ่ม round แล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเอง แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร\n- ใครเผลอพูดตกรอบ กด “ฉันโดน” แล้วเลือกว่าใครฆ่า หรือคนฆ่ากด “ฉันฆ่าได้”\n- หมดเวลาหรือเหลือคนสุดท้าย คนที่รอดได้ทายคำของตัวเอง\n- เล่นกี่ round ก็ได้ แต้มรวมกันจนกดจบเกม\n\n## แต้มต่อ round\n- ฆ่าได้ +1 ต่อคน\n- รอดถึงจบ round +1\n- รอดแล้วทายคำของตัวเองถูก +1\n\n## ผู้ดำเนินเกม (Game Master)\n- เลือกได้ในห้องรอ ไม่เล่น แต่คุมเกม: เริ่ม round ใครตาย ใครฆ่า เปลี่ยนคำ ตัดสินว่าทายถูกไหม สรุป round\n\n## นั่งยังไง\n- นั่งเป็นวงกลม: จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น\n- นั่งเป็นแถวหรืออยู่คนละที่: จอโชว์คำของทุกคน ยกเว้นของตัวเอง\n\n## คีย์ลัด\n- Space เริ่ม/พัก/round ต่อไป · D ฉันโดน · K ฉันฆ่าได้ · 1–9 คนที่โดน · H ซ่อนคำ · R เปลี่ยนคำ\n- ⌘/Ctrl + Z ย้อนคนล่าสุดที่โดน · ⌘/Ctrl + Enter จบเกม รวมคะแนน"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/taboo"]};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -2665,13 +2704,20 @@ const tbAlive=d=>tbIn(d).filter(p=>!p.out);
 const tbMe=d=>(d&&d.players&&d.players[TB_ME])||null;
 const tbHostOk=d=>!!(d&&d.players&&d.players[d.host]&&!d.players[d.host].left);
 const tbIsHost=d=>!!d&&(d.host===TB_ME||(!tbHostOk(d)&&(tbPlayers(d)[0]||{}).pid===TB_ME));
+/* ผู้ดำเนินเกม (game master): optional, does not play, runs the round from a control panel */
+const tbNarr=d=>{const n=d&&d.narrator;return n&&d.players&&d.players[n]&&!d.players[n].left?n:''};
+const tbIsNarr=d=>!!tbNarr(d)&&tbNarr(d)===TB_ME;
+/* who runs the game: the game master if there is one, otherwise the room host */
+const tbCtl=d=>!!d&&(tbNarr(d)?tbIsNarr(d):tbIsHost(d));
+const tbCtlName=d=>tbNarr(d)?'ผู้ดำเนินเกม':'หัวห้อง';
+const tbCanSet=d=>!!d&&(tbIsHost(d)||tbIsNarr(d));
 /* time limit: 0 = no limit, otherwise seconds; the clock counts down and pauses with the game */
 const TB_LIMITS=[[0,'ไม่จับเวลา'],[180,'3 นาที'],[300,'5 นาที']];
 const tbMMSS=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-function tbUsed(d){if(!d||!d.startedAt)return 0;const end=d.status==='end'&&d.endedAt?d.endedAt:(d.paused&&d.pausedAt?d.pausedAt:Date.now());
+function tbUsed(d){if(!d||!d.startedAt)return 0;const end=d.status!=='play'&&d.endedAt?d.endedAt:(d.paused&&d.pausedAt?d.pausedAt:Date.now());
   return Math.max(0,(end-d.startedAt-(+d.pausedTotal||0))/1000)}
 const tbLeft=d=>(+d.limit||0)-tbUsed(d);
-function tbClock(d){if(!d)return '0:00';if(+d.limit>0&&d.status!=='end')return 'เหลือ '+tbMMSS(tbLeft(d));return tbMMSS(Math.floor(tbUsed(d)))}
+function tbClock(d){if(!d)return '0:00';if(+d.limit>0&&d.status==='play')return 'เหลือ '+tbMMSS(tbLeft(d));return tbMMSS(Math.floor(tbUsed(d)))}
 const tbLimitName=v=>{v=Math.round(+v||0);const p=TB_LIMITS.find(x=>x[0]===v);if(p)return p[1];const m=Math.floor(v/60),r=v%60;return (m?m+' นาที':'')+(m&&r?' ':'')+(r?r+' วินาที':'')};
 function tbParseMin(v){const n=parseFloat(String(v||'').replace(/[๐-๙]/g,d=>String(d.charCodeAt(0)-0x0E50)).replace(',','.'));if(!(n>0))return null;return Math.max(15,Math.min(3600,Math.round(n*60)))}
 const tbLimitPick=(cur,act,dis,inId)=>{const custom=+cur>0&&!TB_LIMITS.some(x=>x[0]===+cur);
@@ -2699,68 +2745,125 @@ function tbOnRoom(d){
   if(S.tb.outs&&d.round===S.tb.outsRound){const fresh=Object.keys(outs).filter(id=>!S.tb.outs[id]);if(fresh.length)tbBeep(fresh.includes(TB_ME))}
   S.tb.outs=outs;S.tb.outsRound=d.round;
   S.tb.room=d;
-  /* last one standing: the host (or whoever is first in the room) closes the round */
-  if(d.status==='play'&&!d.paused&&tbIsHost(d)&&tbIn(d).length>=2&&tbAlive(d).length<=1)tbFinish();
+  /* the game master (or host) moves the round on: last one standing → guessing, every guess judged → round summary */
+  if(d.status==='play'&&!d.paused&&tbCtl(d)&&tbIn(d).length>=2&&tbAlive(d).length<=1)tbRoundOver('last');
+  if(d.status==='guess'&&tbCtl(d)&&tbGuessDone(d)){const r=d.round;setTimeout(()=>{const x=S.tb.room;if(x&&x.status==='guess'&&x.round===r&&tbGuessDone(x))tbCloseRound()},1200)}
   changed();
 }
 let tbLock=null;
 async function tbWake(on){try{if(on&&!tbLock&&navigator.wakeLock&&document.visibilityState==='visible'){tbLock=await navigator.wakeLock.request('screen');tbLock.addEventListener('release',()=>{tbLock=null})}
   else if(!on&&tbLock){const l=tbLock;tbLock=null;await l.release()}}catch(e){}}
-const tbWants=()=>!!(S.tb&&S.tb.code&&S.tb.room&&S.tb.room.status==='play'&&S.tab==='tools'&&S.tool==='taboo');
+const tbWants=()=>!!(S.tb&&S.tb.code&&S.tb.room&&(S.tb.room.status==='play'||S.tb.room.status==='guess')&&S.tab==='tools'&&S.tool==='taboo');
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&tbWants())tbWake(true)});
 let tbAC=null;
 function tbBeep(mine){try{if(navigator.vibrate)navigator.vibrate(mine?[250,120,250]:120)}catch(e){}
   try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;tbAC=tbAC||new C();const t=tbAC.currentTime;
     [[740,0],[520,.16]].forEach(([f,o])=>{const g=tbAC.createGain();const s=tbAC.createOscillator();s.type='triangle';s.frequency.value=f;g.gain.setValueAtTime(.0001,t+o);g.gain.exponentialRampToValueAtTime(.25,t+o+.02);g.gain.exponentialRampToValueAtTime(.0001,t+o+.15);s.connect(g);g.connect(tbAC.destination);s.start(t+o);s.stop(t+o+.16)})}catch(e){}}
 setInterval(()=>{if(!(S.tb&&S.tb.room))return;const d=S.tb.room;
-  /* time up: everyone beeps once, the host closes the round and the players still in win together */
-  if(d.status==='play'&&+d.limit>0&&!d.paused&&tbLeft(d)<=0&&S.tb.timeUp!==d.round){S.tb.timeUp=d.round;tbBeep(false);if(tbIsHost(d))tbFinish('time')}
-  if(d.status==='play'&&+d.limit>0&&!d.paused&&tbLeft(d)<=-4&&S.tb.timeUp2!==d.round){S.tb.timeUp2=d.round;tbFinish('time')}
+  /* time up: everyone beeps once, the game master/host moves the round to guessing; anyone steps in if that phone is asleep */
+  if(d.status==='play'&&+d.limit>0&&!d.paused&&tbLeft(d)<=0&&S.tb.timeUp!==d.round){S.tb.timeUp=d.round;tbBeep(false);if(tbCtl(d))tbRoundOver('time')}
+  if(d.status==='play'&&+d.limit>0&&!d.paused&&tbLeft(d)<=-4&&S.tb.timeUp2!==d.round){S.tb.timeUp2=d.round;tbRoundOver('time')}
+  const stuck=(d.status==='play'&&!d.paused&&tbIn(d).length>=2&&tbAlive(d).length<=1)||(d.status==='guess'&&tbGuessDone(d));
+  if(stuck){const key=d.status+d.round;if(S.tb.stuckKey!==key){S.tb.stuckKey=key;S.tb.stuckAt=Date.now()}else if(Date.now()-S.tb.stuckAt>6000&&S.tb.stuckDone!==key){S.tb.stuckDone=key;if(d.status==='play')tbRoundOver('last');else tbCloseRound()}}
   if(!(S.tab==='tools'&&S.tool==='taboo'))return;
   const el=document.getElementById('tbClock');if(el){el.textContent=tbClock(d);el.classList.toggle('warn',d.status==='play'&&+d.limit>0&&tbLeft(d)<=10)}
   const rv=document.getElementById('tbRevealN');if(rv){const left=Math.ceil((S.tb.reveal-Date.now())/1000);if(left<=0)render();else if(rv.textContent!==String(left))rv.textContent=left}},250);
 
-/* game moves */
-async function tbFinish(why){const d=S.tb.room;if(!d||d.status!=='play')return;const o={status:'end',endedAt:Date.now(),paused:false,endBy:why||'',winner:tbAlive(d).map(p=>p.pid)};
-  if(d.paused&&d.pausedAt)o.pausedTotal=(+d.pausedTotal||0)+(Date.now()-d.pausedAt);await tbPatch(o)}
-async function tbStart(){const d=S.tb.room;if(!d)return;if(!tbIsHost(d)){toast('ให้หัวห้องเป็นคนกดเริ่ม');return}
-  const ps=tbPlayers(d);if(ps.length<2){toast('ต้องมีคนในห้องอย่างน้อย 2 คน');return}
+/* game moves
+   a game = many rounds; each round: play → guess (players still in guess their own word) → roundEnd (summary + score table)
+   points per round: ฆ่าได้ +1 each, รอดถึงจบ round +1, เดาคำตัวเองถูก +1 (only those who survived) */
+const TB_WHY={time:'หมดเวลา',last:'เหลือคนสุดท้าย',manual:'จบ round',final:'จบเกม'};
+const tbGuessDone=d=>{const a=tbAlive(d);return a.length>0&&a.every(p=>p.guess===true||p.guess===false)};
+function tbEntry(d){const ins=tbIn(d);const pts={},words={},names={},kills={};
+  ins.forEach(p=>{const k=ins.filter(v=>v.out&&v.killBy===p.pid).length;const s=!p.out;
+    pts[p.pid]={k,s:s?1:0,g:s&&p.guess===true?1:0};words[p.pid]=p.word||'';names[p.pid]={name:p.name,code:p.code||'',color:p.color||'',kid:p.kid||''};if(p.out&&p.killBy)kills[p.pid]=p.killBy});
+  return {r:+d.round||0,why:d.endBy||'',at:Date.now(),pts,words,names,kills}}
+const tbHistWith=d=>(d.history||[]).filter(x=>x.r!==(+d.round||0)).concat(tbEntry(d));
+const tbPts=x=>(x?(+x.k||0)+(+x.s||0)+(+x.g||0):0);
+function tbScoreRows(d){const hist=d.history||[];const rows={};
+  const add=(pid,info)=>{if(!rows[pid])rows[pid]=Object.assign({pid,total:0,per:{}},info)};
+  hist.forEach(h=>Object.keys(h.pts||{}).forEach(pid=>{add(pid,(h.names||{})[pid]||{name:'?'});rows[pid].per[h.r]=h.pts[pid];rows[pid].total+=tbPts(h.pts[pid])}));
+  Object.keys(rows).forEach(pid=>{const p=(d.players||{})[pid];if(p&&!p.left)Object.assign(rows[pid],{name:p.name,code:p.code,color:p.color,kid:p.kid})});
+  return Object.values(rows).sort((a,b)=>b.total-a.total||String(a.name).localeCompare(String(b.name),'th'))}
+function tbFreshTime(d,o){const now=Date.now();o.endedAt=now;o.paused=false;if(d.paused&&d.pausedAt)o.pausedTotal=(+d.pausedTotal||0)+(now-d.pausedAt);return o}
+async function tbRoundOver(why){const d=S.tb.room;if(!d||d.status!=='play')return;const al=tbAlive(d);
+  const o=tbFreshTime(d,{endBy:why||'manual'});
+  if(al.length){o.status='guess';o.players={};al.forEach(p=>{o.players[p.pid]={guess:null}});await tbPatch(o);return}
+  const x=Object.assign({},d,o);o.status='roundEnd';o.history=tbHistWith(x);await tbPatch(o)}
+async function tbCloseRound(){const d=S.tb.room;if(!d)return;if(d.status==='play'){await tbRoundOver('manual');return}
+  if(d.status!=='guess')return;await tbPatch({status:'roundEnd',history:tbHistWith(d)})}
+async function tbFinal(){const d=S.tb.room;if(!d)return;const o={status:'final'};
+  if(d.status==='play'||d.status==='guess'){const t=d.status==='play'?tbFreshTime(d,{endBy:'final'}):{};Object.assign(o,t);o.history=tbHistWith(Object.assign({},d,t))}
+  await tbPatch(o)}
+async function tbNewGame(){const d=S.tb.room;if(!tbCtl(d))return;await tbPatch({status:'lobby',history:[],round:0,saved:false,endBy:''})}
+async function tbStart(){const d=S.tb.room;if(!d)return;if(!tbCtl(d)){toast('ให้'+tbCtlName(d)+'เป็นคนกดเริ่ม');return}
+  const nr=tbNarr(d);const ps=tbPlayers(d).filter(p=>p.pid!==nr);if(ps.length<2){toast('ต้องมีคนเล่นอย่างน้อย 2 คน ไม่นับผู้ดำเนินเกม');return}
   const pool=tbPool(d.cats);if(pool.length<ps.length){toast('คำในหมวดที่เลือกไม่พอ เลือกหมวดเพิ่มอีก');return}
   const recent=new Set(LS.get('tbRecent',[]).concat(d.used||[]));let fresh=shuffle(pool.filter(w=>!recent.has(w)));if(fresh.length<ps.length)fresh=shuffle(pool);
-  const players={};const words=[];ps.forEach((p,i)=>{players[p.pid]={word:fresh[i],inGame:true,out:false,outAt:0,outBy:'',rr:0};words.push(fresh[i])});
+  const players={};const words=[];ps.forEach((p,i)=>{players[p.pid]={word:fresh[i],inGame:true,out:false,outAt:0,outBy:'',killBy:'',guess:null,rr:0};words.push(fresh[i])});
+  if(nr)players[nr]={word:'',inGame:false,out:false,killBy:'',guess:null};
   LS.set('tbRecent',LS.get('tbRecent',[]).concat(words).slice(-300));
   await tbPatch({status:'play',host:tbHostOk(d)?d.host:TB_ME,round:(+d.round||0)+1,startedAt:Date.now()+(d.mode==='line'?0:3200),endBy:'',endedAt:0,paused:false,pausedAt:0,pausedTotal:0,winner:[],saved:false,used:(d.used||[]).concat(words).slice(-300),players})}
-function tbAskOut(pid){const d=S.tb.room;if(!d||d.status!=='play')return;if(d.paused){toast('เกมพักอยู่ กดเล่นต่อก่อน');return}
-  const p=(d.players||{})[pid];if(!p||!p.inGame||p.out||p.left)return;const self=pid===TB_ME;
-  const me=tbMe(d);const iSee=!self||!me.inGame||me.out;
-  openSheet(self?'ฉันพูดคำต้องห้ามแล้ว?':esc(p.name)+' พูดคำต้องห้ามแล้ว?',
-    `<div class="tb-ask" style="--c:${okColor(p.color)}">${tbPawn(p,'lg')}<div>${iSee?`<span class="label">คำต้องห้ามของ ${esc(p.name)}</span><div class="tb-askword">${esc(p.word)}</div>`:'<span class="muted">กดยืนยันแล้วจะเห็นคำของตัวเอง</span>'}</div></div><p class="muted small">ยืนยันแล้ว ${self?'คุณ':esc(p.name)}จะตกรอบ ถ้ากดผิดกดย้อนกลับได้</p>`,
-    `<button class="btn dangerfill big" data-act="tbOutGo" data-id="${esc(pid)}" data-enter>โดนแล้ว ตกรอบ</button><button class="btn ghost big" data-act="closeSheet">ยังไม่โดน</button>`)}
-async function tbUndo(){const d=S.tb.room;if(!d||(d.status!=='play'&&d.status!=='end'))return;
+/* who was caught, and who made them say it: one sheet, tap the killer (or "nobody") */
+function tbAskOut(pid,fix){const d=S.tb.room;if(!d||d.status!=='play'&&!(fix&&d.status==='guess'))return;if(d.paused&&!fix){toast('เกมพักอยู่ กดเล่นต่อก่อน');return}
+  const p=(d.players||{})[pid];if(!p||!p.inGame||p.left||(!fix&&p.out))return;const self=pid===TB_ME;const me=tbMe(d)||{};
+  const iSee=!self||!me.inGame||me.out;const ins=tbIn(d);
+  const cand=ins.filter(x=>x.pid!==pid&&(fix||!x.out));
+  openSheet(fix?'แก้ว่าใครฆ่า '+esc(p.name):self?'ฉันโดนแล้ว ใครฆ่า?':esc(p.name)+' โดนแล้ว ใครฆ่า?',
+    `<div class="tb-ask" style="--c:${okColor(p.color)}">${tbPawn(p,'lg')}<div>${iSee?`<span class="label">คำต้องห้ามของ ${esc(p.name)}</span><div class="tb-askword">${esc(p.word)}</div>`:'<span class="muted">เลือกแล้วจะเห็นคำของตัวเอง</span>'}</div></div>
+    <div class="field"><span>ใครทำให้${self?'เรา':esc(p.name)}พูดคำนี้ (คนนั้นได้ +1)</span>
+      <div class="tb-killers">${cand.map(x=>{const n=ins.findIndex(y=>y.pid===x.pid)+1;return `<button type="button" class="tb-killer ${p.killBy===x.pid?'on':''}" data-act="tbOutGo" data-id="${esc(pid)}" data-k="${esc(x.pid)}" data-key="${n}" style="--c:${okColor(x.color)}">${tbPawn(x,'sm')}<span>${esc(x.name)}</span><kbd>${n}</kbd></button>`}).join('')}</div></div>
+    <p class="muted small">${fix?'เปลี่ยนคนได้แต้มฆ่าของรอบนี้':'เลือกแล้ว '+(self?'คุณ':esc(p.name))+'ตกรอบทันที กดผิดกดย้อนกลับได้'}</p>`,
+    `<button class="btn ${fix?'':'dangerfill'} big" data-act="tbOutGo" data-id="${esc(pid)}" data-k="" data-enter>${fix?'ไม่มีใครฆ่า':'ไม่มีใคร (พูดเอง)'} <kbd>Enter</kbd></button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>`)}
+/* "ฉันฆ่าได้": the killer reports it and picks who they caught */
+function tbAskKill(){const d=S.tb.room;if(!d||d.status!=='play')return;if(d.paused){toast('เกมพักอยู่ กดเล่นต่อก่อน');return}
+  const me=tbMe(d);if(!me||!me.inGame||me.out){toast('ต้องยังอยู่ในเกมถึงจะฆ่าได้');return}const ins=tbIn(d);
+  const cand=ins.filter(x=>x.pid!==TB_ME&&!x.out);
+  openSheet('ฉันฆ่าได้ ฆ่าใคร?',`<div class="field"><span>แตะคนที่เผลอพูดคำของตัวเอง เขาจะตกรอบ แล้วเราได้ +1</span>
+    <div class="tb-killers">${cand.map(x=>{const n=ins.findIndex(y=>y.pid===x.pid)+1;return `<button type="button" class="tb-killer" data-act="tbOutGo" data-id="${esc(x.pid)}" data-k="${esc(TB_ME)}" data-key="${n}" style="--c:${okColor(x.color)}">${tbPawn(x,'sm')}<span>${esc(x.name)}<small>${esc(x.word)}</small></span><kbd>${n}</kbd></button>`}).join('')}</div></div>`,
+    `<button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>`)}
+async function tbOutGo(pid,killer){const d=S.tb.room;if(!d)return;const p=(d.players||{})[pid];if(!p||!p.inGame)return;
+  if(killer&&(killer===pid||!(d.players||{})[killer]))killer='';
+  if(p.out){if(await tbPatch({players:{[pid]:{killBy:killer}}}))toast(killer?d.players[killer].name+' ได้แต้มฆ่า '+p.name:'ไม่นับแต้มฆ่า '+p.name);return}
+  if(d.status!=='play')return;
+  if(!await tbPatch({players:{[pid]:{out:true,outAt:Date.now(),outBy:TB_ME,killBy:killer}}}))return;
+  toast(p.name+' ตกรอบ'+(killer?' · '+d.players[killer].name+' +1':''));
+  const now=S.tb.room;if(now&&now.status==='play'&&tbCtl(now)&&tbAlive(now).filter(x=>x.pid!==pid).length<=1)tbRoundOver('last')}
+async function tbRevive(pid){const d=S.tb.room;if(!d)return;const p=(d.players||{})[pid];if(!p||!p.out)return;
+  const o={players:{[pid]:{out:false,outAt:0,outBy:'',killBy:'',guess:null}}};
+  if(d.status==='guess'){if(d.endBy==='time')o.players[pid].guess=null;
+    else{o.status='play';o.pausedTotal=(+d.pausedTotal||0)+Math.max(0,Date.now()-(d.endedAt||Date.now()));o.endedAt=0;o.endBy='';tbAlive(d).forEach(x=>{o.players[x.pid]={guess:null}});o.players[pid]={out:false,outAt:0,outBy:'',killBy:'',guess:null}}}
+  else if(d.status!=='play')return;
+  if(await tbPatch(o))toast(p.name+' กลับเข้าเกมแล้ว')}
+async function tbUndo(){const d=S.tb.room;if(!d||(d.status!=='play'&&d.status!=='guess'))return;if(d.status==='guess'&&!tbCtl(d)){toast('ให้'+tbCtlName(d)+'เป็นคนย้อน');return}
   const last=tbIn(d).filter(p=>p.out).sort((a,b)=>(b.outAt||0)-(a.outAt||0))[0];if(!last){toast('ยังไม่มีใครโดน');return}
-  const o={players:{[last.pid]:{out:false,outAt:0,outBy:''}}};
-  if(d.status==='end'&&d.endBy==='time')o.winner=(d.winner||[]).concat(last.pid);
-  else if(d.status==='end')Object.assign(o,{status:'play',winner:[],endedAt:0,saved:false,endBy:''});
-  if(await tbPatch(o))toast(last.name+' กลับเข้าเกมแล้ว')}
+  await tbRevive(last.pid)}
 async function tbPause(){const d=S.tb.room;if(!d||d.status!=='play')return;
   if(d.paused)await tbPatch({paused:false,pausedAt:0,pausedTotal:(+d.pausedTotal||0)+Math.max(0,Date.now()-(d.pausedAt||Date.now()))});
   else await tbPatch({paused:true,pausedAt:Date.now()})}
+/* change a word: as many times as you like */
 async function tbReroll(pid){const d=S.tb.room;if(!d||d.status!=='play')return;if(d.paused){toast('เกมพักอยู่');return}
-  const p=(d.players||{})[pid];if(!p||!p.inGame||p.out)return;if((+p.rr||0)>=1){toast('เปลี่ยนคำได้คนละครั้งเดียวต่อรอบ');return}
+  const p=(d.players||{})[pid];if(!p||!p.inGame||p.out)return;
   const now=new Set(tbIn(d).map(x=>x.word));const used=new Set(d.used||[]);const pool=tbPool(d.cats);
   let c=pool.filter(w=>!now.has(w)&&!used.has(w));if(!c.length)c=pool.filter(w=>!now.has(w));if(!c.length){toast('ไม่มีคำเหลือให้เปลี่ยน');return}
   const w=c[Math.floor(Math.random()*c.length)];
   if(await tbPatch({players:{[pid]:{word:w,rr:(+p.rr||0)+1}},used:(d.used||[]).concat(w).slice(-300)}))toast(pid===TB_ME?'เปลี่ยนคำของคุณแล้ว':'เปลี่ยนคำของ '+p.name+' แล้ว')}
+/* guessing: the game master judges; without one, anyone but the guesser does */
+const tbCanJudge=(d,pid)=>tbNarr(d)?tbIsNarr(d):pid!==TB_ME;
+async function tbGuess(pid,v){const d=S.tb.room;if(!d||d.status!=='guess')return;const p=(d.players||{})[pid];if(!p||!p.inGame||p.out)return;
+  if(!tbCanJudge(d,pid)){toast(tbNarr(d)?'ให้ผู้ดำเนินเกมเป็นคนตัดสิน':'ให้คนอื่นตัดสินว่าเดาถูกไหม');return}
+  await tbPatch({players:{[pid]:{guess:p.guess===v?null:v}}})}
 
 /* views */
-const TB_KEYS=[['Space','เริ่มเกม / พักเกม'],['1–9','คนที่ 1–9 โดนแล้ว'],['H','ซ่อน / โชว์คำของตัวเอง'],['R','เปลี่ยนคำของตัวเอง'],['⌘/Ctrl + Z','ย้อนคนล่าสุดที่โดน'],['⌘/Ctrl + Enter','จบเกม'],['Esc','ปิดหน้าต่าง']];
+const TB_KEYS=[['Space','เริ่ม / พักเกม / round ต่อไป'],['D','ฉันโดน'],['K','ฉันฆ่าได้'],['1–9','คนที่ 1–9 โดน (ในหน้าต่างเลือกคนฆ่า กดเลขคนฆ่า)'],['H','ซ่อน / โชว์คำของตัวเอง'],['R','เปลี่ยนคำของตัวเอง'],['⌘/Ctrl + Z','ย้อนคนล่าสุดที่โดน'],['⌘/Ctrl + Enter','จบเกม รวมคะแนน'],['Esc','ปิดหน้าต่าง']];
 const tbKeys=all=>`<div class="${all?'tb-keylist':'f7-keys tb-keys'}">${TB_KEYS.map(([k,v])=>`<span><kbd>${k}</kbd> ${v}</span>`).join('')}</div>`;
 const TB_RULES=`<ol class="tb-rules">
   <li>ทุกคนเปิดเว็บนี้ในมือถือของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลักเข้าห้อง</li>
-  <li>เริ่มเกมแล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเองเด็ดขาด แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร</li>
-  <li>คุยกันไปเรื่อยๆ หลอกล่อให้คนอื่นเผลอพูดคำของเขา</li>
-  <li>ใครเผลอพูด ใครก็ได้กด “โดน” ที่ชื่อคนนั้น แล้วคนนั้นตกรอบ คนสุดท้ายที่เหลือชนะ</li>
-  <li>ตั้งเวลาได้ตอนสร้างห้อง ถ้าหมดเวลาก่อน คนที่ยังไม่ตกรอบชนะร่วมกัน</li>
+  <li>เริ่ม round แล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเอง แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร</li>
+  <li>คุยกันไปเรื่อยๆ หลอกล่อให้คนอื่นเผลอพูดคำของเขา ใครเผลอพูดตกรอบ กด “ฉันโดน” แล้วเลือกว่าใครฆ่า หรือคนฆ่ากด “ฉันฆ่าได้”</li>
+  <li>หมดเวลาหรือเหลือคนสุดท้าย คนที่รอดได้ทายคำของตัวเอง</li>
+  <li>แต้มต่อ round: ฆ่าได้ +1 ต่อคน · รอดถึงจบ round +1 · ทายคำตัวเองถูก +1 เล่นกี่ round ก็ได้ แต้มรวมกันจนกดจบเกม</li>
+  <li>เลือกคนเป็นผู้ดำเนินเกมได้ คนนั้นไม่เล่น แต่คุมเกม: กดเริ่ม ใครตาย ใครฆ่า เปลี่ยนคำ ตัดสินว่าทายถูกไหม และสรุป round</li>
 </ol>
 <p class="small muted"><b>นั่งเป็นวงกลม</b> จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น · <b>นั่งเป็นแถวหรืออยู่คนละที่</b> จอโชว์คำของทุกคน ยกเว้นของตัวเอง</p>`;
 function tbHome(){
@@ -2774,7 +2877,7 @@ function tbHome(){
     </div>
     <div class="tb-two">
       <div class="stage"><div><h3>สร้างห้องใหม่</h3><p class="muted small">ได้รหัส 6 หลักให้คนอื่นกรอกเข้ามา</p></div>
-        <div class="field"><span>จับเวลาแต่ละรอบ</span>${tbLimitPick(tbLimitPref(),'tbLimitHome',false,'tbLimitHomeIn')}</div>
+        <div class="field"><span>จับเวลาแต่ละ round</span>${tbLimitPick(tbLimitPref(),'tbLimitHome',false,'tbLimitHomeIn')}</div>
         <button class="btn primary big" data-act="tbCreate" ${S.tb.busy?'disabled':''}>${S.tb.busy==='create'?'กำลังสร้างห้อง…':'สร้างห้อง'}</button></div>
       <div class="stage"><div><h3>เข้าห้องด้วยรหัส</h3><p class="muted small">ขอรหัสจากคนที่สร้างห้อง</p></div>
         <div class="tb-join"><input type="text" id="tbCodeIn" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="go" maxlength="9" placeholder="000000" value="${esc(S.tb.codeIn||'')}" aria-label="รหัสห้อง 6 หลัก"><button class="btn primary big" data-act="tbJoin" ${S.tb.busy?'disabled':''}>${S.tb.busy==='join'?'กำลังเข้าห้อง…':'เข้าห้อง'}</button></div>
@@ -2786,73 +2889,118 @@ function tbHome(){
     <div class="panel"><h3>คีย์ลัด</h3><p class="small muted" style="margin:4px 0 10px">ใช้ได้เมื่อต่อคีย์บอร์ด ไม่มีคีย์บอร์ดก็กดปุ่มบนจอได้หมด</p>${tbKeys(true)}</div>
   </div>`;
 }
+/* score table: names (with the running total) frozen on the left, one column per round */
+function tbTable(d,opts){opts=opts||{};const rows=tbScoreRows(d);const hist=(d.history||[]).slice().sort((a,b)=>a.r-b.r);
+  if(!rows.length||!hist.length)return '';const best=rows[0].total;
+  const cell=x=>{if(!x)return '<td class="tb-na">–</td>';const bits=[];if(+x.k)bits.push('ฆ่า '+x.k);if(+x.s)bits.push('รอด');if(+x.g)bits.push('ทายถูก');
+    return `<td><b>${tbPts(x)}</b>${bits.length?`<small>${bits.join(' · ')}</small>`:''}</td>`};
+  return `<div class="tb-scorebox">${opts.title?`<h3>${opts.title}</h3>`:''}<div class="tb-tablewrap"><table class="tb-table">
+    <thead><tr><th class="nm">ผู้เล่น · รวม</th>${hist.map((h,i)=>`<th>R${i+1}${h.why?`<small>${esc(TB_WHY[h.why]||'')}</small>`:''}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map((r,i)=>`<tr class="${r.total===best&&best>0?'tb-best':''}"><th class="nm" scope="row"><span class="tb-nm">${tbPawn(r,'sm')}<span class="n">${esc(r.name||'?')}</span><span class="tb-tot">${r.total}</span></span></th>${hist.map(h=>cell((h.pts||{})[r.pid])).join('')}</tr>`).join('')}</tbody>
+  </table></div><p class="muted small">ฆ่าได้ +1 ต่อคน · รอดถึงจบ round +1 · ทายคำตัวเองถูก +1 · เลื่อนตารางไปทางขวาเพื่อดู round อื่น</p></div>`}
 function tbLobby(d){
-  const ps=tbPlayers(d);const host=tbIsHost(d);const cats=d.cats||[];const code=String(d.code||S.tb.code);
-  const row=(p,i)=>`<div class="tb-row" style="--c:${okColor(p.color)}"><span class="tb-no">${i+1}</span>${tbPawn(p)}<div class="tb-who"><b>${esc(p.name)}</b><span class="tb-tags">${p.pid===d.host?'<span class="tb-tag host">หัวห้อง</span>':''}${p.pid===TB_ME?'<span class="tb-tag">คุณ</span>':''}</span></div>
-    <div class="tb-acts">${host&&p.pid!==TB_ME?`<button class="btn sm ghost" data-act="tbKick" data-id="${esc(p.pid)}">เอาออก</button>`:''}</div></div>`;
+  const ps=tbPlayers(d);const host=tbIsHost(d);const set=tbCanSet(d);const nr=tbNarr(d);const cats=d.cats||[];const code=String(d.code||S.tb.code);
+  const row=(p,i)=>{const isN=p.pid===nr;const canN=host||p.pid===TB_ME;
+    return `<div class="tb-row ${isN?'gm':''}" style="--c:${okColor(p.color)}"><span class="tb-no">${isN?'—':i+1}</span>${tbPawn(p)}<div class="tb-who"><b>${esc(p.name)}</b><span class="tb-tags">${p.pid===d.host?'<span class="tb-tag host">หัวห้อง</span>':''}${isN?'<span class="tb-tag gm">ผู้ดำเนินเกม · ไม่เล่น</span>':''}${p.pid===TB_ME?'<span class="tb-tag">คุณ</span>':''}</span></div>
+    <div class="tb-acts">${canN?`<button class="btn sm ${isN?'':'ghost'}" data-act="tbNarr" data-id="${esc(p.pid)}" aria-pressed="${isN}">${isN?'เลิกเป็นผู้ดำเนินเกม':'ให้เป็นผู้ดำเนินเกม'}</button>`:''}${host&&p.pid!==TB_ME?`<button class="btn sm ghost" data-act="tbKick" data-id="${esc(p.pid)}">เอาออก</button>`:''}</div></div>`};
+  const players=ps.filter(p=>p.pid!==nr);let n=0;const listed=ps.map(p=>p.pid===nr?row(p,-1):row(p,n++)).join('');
+  const ctl=tbCtl(d);const more=(d.history||[]).length;
   return `<div class="tb">
     <div class="stage center"><span class="label">รหัสห้อง</span><div class="tb-code" aria-label="รหัสห้อง ${esc(code)}">${esc(code.slice(0,3))}<span> </span>${esc(code.slice(3))}</div>
       <p class="muted small">คนอื่นเปิดเว็บนี้ → ตัวช่วยเล่น → คำต้องห้าม → กรอกรหัสนี้</p></div>
-    <div class="stage"><div class="sec-head"><h3>คนในห้อง ${ps.length} คน</h3></div><div class="tb-rows">${ps.map(row).join('')}</div>
-      ${ps.length<2?'<p class="muted small">รอคนเข้าห้องอีกอย่างน้อย 1 คน</p>':''}</div>
+    <div class="stage"><div class="sec-head"><h3>คนในห้อง ${ps.length} คน${nr?' · เล่น '+players.length+' คน':''}</h3></div>
+      <p class="muted small">ผู้ดำเนินเกมไม่ได้เล่น แต่คุมเกมจากมือถือตัวเอง: เริ่ม round ใครตาย ใครฆ่า เปลี่ยนคำ ตัดสินว่าทายถูกไหม สรุป round ไม่มีก็ได้ หัวห้องจะเป็นคนกดเริ่มแทน</p>
+      <div class="tb-rows">${listed}</div>
+      ${players.length<2?'<p class="muted small">ต้องมีคนเล่นอย่างน้อย 2 คน ไม่นับผู้ดำเนินเกม</p>':''}</div>
     <div class="stage">
-      <div><h3>จับเวลา</h3>${host?'':'<p class="muted small">หัวห้องเป็นคนเลือก</p>'}</div>
-      ${tbLimitPick(+d.limit||0,'tbLimit',!host,'tbLimitIn')}
-      <div><h3>นั่งยังไง</h3>${host?'':'<p class="muted small">หัวห้องเป็นคนเลือก</p>'}</div>
+      <div><h3>จับเวลาแต่ละ round</h3>${set?'':'<p class="muted small">หัวห้องหรือผู้ดำเนินเกมเป็นคนเลือก</p>'}</div>
+      ${tbLimitPick(+d.limit||0,'tbLimit',!set,'tbLimitIn')}
+      <div><h3>นั่งยังไง</h3></div>
       <div class="seg tb-seg">
-        <button data-act="tbMode" data-id="circle" aria-pressed="${d.mode!=='line'}" ${host?'':'disabled'}><b>นั่งเป็นวงกลม</b><span>จอโชว์คำของตัวเอง หันจอออกให้คนอื่นดู</span></button>
-        <button data-act="tbMode" data-id="line" aria-pressed="${d.mode==='line'}" ${host?'':'disabled'}><b>เป็นแถว หรืออยู่คนละที่</b><span>จอโชว์คำของทุกคน ยกเว้นของตัวเอง</span></button>
+        <button data-act="tbMode" data-id="circle" aria-pressed="${d.mode!=='line'}" ${set?'':'disabled'}><b>นั่งเป็นวงกลม</b><span>จอโชว์คำของตัวเอง หันจอออกให้คนอื่นดู</span></button>
+        <button data-act="tbMode" data-id="line" aria-pressed="${d.mode==='line'}" ${set?'':'disabled'}><b>เป็นแถว หรืออยู่คนละที่</b><span>จอโชว์คำของทุกคน ยกเว้นของตัวเอง</span></button>
       </div>
       <div><h3>หมวดคำ</h3><p class="muted small">เลือกได้หลายหมวด คำจะสุ่มจากทุกหมวดที่เลือกรวมกัน</p></div>
-      <div class="chips">${tbCats().map(c=>`<button class="chip" data-act="tbCat" data-id="${esc(c.id)}" aria-pressed="${cats.includes(c.id)}" ${host?'':'disabled'}>${esc(c.name)} <span class="n">${tbWords(c.id).length}</span></button>`).join('')}</div>
+      <div class="chips">${tbCats().map(c=>`<button class="chip" data-act="tbCat" data-id="${esc(c.id)}" aria-pressed="${cats.includes(c.id)}" ${set?'':'disabled'}>${esc(c.name)} <span class="n">${tbWords(c.id).length}</span></button>`).join('')}</div>
     </div>
-    <div class="btns">${host?`<button class="btn primary big" data-act="tbStart" ${ps.length>=2?'':'disabled'}>เริ่มเกม <kbd>Space</kbd></button>`:`<span class="tb-pill">รอหัวห้องกดเริ่ม</span>${tbHostOk(d)?'':'<button class="btn sm ghost" data-act="tbBeHost">เป็นหัวห้องแทน</button>'}`}
+    ${more?tbTable(d,{title:'คะแนนสะสม'}):''}
+    <div class="btns">${ctl?`<button class="btn primary big" data-act="tbStart" ${players.length>=2?'':'disabled'}>${more?'เล่น round ต่อไป':'เริ่มเกม'} <kbd>Space</kbd></button>${more?'<button class="btn" data-act="tbEndAsk">จบเกม รวมคะแนน</button>':''}`:`<span class="tb-pill">รอ${tbCtlName(d)}กดเริ่ม</span>${tbHostOk(d)?'':'<button class="btn sm ghost" data-act="tbBeHost">เป็นหัวห้องแทน</button>'}`}
       <button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
   </div>`;
 }
 function tbBar(d){const a=tbAlive(d).length,n=tbIn(d).length;
-  return `<div class="tb-bar"><span class="tb-pill">ห้อง ${esc(d.code||S.tb.code)}</span><span class="tb-pill">เหลือ ${a}/${n} คน</span><span class="tb-pill" id="tbClock">${tbClock(d)}</span>
-    <button class="btn sm" data-act="tbPause">${d.paused?'เล่นต่อ':'พักเกม'}</button></div>`}
+  return `<div class="tb-bar"><span class="tb-pill">ห้อง ${esc(d.code||S.tb.code)} · R${+d.round||1}</span><span class="tb-pill">เหลือ ${a}/${n} คน</span><span class="tb-pill" id="tbClock">${tbClock(d)}</span>${tbIsNarr(d)?'<span class="tb-pill gm">ผู้ดำเนินเกม</span>':''}
+    ${d.status==='play'?`<button class="btn sm" data-act="tbPause">${d.paused?'เล่นต่อ':'พักเกม'}</button>`:''}</div>`}
+const tbKillerName=(d,p)=>p.killBy&&d.players[p.killBy]?d.players[p.killBy].name:'';
+/* the player list: words of everyone except your own (unless you are out / watching / the game master) */
 function tbList(d,showMine){
-  const me=tbMe(d);
-  return `<div class="tb-rows">${tbIn(d).map((p,i)=>{const mine=p.pid===TB_ME;const see=!mine||showMine;
-    const by=p.out&&p.outBy&&d.players[p.outBy]?d.players[p.outBy].name:'';
+  const nar=tbIsNarr(d);
+  return `<div class="tb-rows">${tbIn(d).map((p,i)=>{const mine=p.pid===TB_ME;const see=!mine||showMine;const kb=tbKillerName(d,p);
+    const acts=p.out?`<button class="btn sm ghost" data-act="tbFix" data-id="${esc(p.pid)}">แก้คนฆ่า</button>${nar?`<button class="btn sm ghost" data-act="tbRevive" data-id="${esc(p.pid)}">ฟื้น</button>`:''}`
+      :`<button class="btn sm ghost" data-act="tbReroll" data-id="${esc(p.pid)}">เปลี่ยนคำ</button><button class="btn sm danger" data-act="tbOut" data-id="${esc(p.pid)}">${nar?'ตาย':'โดน'}</button>`;
     return `<div class="tb-row ${p.out?'out':''} ${mine?'me':''}" style="--c:${okColor(p.color)}"><span class="tb-no">${i+1}</span>${tbPawn(p)}
-      <div class="tb-who"><b>${esc(p.name)}${mine?' <span class="tb-tag">คุณ</span>':''}</b>${see?`<span class="tb-word">${esc(p.word)}</span>`:'<span class="tb-word mine">คำของคุณ ???</span>'}${p.out?`<span class="small muted">ตกรอบ${by&&p.outBy!==p.pid?' · '+esc(by)+' กด':''}</span>`:''}</div>
-      <div class="tb-acts">${p.out?'':`${(+p.rr||0)<1&&(see||mine)?`<button class="btn sm ghost" data-act="tbReroll" data-id="${esc(p.pid)}">เปลี่ยนคำ</button>`:''}<button class="btn sm danger" data-act="tbOut" data-id="${esc(p.pid)}">โดน</button>`}</div></div>`}).join('')}</div>`}
-function tbFoot(d){const anyOut=tbIn(d).some(p=>p.out);
-  return `<div class="btns"><button class="btn primary" data-act="tbEndAsk">จบเกม</button>${anyOut?'<button class="btn" data-act="tbUndo">ย้อนคนล่าสุดที่โดน</button>':''}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>${tbKeys()}`}
+      <div class="tb-who"><b>${esc(p.name)}${mine?' <span class="tb-tag">คุณ</span>':''}</b>${see?`<span class="tb-word">${esc(p.word)}</span>`:'<span class="tb-word mine">คำของคุณ ???</span>'}${p.out?`<span class="small muted">ตกรอบ · ${kb?esc(kb)+' ฆ่า':'พูดเอง'}</span>`:''}</div>
+      <div class="tb-acts">${acts}</div></div>`}).join('')}</div>`}
+function tbMyBtns(d){const me=tbMe(d);if(!me||!me.inGame||me.out||d.paused)return '';
+  return `<div class="tb-mybtns"><button class="btn big dangerfill" data-act="tbMeOut">ฉันโดน <kbd>D</kbd></button><button class="btn big" data-act="tbMeKill">ฉันฆ่าได้ <kbd>K</kbd></button></div>`}
+function tbFoot(d){const anyOut=tbIn(d).some(p=>p.out);const ctl=tbCtl(d);
+  return `<div class="btns">${ctl?'<button class="btn primary" data-act="tbRoundEnd">จบ round นี้</button><button class="btn" data-act="tbEndAsk">จบเกม รวมคะแนน</button>':''}${anyOut?'<button class="btn" data-act="tbUndo">ย้อนคนล่าสุดที่โดน</button>':''}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>${tbKeys()}`}
 function tbPlay(d){
-  const me=tbMe(d);const inG=me&&me.inGame;const alive=inG&&!me.out;
+  const me=tbMe(d)||{};const inG=me.inGame;const alive=inG&&!me.out;const nar=tbIsNarr(d);
   if(d.paused)return `<div class="tb">${tbBar(d)}<div class="stage center"><div class="turnname">พักเกมอยู่</div><p class="muted">คำของทุกคนซ่อนไว้ก่อน ใครก็กดเล่นต่อได้</p><button class="btn primary big" data-act="tbPause">เล่นต่อ <kbd>Space</kbd></button></div>${tbFoot(d)}</div>`;
+  if(nar)return `<div class="tb">${tbBar(d)}<div class="banner tb-note">คุณเป็นผู้ดำเนินเกม เห็นคำของทุกคน กด “ตาย” แล้วเลือกคนฆ่า · เปลี่ยนคำได้ไม่จำกัด · กด “จบ round นี้” เมื่อพร้อม</div>${tbList(d,true)}${tbFoot(d)}</div>`;
   if(d.mode!=='line'&&alive){
     if(S.tb.reveal>Date.now())return `<div class="tb-full warn" role="alert"><div></div><div class="tb-warn"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="13" y="4" width="22" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="3.4"/><path d="M4 24h6m28 0h6M7 19l-3 5 3 5m34-10 3 5-3 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <b>หันจอไปทางคนอื่น</b><span>อย่าแอบดูคำของตัวเองนะ</span><div class="tb-count" id="tbRevealN">${Math.max(1,Math.ceil((S.tb.reveal-Date.now())/1000))}</div></div>
       <div class="btns" style="justify-content:center"><button class="btn big" data-act="tbShow">โชว์เลย</button></div></div>`;
-    if(!S.tb.hide){const len=Math.max(1,Array.from(String(me.word||'').replace(/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g,'')).length);
+    if(!S.tb.hide){const len=Math.max(1,Array.from(String(me.word||'').replace(/[ัิ-ฺ็-๎]/g,'')).length);
       return `<div class="tb-full" style="--c:${okColor(me.color)}"><i class="tb-band"></i>
-        <div class="tb-top">${tbPawn(me,'sm')}<span>คำต้องห้ามของ <b>${esc(me.name)}</b></span></div>
-        <div class="tb-big" style="font-size:min(${Math.min(30,140/len).toFixed(1)}vw,${Math.min(42,170/len).toFixed(1)}vh)">${esc(me.word)}</div>
+        <div class="tb-top">${tbPawn(me,'sm')}<span>คำต้องห้ามของ <b>${esc(me.name)}</b></span><span class="tb-pill dark">R${+d.round||1}</span></div>
+        <div class="tb-big" style="font-size:min(${Math.min(30,140/len).toFixed(1)}vw,${Math.min(40,160/len).toFixed(1)}vh)">${esc(me.word)}</div>
         <div class="tb-under"><span class="tb-pill dark">เหลือ ${tbAlive(d).length}/${tbIn(d).length}</span><span class="tb-pill dark" id="tbClock">${tbClock(d)}</span>
-          ${(+me.rr||0)<1?'<button class="btn" data-act="tbReroll" data-id="'+esc(TB_ME)+'">เปลี่ยนคำ</button>':''}<button class="btn" data-act="tbHide">ซ่อนคำ · ใครโดน</button></div></div>`}
-    return `<div class="tb">${tbBar(d)}<div class="tb-hidden"><div><b>คำของคุณซ่อนอยู่</b><span class="muted small">กดใครโดนแล้วค่อยโชว์คำกลับ</span></div><button class="btn primary" data-act="tbShowAsk">โชว์คำ (หันจอออก) <kbd>H</kbd></button></div>${tbList(d,false)}${tbFoot(d)}</div>`;
+          <button class="btn tb-outbtn" data-act="tbMeOut">ฉันโดน</button><button class="btn" data-act="tbMeKill">ฉันฆ่าได้</button>
+          <button class="btn" data-act="tbReroll" data-id="${esc(TB_ME)}">เปลี่ยนคำ</button><button class="btn" data-act="tbHide">ซ่อนคำ · ดูคนอื่น</button></div></div>`}
+    return `<div class="tb">${tbBar(d)}<div class="tb-hidden"><div><b>คำของคุณซ่อนอยู่</b><span class="muted small">กดเสร็จแล้วค่อยโชว์คำกลับ</span></div><button class="btn primary" data-act="tbShowAsk">โชว์คำ (หันจอออก) <kbd>H</kbd></button></div>${tbMyBtns(d)}${tbList(d,false)}${tbFoot(d)}</div>`;
   }
-  const note=!inG?'<div class="banner tb-note">คุณเข้ามาตอนเกมเล่นอยู่ ดูไปก่อน รอบหน้าได้เล่นด้วย</div>'
-    :me.out?`<div class="tb-gone" style="--c:${okColor(me.color)}"><span>คุณตกรอบแล้ว คำของคุณคือ</span><b>${esc(me.word)}</b><span class="small">ยังช่วยกด “โดน” ให้คนอื่นได้</span></div>`:'';
-  return `<div class="tb">${tbBar(d)}${note}${tbList(d,!alive)}${tbFoot(d)}</div>`;
+  const note=!inG?'<div class="banner tb-note">คุณเข้ามาตอน round นี้เล่นอยู่ ดูไปก่อน round หน้าได้เล่นด้วย</div>'
+    :me.out?`<div class="tb-gone" style="--c:${okColor(me.color)}"><span>คุณตกรอบแล้ว คำของคุณคือ</span><b>${esc(me.word)}</b><span class="small">${tbKillerName(d,me)?esc(tbKillerName(d,me))+' ได้แต้มฆ่า · ':''}ยังช่วยกด “โดน” ให้คนอื่นได้</span></div>`:'';
+  return `<div class="tb">${tbBar(d)}${note}${tbMyBtns(d)}${tbList(d,!alive)}${tbFoot(d)}</div>`;
 }
-function tbEnd(d){
-  const ins=tbIn(d);const win=(d.winner||[]).map(id=>d.players[id]).filter(Boolean);const host=tbIsHost(d);
-  const rank=ins.slice().sort((a,b)=>(a.out?1:0)-(b.out?1:0)||(b.outAt||0)-(a.outAt||0));
-  return `<div class="tb"><div class="stage center">
-    ${win.length?`<div class="pawns" style="justify-content:center">${win.map(p=>tbPawn(p,'xl')).join('')}</div>`:''}
-    <div class="turnname">${win.length?esc(win.map(p=>p.name).join(' & '))+' ชนะ':'จบเกม'}</div>
-    ${d.endBy==='time'?`<p class="tb-timeup">หมดเวลา ${esc(tbLimitName(d.limit))} · คนที่ยังไม่ตกรอบชนะร่วมกัน</p>`:`<p class="muted">ใช้เวลา ${tbClock(d)} นาที</p>`}
-    <div class="rank">${rank.map((p,i)=>`<div><span class="no">${i+1}</span>${tbPawn(p)}<span><b>${esc(p.name)}</b><span class="small muted"> · ${esc(p.word)}</span></span><span class="small muted">${p.out?'ตกรอบ':'รอด'}</span></div>`).join('')}</div>
-    ${d.saved?'<p class="muted small">บันทึกผลเข้าบ้านแล้ว</p>':`<button class="btn" data-act="tbSave">บันทึกผลเข้าบ้าน</button>`}
-    <div class="btns" style="justify-content:center">${host?'<button class="btn primary big" data-act="tbStart">เล่นอีกรอบ <kbd>Space</kbd></button><button class="btn" data-act="tbToLobby">เปลี่ยนหมวด / แบบนั่ง</button>':'<span class="tb-pill">รอหัวห้องเริ่มรอบใหม่</span>'}
-      ${ins.some(p=>p.out)?'<button class="btn ghost" data-act="tbUndo">ย้อนคนล่าสุดที่โดน</button>':''}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
-  </div></div>`;
+/* guessing: players still in say their own word out loud; others (or the game master) mark right or wrong */
+function tbGuessView(d){
+  const al=tbAlive(d);const ctl=tbCtl(d);const nar=tbNarr(d);
+  const rows=al.map(p=>{const mine=p.pid===TB_ME;const can=tbCanJudge(d,p.pid);const st=p.guess===true?'<span class="tb-gst ok">ทายถูก +1</span>':p.guess===false?'<span class="tb-gst no">ทายผิด</span>':'<span class="tb-gst">รอทาย</span>';
+    return `<div class="tb-row res ${mine?'me':''}" style="--c:${okColor(p.color)}"><span class="tb-no"></span>${tbPawn(p)}<div class="tb-who"><b>${esc(p.name)}${mine?' <span class="tb-tag">คุณ</span>':''}</b>${mine&&!tbIsNarr(d)?'<span class="tb-word mine">ทายคำของตัวเองออกมาดังๆ</span>':`<span class="tb-word">${esc(p.word)}</span>`}${st}</div>
+      <div class="tb-acts">${can?`<button class="btn sm ${p.guess===true?'primary':''}" data-act="tbGuess" data-id="${esc(p.pid)}" data-v="1" aria-pressed="${p.guess===true}">ทายถูก</button><button class="btn sm ${p.guess===false?'primary':''}" data-act="tbGuess" data-id="${esc(p.pid)}" data-v="0" aria-pressed="${p.guess===false}">ทายผิด</button>`:''}</div></div>`}).join('');
+  return `<div class="tb">${tbBar(d)}
+    <div class="stage center"><span class="label">${esc(TB_WHY[d.endBy]||'จบ round')} · round ${+d.round||1}</span><div class="turnname">${al.length===1?esc(al[0].name)+' รอด!':'รอด '+al.length+' คน'}</div>
+      <p class="muted">คนที่รอดได้ +1 แล้ว ทายคำของตัวเองให้ถูกได้อีก +1 · ${nar?'ผู้ดำเนินเกมเป็นคนตัดสิน':'คนอื่นช่วยกดว่าทายถูกไหม'}</p></div>
+    <div class="tb-rows">${rows}</div>
+    <div class="btns">${ctl?'<button class="btn primary big" data-act="tbCloseRound">สรุป round <kbd>Space</kbd></button><button class="btn" data-act="tbEndAsk">จบเกม รวมคะแนน</button><button class="btn ghost" data-act="tbUndo">ย้อนคนล่าสุดที่โดน</button>':`<span class="tb-pill">ทายครบแล้วจะสรุป round ให้เอง</span>`}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
+  </div>`;
+}
+function tbRoundView(d){
+  const h=(d.history||[]).find(x=>x.r===+d.round)||{pts:{},words:{},names:{},kills:{}};const ctl=tbCtl(d);
+  const ids=Object.keys(h.pts||{}).sort((a,b)=>tbPts(h.pts[b])-tbPts(h.pts[a]));
+  const nm=id=>((d.players||{})[id]&&d.players[id].name)||((h.names||{})[id]||{}).name||'?';
+  const info=id=>Object.assign({},(h.names||{})[id]||{},(d.players||{})[id]||{});
+  return `<div class="tb"><div class="stage center"><span class="label">${esc(TB_WHY[h.why]||'จบ round')}</span><div class="turnname">จบ round ${+d.round||1}</div></div>
+    <div class="tb-rows">${ids.map(id=>{const x=h.pts[id];const out=!x.s;const kb=(h.kills||{})[id];
+      return `<div class="tb-row res ${out?'dim':''}" style="--c:${okColor(info(id).color)}"><span class="tb-no"></span>${tbPawn(info(id))}<div class="tb-who"><b>${esc(nm(id))} <span class="small muted">· ${esc((h.words||{})[id]||'')}</span></b>
+        <span class="tb-chips">${+x.k?`<span class="tb-gst ok">ฆ่า ${x.k} +${x.k}</span>`:''}${x.s?'<span class="tb-gst ok">รอด +1</span>':`<span class="tb-gst">ตกรอบ${kb?' · '+esc(nm(kb))+' ฆ่า':''}</span>`}${x.g?'<span class="tb-gst ok">ทายถูก +1</span>':''}</span></div>
+        <div class="tb-rpts">+${tbPts(x)}</div></div>`}).join('')}</div>
+    ${tbTable(d,{title:'คะแนนรวมทุก round'})}
+    <div class="btns">${ctl?`<button class="btn primary big" data-act="tbStart">เล่น round ต่อไป <kbd>Space</kbd></button><button class="btn" data-act="tbEndAsk">จบเกม รวมคะแนน</button><button class="btn" data-act="tbToLobby">เปลี่ยนตั้งค่า / ผู้ดำเนินเกม</button>`:`<span class="tb-pill">รอ${tbCtlName(d)}เริ่ม round ต่อไป</span>`}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
+  </div>`;
+}
+function tbFinalView(d){
+  const rows=tbScoreRows(d);const best=rows.length?rows[0].total:0;const win=rows.filter(r=>r.total===best);const ctl=tbCtl(d);const n=(d.history||[]).length;
+  return `<div class="tb"><div class="stage center"><span class="label">จบเกม · เล่นไป ${n} round</span>
+    ${win.length?`<div class="pawns" style="justify-content:center">${win.map(p=>tbPawn(p,'xl')).join('')}</div><div class="turnname">${esc(win.map(p=>p.name).join(' & '))} ชนะ · ${best} แต้ม</div>`:'<div class="turnname">จบเกม</div>'}
+    ${d.saved?'<p class="muted small">บันทึกผลเข้าบ้านแล้ว</p>':(rows.length?'<button class="btn" data-act="tbSave">บันทึกผลเข้าบ้าน</button>':'')}</div>
+    ${tbTable(d,{title:'คะแนนทุก round'})}
+    <div class="btns">${ctl?'<button class="btn primary big" data-act="tbNewGame">เริ่มเกมใหม่ (แต้มเริ่มที่ 0)</button>':`<span class="tb-pill">รอ${tbCtlName(d)}เริ่มเกมใหม่</span>`}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
+  </div>`;
 }
 function vTaboo(){
   tbInit();
@@ -2863,7 +3011,9 @@ function vTaboo(){
     const d=S.tb.room;
     if(!d||!S.tb.loaded)return `<div class="panel muted">กำลังเข้าห้อง ${esc(S.tb.code)}…</div>`;
     if(d.status==='play')return tbPlay(d);
-    if(d.status==='end')return tbEnd(d);
+    if(d.status==='guess')return tbGuessView(d);
+    if(d.status==='roundEnd'||d.status==='end')return tbRoundView(d);
+    if(d.status==='final')return tbFinalView(d);
     return tbLobby(d);
   }
   return tbHome();
@@ -2888,8 +3038,8 @@ Object.assign(ACT,{
     catch(e){S.tb.busy=false;tbFail(e);render();return}
     if(!code){S.tb.busy=false;toast('สร้างห้องไม่สำเร็จ ลองใหม่อีกครั้ง');render();return}
     const now=Date.now();let cats=LS.get('tbCats',null);if(!Array.isArray(cats)||!cats.length)cats=TB_CATS.map(c=>c.id);
-    const room={code,at:now,host:TB_ME,mode:LS.get('tbMode','circle')==='line'?'line':'circle',cats,status:'lobby',limit:tbLimitPref(),round:0,paused:false,pausedAt:0,pausedTotal:0,startedAt:0,endedAt:0,winner:[],saved:false,used:[],
-      players:{[TB_ME]:Object.assign({},who,{joinedAt:now,left:false,inGame:false,word:'',rr:0,out:false,outAt:0,outBy:''})}};
+    const room={code,at:now,host:TB_ME,mode:LS.get('tbMode','circle')==='line'?'line':'circle',cats,status:'lobby',narrator:'',history:[],limit:tbLimitPref(),round:0,paused:false,pausedAt:0,pausedTotal:0,startedAt:0,endedAt:0,winner:[],saved:false,used:[],
+      players:{[TB_ME]:Object.assign({},who,{joinedAt:now,left:false,inGame:false,word:'',rr:0,out:false,outAt:0,outBy:'',killBy:'',guess:null})}};
     try{await tbTimeout(tbRef(code).set(room),12000)}catch(e){S.tb.busy=false;tbFail(e);render();return}
     S.tb.busy=false;S.tb.code=code;LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render()},
   async tbJoin(){tbInit();if(S.tb.busy)return;const code=tbDigits(val('tbCodeIn'));S.tb.codeIn=code;
@@ -2901,27 +3051,37 @@ Object.assign(ACT,{
     let d=null;try{const s=await tbTimeout(tbRef(code).get(),12000);d=s.exists?s.data():null}catch(e){done();tbFail(e);return}
     if(!d){done('ไม่เจอห้อง '+code+' ตรวจรหัสอีกที หรือให้คนสร้างห้องดูว่ายังเปิดอยู่');return}
     const prev=(d.players||{})[TB_ME];const me=Object.assign({},who,{left:false});
-    if(!prev||prev.left)Object.assign(me,{joinedAt:Date.now(),inGame:false,word:'',rr:0,out:false,outAt:0,outBy:''});
+    if(!prev||prev.left)Object.assign(me,{joinedAt:Date.now(),inGame:false,word:'',rr:0,out:false,outAt:0,outBy:'',killBy:'',guess:null});
     S.tb.code=code;
     let ok=false;try{ok=await tbTimeout(tbPatch({players:{[TB_ME]:me}}),12000)}catch(e){tbFail(e)}
     if(!ok){S.tb.code=null;done();return}
-    S.tb.busy=false;S.tb.codeIn='';LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render();if(d.status==='play'&&(!prev||prev.left||!prev.inGame))toast('เกมกำลังเล่นอยู่ รอบหน้าได้เล่นด้วย')},
+    S.tb.busy=false;S.tb.codeIn='';LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render();if(d.status==='play'&&(!prev||prev.left||!prev.inGame))toast('round นี้เล่นอยู่ round หน้าได้เล่นด้วย')},
   async tbLeave(){const d=S.tb.room;const o={players:{[TB_ME]:{left:true}}};
     if(d&&d.host===TB_ME){const nx=tbPlayers(d).find(p=>p.pid!==TB_ME);if(nx)o.host=nx.pid}
+    if(d&&d.narrator===TB_ME)o.narrator='';
     await tbPatch(o);tbExit('ออกจากห้องแล้ว')},
   tbKick(t){const d=S.tb.room;if(!tbIsHost(d))return;tbPatch({players:{[t.dataset.id]:{left:true}}})},
   tbBeHost(){tbPatch({host:TB_ME})},
-  tbMode(t){const d=S.tb.room;if(!tbIsHost(d))return;const m=t.dataset.id==='line'?'line':'circle';LS.set('tbMode',m);tbPatch({mode:m})},
-  tbCat(t){const d=S.tb.room;if(!tbIsHost(d))return;const id=t.dataset.id;let c=(d.cats||[]).slice();
+  tbMode(t){const d=S.tb.room;if(!tbCanSet(d))return;const m=t.dataset.id==='line'?'line':'circle';LS.set('tbMode',m);tbPatch({mode:m})},
+  tbCat(t){const d=S.tb.room;if(!tbCanSet(d))return;const id=t.dataset.id;let c=(d.cats||[]).slice();
     if(c.includes(id)){if(c.length<2){toast('ต้องเลือกอย่างน้อย 1 หมวด');return}c=c.filter(x=>x!==id)}else c.push(id);LS.set('tbCats',c);tbPatch({cats:c})},
   tbStart(){tbStart()},
   tbLimitHome(t){LS.set('tbLimit',+t.dataset.id);render()},
-  tbLimit(t){const d=S.tb.room;if(!tbIsHost(d))return;const v=+t.dataset.id;LS.set('tbLimit',v);tbPatch({limit:v})},
-  tbToLobby(){const d=S.tb.room;if(!tbIsHost(d))return;tbPatch({status:'lobby'})},
+  tbLimit(t){const d=S.tb.room;if(!tbCanSet(d))return;const v=+t.dataset.id;LS.set('tbLimit',v);tbPatch({limit:v})},
+  tbToLobby(){const d=S.tb.room;if(!tbCtl(d)&&!tbIsHost(d))return;tbPatch({status:'lobby'})},
+  tbNarr(t){const d=S.tb.room;if(!d)return;const id=t.dataset.id;if(!tbIsHost(d)&&id!==TB_ME)return;
+    if(d.status==='play'||d.status==='guess'){toast('เปลี่ยนผู้ดำเนินเกมได้ตอนอยู่ห้องรอ');return}
+    tbPatch({narrator:tbNarr(d)===id?'':id})},
+  tbNewGame(){tbNewGame()},
+  tbMeOut(){tbAskOut(TB_ME)},
+  tbMeKill(){tbAskKill()},
+  tbFix(t){tbAskOut(t.dataset.id,true)},
+  tbRevive(t){tbRevive(t.dataset.id)},
+  tbRoundEnd(){const d=S.tb.room;if(!tbCtl(d))return;tbRoundOver('manual')},
+  tbCloseRound(){const d=S.tb.room;if(!tbCtl(d))return;tbCloseRound()},
+  tbGuess(t){tbGuess(t.dataset.id,t.dataset.v==='1')},
   tbOut(t){tbAskOut(t.dataset.id)},
-  async tbOutGo(t){const pid=t.dataset.id;closeSheet();const d=S.tb.room;if(!d||d.status!=='play')return;const p=(d.players||{})[pid];if(!p||p.out)return;
-    if(!await tbPatch({players:{[pid]:{out:true,outAt:Date.now(),outBy:TB_ME}}}))return;
-    const now=S.tb.room;const left=tbAlive(now).filter(x=>x.pid!==pid);if(now.status==='play'&&left.length<=1)tbFinish()},
+  tbOutGo(t){closeSheet();tbOutGo(t.dataset.id,t.dataset.k||'')},
   tbUndo(){tbUndo()},
   tbPause(){tbPause()},
   tbReroll(t){tbReroll(t.dataset.id)},
@@ -2930,10 +3090,9 @@ Object.assign(ACT,{
   tbShowAsk(){S.tb.hide=false;S.tb.reveal=Date.now()+3200;render()},
   tbShow(){S.tb.reveal=0;render()},
   tbEndAsk(){tbEndAsk()},
-  async tbSave(){const d=S.tb.room;if(!d||d.status!=='end'||d.saved)return;if(!await tbPatch({saved:true}))return;
-    const pl=p=>p.kid&&kidById(p.kid)?{id:p.kid}:{name:p.name,code:p.code,color:p.color};
-    const ins=tbIn(d);const win=(d.winner||[]).map(id=>d.players[id]).filter(Boolean);
-    try{await saveGameSession({game:'คำต้องห้าม',players:ins.map(pl),winners:win.map(pl),pts:{}});toast('บันทึกผลเข้าบ้านแล้ว')}catch(e){toast('บันทึกผลไม่สำเร็จ')}},
+  async tbSave(){const d=S.tb.room;if(!d||d.status!=='final'||d.saved)return;const rows=tbScoreRows(d);if(!rows.length)return;if(!await tbPatch({saved:true}))return;
+    const pl=p=>p.kid&&kidById(p.kid)?{id:p.kid}:{name:p.name,code:p.code,color:p.color};const best=rows[0].total;
+    try{await saveGameSession({game:'คำต้องห้าม',players:rows.map(pl),winners:rows.filter(r=>r.total===best).map(pl),pts:{}});toast('บันทึกผลเข้าบ้านแล้ว')}catch(e){toast('บันทึกผลไม่สำเร็จ')}},
   tbWordsForm(t){tbWordsForm(t&&t.dataset&&t.dataset.id||S.tbEdit||TB_CATS[0].id)},
   async tbNewCat(){const m=JSON.parse(JSON.stringify(tbMeta()));m.cats=(m.cats||[]).concat({id:'u'+uid(),name:'หมวดใหม่'});
     if(await Store.put('meta','taboo',m))tbWordsForm(m.cats[m.cats.length-1].id)},
@@ -2950,21 +3109,25 @@ Object.assign(ACT,{
     if(await Store.put('meta','taboo',m)){closeSheet();toast('ลบหมวดแล้ว');render()}}
 });
 document.addEventListener('keydown',e=>{
-  if(!(S.tab==='tools'&&S.tool==='taboo'&&S.tb&&S.tb.code&&S.tb.room)||!$('#sheet').hidden||e.isComposing)return;
+  if(!(S.tab==='tools'&&S.tool==='taboo'&&S.tb&&S.tb.code&&S.tb.room)||e.isComposing)return;
   const a=document.activeElement;if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;
+  const dig=/^(Digit|Numpad)([1-9])$/.exec(e.code||'');
+  /* inside the "who killed" popup: the number picks that player */
+  if(!$('#sheet').hidden){if(dig&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const b=$(`#sheetCard [data-key="${dig[2]}"]`);if(b){e.preventDefault();b.click()}}return}
   const d=S.tb.room;
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.code==='KeyZ'){e.preventDefault();tbUndo();return}
   if(e.ctrlKey||e.metaKey||e.altKey)return;
-  if(e.code==='Space'){e.preventDefault();if(d.status==='play')tbPause();else if(tbIsHost(d))tbStart();return}
-  const dig=/^(Digit|Numpad)([1-9])$/.exec(e.code||'');
-  if(dig){if(d.status==='play'){const p=tbIn(d)[+dig[2]-1];if(p){e.preventDefault();tbAskOut(p.pid)}}return}
+  if(e.code==='Space'){e.preventDefault();if(d.status==='play')tbPause();else if(d.status==='guess'){if(tbCtl(d))tbCloseRound()}else if(d.status!=='final'&&tbCtl(d))tbStart();return}
+  if(dig){if(d.status==='play'){const p=tbIn(d)[+dig[2]-1];if(p&&!p.out){e.preventDefault();tbAskOut(p.pid)}}return}
+  if(e.code==='KeyD'){e.preventDefault();tbAskOut(TB_ME);return}
+  if(e.code==='KeyK'){e.preventDefault();tbAskKill();return}
   if(e.code==='KeyH'){e.preventDefault();ACT.tbHide();return}
   if(e.code==='KeyR'){e.preventDefault();tbReroll(TB_ME)}
 });
 
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='tbCodeIn'&&S.tb){S.tb.codeIn=t.value}});
 function tbLimitApply(t){const v=tbParseMin(t.value);if(v==null){if(t.value.trim())toast('ใส่เวลาเป็นนาที เช่น 4 หรือ 2.5');return}LS.set('tbLimit',v);
-  if(t.id==='tbLimitIn'){const d=S.tb&&S.tb.room;if(d&&tbIsHost(d)&&+d.limit!==v)tbPatch({limit:v})}else render();toast('จับเวลารอบละ '+tbLimitName(v))}
+  if(t.id==='tbLimitIn'){const d=S.tb&&S.tb.room;if(d&&tbCanSet(d)&&+d.limit!==v)tbPatch({limit:v})}else render();toast('จับเวลารอบละ '+tbLimitName(v))}
 document.addEventListener('change',e=>{const t=e.target;if(t&&(t.id==='tbLimitIn'||t.id==='tbLimitHomeIn'))tbLimitApply(t)});
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.isComposing||e.metaKey||e.ctrlKey||!t)return;
   if(t.id==='tbCodeIn'){e.preventDefault();t.blur();ACT.tbJoin()}else if(t.id==='tbNameIn'){e.preventDefault();ACT.tbName()}
@@ -2981,8 +3144,9 @@ function endInfo(){
     case 'flip7':{const f=S.flip;if(!f||f.phase!=='play'||!(f.players||[]).length)return null;return {name:'Flip 7',note:'ไปหน้าสรุปแต้ม',go:()=>ACT.f7End()}}
     case 'poker':{const P=S.poker;if(!P)return null;if(P.h&&(P.phase==='hand'||P.phase==='show'))return {block:'ยังอยู่กลางมือ เล่นมือนี้ให้จบก่อนแล้วค่อยจบเกม'};
       if(P.phase!=='ready'||!(P.players||[]).length)return null;return {name:'โป๊กเกอร์',note:'ไปหน้าสรุปชิป',go:()=>ACT.pbEnd()}}
-    case 'taboo':{const d=S.tb&&S.tb.room;if(!d||d.status!=='play')return null;const a=tbAlive(d);
-      return {name:'คำต้องห้าม · ห้อง '+(d.code||S.tb.code),note:a.length?'คนที่ยังไม่ตกรอบ ('+a.map(p=>p.name).join(', ')+') ชนะร่วมกัน':'',go:()=>tbFinish()}}
+    case 'taboo':{const d=S.tb&&S.tb.room;if(!d||!['play','guess','roundEnd','end','lobby'].includes(d.status))return null;if(d.status==='lobby'&&!(d.history||[]).length)return null;
+      if(!tbCtl(d))return {block:'ให้'+tbCtlName(d)+'เป็นคนกดจบเกม'};
+      return {name:'คำต้องห้าม · ห้อง '+(d.code||S.tb.code),note:(d.status==='play'||d.status==='guess'?'round นี้นับแต้มเท่าที่เล่นไปแล้ว คนที่ยังไม่ตกรอบได้ +1 ':'')+'แล้วรวมแต้มทุก round ประกาศผู้ชนะ',go:()=>tbFinal()}}
   }
   return null;
 }
@@ -3057,7 +3221,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-24T18:39:00+07:00';
+const SITE_UPDATED='2026-10-24T22:13:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
