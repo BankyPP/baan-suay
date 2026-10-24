@@ -161,6 +161,7 @@ ul.plain{list-style:none;margin:0;padding:0}
 .prose p,.prose ul,.prose ol{margin:.5em 0}
 .prose ul,.prose ol{padding-left:1.3em}
 .prose li{margin:.2em 0}
+.prose u,.qtext u,.choice u,.explain u,.fmtprev u,.goals u{text-underline-offset:.22em}
 .prose code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--sunk);padding:1px 5px;border-radius:5px}
 .tip{background:var(--sunk);border-radius:12px;padding:10px 14px;margin:.7em 0}
 .back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font:500 .92rem var(--f-head);cursor:pointer;padding:6px 0}
@@ -612,6 +613,8 @@ function ago(t){if(!t)return'';const d=(Date.now()-t)/1000;if(d<60)return'เม
 /* light markdown: ## heading, - list, 1. list, > tip, **bold**, *italic*, `code`, H_2O, x^2, ->, <=> */
 function inline(s){
   return s.replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/__([^_]+?)__/g,'<u>$1</u>')
+    .replace(/\*\*\*([^*]+)\*\*\*/g,'<strong><em>$1</em></strong>')
     .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
     .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\w)/g,'$1<em>$2</em>')
     .replace(/_\{([^}]+)\}/g,'<sub>$1</sub>')
@@ -1365,21 +1368,39 @@ function bsCatForm(c){const b=bsBoardNow();const ck='bscol:'+c;
   `<button class="btn primary" data-act="bsCatSave" data-c="${c}">บันทึก</button>${b.cats.length>1?(S.confirm===ck?`<button class="btn dangerfill" data-act="bsColDel" data-c="${c}">ยืนยันลบหัวข้อและคำถามทั้งคอลัมน์</button>`:`<button class="btn danger" data-act="bsColAsk" data-c="${c}">ลบหัวข้อนี้</button>`):''}`)}
 /* formatting bar for sub/superscript in editor sheets */
 function fmtBar(){return `<div class="fmtbar" role="toolbar" aria-label="จัดรูปแบบตัวอักษร">
+  <button type="button" data-fmt="b" aria-label="ตัวหนา" title="ตัวหนา (Ctrl+B)"><b style="font-weight:800">B</b><span>ตัวหนา</span></button>
+  <button type="button" data-fmt="i" aria-label="ตัวเอียง" title="ตัวเอียง (Ctrl+I)"><b style="font-style:italic;font-weight:500">I</b><span>ตัวเอียง</span></button>
+  <button type="button" data-fmt="u" aria-label="ขีดเส้นใต้" title="ขีดเส้นใต้ (Ctrl+U)"><b style="text-decoration:underline;text-underline-offset:.18em;font-weight:500">U</b><span>ขีดเส้นใต้</span></button>
   <button type="button" data-fmt="sub" aria-label="ตัวห้อย"><b>X<sub>2</sub></b><span>ตัวห้อย</span></button>
   <button type="button" data-fmt="sup" aria-label="ตัวยก"><b>X<sup>2</sup></b><span>ตัวยก</span></button>
   <button type="button" data-fmt="arrow" aria-label="ลูกศร">→</button>
   <button type="button" data-fmt="eq" aria-label="ลูกศรสมดุล">⇌</button>
-  <div class="fmtprev" id="fmtPrev"><span class="muted">เลือกข้อความในช่องที่พิมพ์ แล้วกดตัวห้อยหรือตัวยก</span></div></div>`}
+  <div class="fmtprev" id="fmtPrev"><span class="muted">เลือกข้อความในช่องที่พิมพ์ แล้วกดปุ่มจัดรูปแบบ</span></div></div>`}
 const FMT={el:null,start:0,end:0};
 function fmtTrack(el){if(!el||!$('#sheetCard').contains(el)||!(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&el.type==='text'))||el.id==='bsGuest')return;
   FMT.el=el;try{FMT.start=el.selectionStart;FMT.end=el.selectionEnd}catch(e){}fmtPreview()}
 function fmtPreview(){const pv=$('#fmtPrev');if(!pv)return;const el=FMT.el;
-  if(!el||!document.body.contains(el)){pv.innerHTML='<span class="muted">เลือกข้อความในช่องที่พิมพ์ แล้วกดตัวห้อยหรือตัวยก</span>';return}
+  if(!el||!document.body.contains(el)){pv.innerHTML='<span class="muted">เลือกข้อความในช่องที่พิมพ์ แล้วกดปุ่มจัดรูปแบบ</span>';return}
   const v=el.value.trim();pv.innerHTML=v?'<span class="muted">ตัวอย่าง:</span> '+inline(esc(v.length>140?v.slice(0,140)+'…':v)).replace(/\n/g,' '):'<span class="muted">ตัวอย่างจะขึ้นตรงนี้ตอนพิมพ์</span>'}
+/* ** bold, * italic, __ underline; pressing again on already-marked text takes the mark off */
+function fmtWrap(el,a,b,kind){
+  const v=el.value;const run=(i,d)=>{let n=0;while(v[i+(d<0?-1-n:n)]==='*')n++;return n};
+  let m,on;
+  if(kind==='u'){m='__';on=v.slice(a-2,a)==='__'&&v.slice(b,b+2)==='__'}
+  else{const n=Math.min(run(a,-1),run(b,1));m=kind==='b'?'**':'*';on=kind==='b'?(n===2||n>=3):(n===1||n>=3)}
+  let nv,s0,s1;
+  if(on){nv=v.slice(0,a-m.length)+v.slice(a,b)+v.slice(b+m.length);s0=a-m.length;s1=b-m.length}
+  else{nv=v.slice(0,a)+m+v.slice(a,b)+m+v.slice(b);s0=a+m.length;s1=b+m.length}
+  el.value=nv;try{el.focus({preventScroll:true});el.setSelectionRange(s0,s1)}catch(e){}
+  FMT.start=s0;FMT.end=s1;autoGrow(el);fmtPreview();
+}
 function fmtApply(kind){
   const el=FMT.el;if(!el||!document.body.contains(el)){toast('แตะช่องที่จะพิมพ์ก่อน แล้วเลือกข้อความ');return}
   const a=Math.min(FMT.start,FMT.end),b=Math.max(FMT.start,FMT.end);const sel=el.value.slice(a,b);
   let ins,caret;
+  if(kind==='b'||kind==='i'||kind==='u'){
+    if(el.tagName!=='TEXTAREA'){toast('ช่องชื่อทำตัวหนา ตัวเอียง หรือขีดเส้นใต้ไม่ได้ ใช้ได้ในช่องโจทย์ ตัวเลือก และคำอธิบาย');return}
+    fmtWrap(el,a,b,kind);return}
   if(kind==='sub'||kind==='sup'){const m=kind==='sub'?'_':'^';ins=m+'{'+sel+'}';caret=sel?a+ins.length:a+2}
   else{ins=kind==='arrow'?' -> ':' <=> ';caret=a+ins.length}
   el.value=el.value.slice(0,a)+ins+el.value.slice(b);
@@ -1676,7 +1697,7 @@ ${d.part!=='quiz'?`
     <div class="btns"><button class="btn" data-act="tAdd">เพิ่มหัวข้อ</button></div>
     <details ${plain(d.content)?'open':''}><summary class="label" style="cursor:pointer">เนื้อหาเพิ่มเติม (ไม่ใส่ก็ได้)</summary>
       <label class="field" style="margin-top:10px"><textarea id="lfContent" style="min-height:120px" aria-label="เนื้อหาเพิ่มเติม">${esc(d.content)}</textarea>
-      <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
+      <small>## หัวข้อ · - รายการ · > กล่องเคล็ดลับ · **ตัวหนา** · *ตัวเอียง* · __ขีดเส้นใต้__ · H_2O ตัวห้อย · Cu^{2+} ตัวยก · -> ลูกศร · &lt;=&gt; ลูกศรสมดุล</small></label></details>
 `:''}${d.part==='quiz'?`
     <div class="panel qsettings">
       <b class="label">ตั้งค่าชุดข้อสอบ</b>
@@ -1760,18 +1781,18 @@ async function saveLesson(){
 
 function gameForm(id){
   const g=id?Store.d.games[id]:{name:'',kind:'compete',min:2,max:6,minutes:'',props:'',rules:'',helper:''};const ck='game:'+(id||'');
-  openSheet(id?'แก้ไขเกม':'เพิ่มเกม',`
+  openSheet(id?'แก้ไขเกม':'เพิ่มเกม',`${fmtBar()}
     <label class="field"><span>ชื่อเกม</span><input type="text" id="gfName" value="${esc(g.name)}" placeholder="เช่น Splendor, เกมด่านของพี่"></label>
     <div class="field"><span>ประเภท</span><div class="pick">${KINDS.map(([v,n])=>`<label class="opt"><input type="radio" name="gfKind" value="${v}" ${g.kind===v?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
     <div class="row3"><label class="field"><span>คนเล่นน้อยสุด</span><input type="number" id="gfMin" value="${esc(g.min)}" min="1"></label><label class="field"><span>มากสุด</span><input type="number" id="gfMax" value="${esc(g.max)}" min="1"></label><label class="field"><span>เวลา (นาที)</span><input type="number" id="gfTime" value="${esc(g.minutes||'')}" min="1"></label></div>
     <label class="field"><span>อุปกรณ์</span><input type="text" id="gfProps" value="${esc(g.props||'')}" placeholder="เช่น ไพ่ 1 สำรับ, ลูกเต๋า 2 ลูก"></label>
-    <label class="field"><span>กติกา</span><textarea id="gfRules" style="min-height:150px">${esc(g.rules||'')}</textarea><small>ใช้ ## หัวข้อ และ - รายการ ได้เหมือนบทเรียน</small></label>
+    <label class="field"><span>กติกา</span><textarea id="gfRules" style="min-height:150px">${esc(g.rules||'')}</textarea><small>ใช้ ## หัวข้อ - รายการ และปุ่มตัวหนา ตัวเอียง ขีดเส้นใต้ได้เหมือนบทเรียน</small></label>
     <label class="field"><span>ตัวช่วยที่ใช้ตอนเล่น</span><select id="gfHelper">${HELPERS.map(([v,n])=>`<option value="${v}" ${g.helper===v?'selected':''}>${n}</option>`).join('')}</select></label>`,
     `<button class="btn primary" data-act="saveGame" data-id="${esc(id||'')}">บันทึกเกม</button>${id?(S.confirm===ck?`<button class="btn dangerfill" data-act="delGame" data-id="${esc(id)}">ยืนยันลบเกม</button>`:`<button class="btn danger" data-act="askGame" data-id="${esc(id)}">ลบเกม</button>`):''}`);
 }
 function postForm(id){
   const p=id?Store.d.posts[id]:{author:S.lastAuthor||'',type:'news',title:'',text:'',date:'',pin:false};
-  openSheet(id?'แก้ไขโพสต์':'เขียนโพสต์',`
+  openSheet(id?'แก้ไขโพสต์':'เขียนโพสต์',`${fmtBar()}
     <div class="field"><span>ใครเขียน</span>${kidPick('pfAuthor','radio',[p.author])}</div>
     <div class="field"><span>ประเภท</span><div class="pick">${POSTTYPES.map(([v,n])=>`<label class="opt"><input type="radio" name="pfType" value="${v}" ${p.type===v?'checked':''}><span>${n}</span></label>`).join('')}</div></div>
     <label class="field"><span>หัวข้อ</span><input type="text" id="pfTitle" value="${esc(p.title)}"></label>
@@ -2588,9 +2609,14 @@ document.addEventListener('change',e=>{
   if(c==='f7Target'){const v=parseInt(e.target.value,10);if(v>0){f7().target=v;persist();render()}}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
+document.addEventListener('keydown',e=>{
+  if(!(e.ctrlKey||e.metaKey)||e.altKey||e.shiftKey||e.isComposing)return;
+  const k={KeyB:'b',KeyI:'i',KeyU:'u'}[e.code];const el=document.activeElement;
+  if(!k||!el||el.tagName!=='TEXTAREA'||!$('#fmtPrev')||!$('#sheetCard').contains(el))return;
+  e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-24T12:20:00+07:00';
+const SITE_UPDATED='2026-10-24T12:40:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
