@@ -604,6 +604,9 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .tb-keylist{font-size:.88rem;color:var(--muted);display:flex;gap:8px 16px;flex-wrap:wrap}
 .tb-keylist span{white-space:nowrap}
 .tb-none button.pawn[aria-pressed="false"]{opacity:1}
+.tb-warnline{color:var(--bad);font-family:var(--f-head);font-weight:500}
+.tb-flash{animation:tbflash 1.2s ease 1}
+@keyframes tbflash{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 4px var(--focus)}}
 </style>
 </head>
 <body>
@@ -2645,6 +2648,11 @@ function tbWho(){const w=LS.get('tbWho',null);if(!w)return null;
   if(w.kid){const k=kidById(w.kid);return k?{kid:k.id,name:k.code,code:k.code,color:okColor(k.color)}:null}
   if(w.name){const n=String(w.name).trim().slice(0,20);if(!n)return null;let h=0;for(const ch of n)h=(h*31+ch.codePointAt(0))>>>0;return {kid:'',name:n,code:Array.from(n).slice(0,2).join(''),color:SWATCHES[h%SWATCHES.length]}}
   return null}
+const tbDigits=v=>String(v||'').replace(/[๐-๙]/g,d=>String(d.charCodeAt(0)-0x0E50)).replace(/\D/g,'');
+/* a typed name counts even if "ใช้ชื่อนี้" was not pressed; with no name, point at the name box */
+function tbNeedWho(){let who=tbWho();if(who)return who;const n=val('tbNameIn');if(n){LS.set('tbWho',{name:n.slice(0,20)});who=tbWho();if(who)return who}
+  toast('เลือกชื่อก่อน แตะตัวหมากหรือพิมพ์ชื่อด้านบน');const b=document.getElementById('tbWhoBox');if(b){b.scrollIntoView({behavior:'smooth',block:'center'});b.classList.remove('tb-flash');void b.offsetWidth;b.classList.add('tb-flash')}return null}
+const tbTimeout=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>{const e=new Error('timeout');e.code='timeout';j(e)},ms))]);
 const tbPawn=(p,cls)=>playerPawn({id:p.kid||'',name:p.name||'?',code:p.code||String(p.name||'?').slice(0,2),color:p.color},cls);
 const tbPlayers=d=>Object.keys((d&&d.players)||{}).map(id=>Object.assign({},d.players[id],{pid:id})).filter(p=>!p.left).sort((a,b)=>(a.joinedAt||0)-(b.joinedAt||0)||a.pid.localeCompare(b.pid));
 const tbIn=d=>tbPlayers(d).filter(p=>p.inGame);
@@ -2657,8 +2665,8 @@ function tbClock(d){if(!d||!d.startedAt)return '0:00';const end=d.status==='end'
 
 /* the room lives in one document: rooms/<รหัส> */
 const tbRef=c=>Store.db.collection('rooms').doc(c);
-function tbFail(e){const c=String((e&&(e.code||e.name||e.message))||'');
-  toast(/permission/i.test(c)?'ห้องเกมยังเปิดไม่ได้ ให้พี่เพิ่ม Rules ของ rooms ใน Firebase ก่อน':'เชื่อมต่อห้องไม่ได้ ลองใหม่อีกครั้ง')}
+function tbFail(e){const c=String((e&&(e.code||e.name||e.message))||'');try{console.warn('taboo',e)}catch(_){}
+  toast(/permission/i.test(c)?'ห้องเกมยังเปิดไม่ได้ ให้พี่เพิ่ม Rules ของ rooms ใน Firebase ก่อน':/timeout/i.test(c)?'เชื่อมต่อช้ามาก ตรวจอินเทอร์เน็ตแล้วลองใหม่':'เชื่อมต่อห้องไม่ได้ ลองใหม่อีกครั้ง'+(c?' ('+c+')':''))}
 async function tbPatch(o){const c=S.tb&&S.tb.code;if(!c||!Store.db)return false;
   try{if(Store.kind==='firebase')await tbRef(c).set(o,{merge:true});else await tbRef(c).update(o);return true}catch(e){tbFail(e);return false}}
 function tbSub(){tbInit();const c=S.tb.code;if(!c||!Store.db||S.tb.subCode===c)return;tbUnsub();S.tb.subCode=c;S.tb.loaded=false;
@@ -2735,7 +2743,7 @@ const TB_RULES=`<ol class="tb-rules">
 function tbHome(){
   const who=tbWho();const w=LS.get('tbWho',null)||{};const ks=kids();
   return `<div class="tb">
-    <div class="stage">
+    <div class="stage" id="tbWhoBox">
       <div><h3>เราคือใคร</h3><p class="muted small">เลือกชื่อของตัวเองก่อน ใช้ชื่อนี้ทุกครั้งที่เข้าห้องจากเครื่องนี้</p></div>
       ${ks.length?`<div class="pawns ${w.kid?'':'tb-none'}">${ks.map(k=>pawnBtn(k,'tbKid',w.kid===k.id,'lg')).join('')}</div>`:''}
       <div class="row2"><label class="field"><span>หรือพิมพ์ชื่อ (เพื่อนหรือแขก)</span><input type="text" id="tbNameIn" maxlength="20" value="${esc(w.name||'')}" placeholder="เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="tbName">ใช้ชื่อนี้</button></div></div>
@@ -2743,9 +2751,10 @@ function tbHome(){
     </div>
     <div class="tb-two">
       <div class="stage"><div><h3>สร้างห้องใหม่</h3><p class="muted small">ได้รหัส 6 หลักให้คนอื่นกรอกเข้ามา</p></div>
-        <button class="btn primary big" data-act="tbCreate" ${who&&!S.tb.busy?'':'disabled'}>${S.tb.busy?'กำลังสร้างห้อง…':who?'สร้างห้อง':'เลือกชื่อก่อน'}</button></div>
+        <button class="btn primary big" data-act="tbCreate" ${S.tb.busy?'disabled':''}>${S.tb.busy==='create'?'กำลังสร้างห้อง…':'สร้างห้อง'}</button></div>
       <div class="stage"><div><h3>เข้าห้องด้วยรหัส</h3><p class="muted small">ขอรหัสจากคนที่สร้างห้อง</p></div>
-        <div class="tb-join"><input type="text" id="tbCodeIn" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="000000" aria-label="รหัสห้อง 6 หลัก"><button class="btn primary big" data-act="tbJoin" ${who?'':'disabled'}>เข้าห้อง</button></div></div>
+        <div class="tb-join"><input type="text" id="tbCodeIn" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="go" maxlength="9" placeholder="000000" value="${esc(S.tb.codeIn||'')}" aria-label="รหัสห้อง 6 หลัก"><button class="btn primary big" data-act="tbJoin" ${S.tb.busy?'disabled':''}>${S.tb.busy==='join'?'กำลังเข้าห้อง…':'เข้าห้อง'}</button></div>
+        ${who?'':'<p class="small tb-warnline">เลือกชื่อด้านบนก่อน แล้วค่อยสร้างหรือเข้าห้อง</p>'}</div>
     </div>
     <details class="rules panel" open><summary>วิธีเล่น</summary><div class="prose small" style="margin-top:8px">${TB_RULES}</div></details>
     <div class="panel"><div class="sec-head"><h3>หมวดคำ</h3>${S.bro?'<button class="btn sm" data-act="tbWordsForm">แก้คำในคลัง</button>':''}</div>
@@ -2847,25 +2856,30 @@ const tbEndAsk=()=>askEndGame();
 Object.assign(ACT,{
   tbKid(t){const w=LS.get('tbWho',null)||{};LS.set('tbWho',w.kid===t.dataset.id?null:{kid:t.dataset.id});render()},
   tbName(){const n=val('tbNameIn');if(!n){toast('พิมพ์ชื่อก่อน');return}LS.set('tbWho',{name:n.slice(0,20)});render()},
-  async tbCreate(){tbInit();const who=tbWho();if(!who){toast('เลือกชื่อก่อน');return}if(!Store.db)return;S.tb.busy=true;render();
+  async tbCreate(){tbInit();if(S.tb.busy)return;const who=tbNeedWho();if(!who)return;if(!Store.db){toast('ยังเชื่อมต่อฐานข้อมูลบ้านไม่ได้ ลองเปิดหน้าใหม่');return}S.tb.busy='create';render();
     let code=null;
-    try{for(let i=0;i<8;i++){const c=String(100000+Math.floor(Math.random()*900000));const s=await tbRef(c).get();if(!s.exists||Date.now()-((s.data()||{}).at||0)>12*3600e3){code=c;break}}}
+    try{for(let i=0;i<8;i++){const c=String(100000+Math.floor(Math.random()*900000));const s=await tbTimeout(tbRef(c).get(),12000);if(!s.exists||Date.now()-((s.data()||{}).at||0)>12*3600e3){code=c;break}}}
     catch(e){S.tb.busy=false;tbFail(e);render();return}
     if(!code){S.tb.busy=false;toast('สร้างห้องไม่สำเร็จ ลองใหม่อีกครั้ง');render();return}
     const now=Date.now();let cats=LS.get('tbCats',null);if(!Array.isArray(cats)||!cats.length)cats=TB_CATS.map(c=>c.id);
     const room={code,at:now,host:TB_ME,mode:LS.get('tbMode','circle')==='line'?'line':'circle',cats,status:'lobby',round:0,paused:false,pausedAt:0,pausedTotal:0,startedAt:0,endedAt:0,winner:[],saved:false,used:[],
       players:{[TB_ME]:Object.assign({},who,{joinedAt:now,left:false,inGame:false,word:'',rr:0,out:false,outAt:0,outBy:''})}};
-    try{await tbRef(code).set(room)}catch(e){S.tb.busy=false;tbFail(e);render();return}
+    try{await tbTimeout(tbRef(code).set(room),12000)}catch(e){S.tb.busy=false;tbFail(e);render();return}
     S.tb.busy=false;S.tb.code=code;LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render()},
-  async tbJoin(){tbInit();const who=tbWho();if(!who){toast('เลือกชื่อก่อน');return}const code=val('tbCodeIn').replace(/\D/g,'');
-    if(code.length!==6){toast('ใส่รหัสห้อง 6 หลัก');return}if(!Store.db)return;
-    let d=null;try{const s=await tbRef(code).get();d=s.exists?s.data():null}catch(e){tbFail(e);return}
-    if(!d){toast('ไม่เจอห้อง '+code+' ลองตรวจรหัสอีกที');return}
+  async tbJoin(){tbInit();if(S.tb.busy)return;const code=tbDigits(val('tbCodeIn'));S.tb.codeIn=code;
+    const who=tbNeedWho();if(!who)return;
+    if(code.length!==6){toast(code.length?'รหัสห้องต้องมี 6 หลัก ตอนนี้ใส่ '+code.length+' หลัก':'ใส่รหัสห้อง 6 หลักก่อน');const el=document.getElementById('tbCodeIn');if(el)el.focus();return}
+    if(!Store.db){toast('ยังเชื่อมต่อฐานข้อมูลบ้านไม่ได้ ลองเปิดหน้าใหม่');return}
+    S.tb.busy='join';render();
+    const done=m=>{S.tb.busy=false;render();if(m)toast(m)};
+    let d=null;try{const s=await tbTimeout(tbRef(code).get(),12000);d=s.exists?s.data():null}catch(e){done();tbFail(e);return}
+    if(!d){done('ไม่เจอห้อง '+code+' ตรวจรหัสอีกที หรือให้คนสร้างห้องดูว่ายังเปิดอยู่');return}
     const prev=(d.players||{})[TB_ME];const me=Object.assign({},who,{left:false});
     if(!prev||prev.left)Object.assign(me,{joinedAt:Date.now(),inGame:false,word:'',rr:0,out:false,outAt:0,outBy:''});
     S.tb.code=code;
-    if(!await tbPatch({players:{[TB_ME]:me}})){S.tb.code=null;return}
-    LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render();if(d.status==='play'&&(!prev||prev.left||!prev.inGame))toast('เกมกำลังเล่นอยู่ รอบหน้าได้เล่นด้วย')},
+    let ok=false;try{ok=await tbTimeout(tbPatch({players:{[TB_ME]:me}}),12000)}catch(e){tbFail(e)}
+    if(!ok){S.tb.code=null;done();return}
+    S.tb.busy=false;S.tb.codeIn='';LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render();if(d.status==='play'&&(!prev||prev.left||!prev.inGame))toast('เกมกำลังเล่นอยู่ รอบหน้าได้เล่นด้วย')},
   async tbLeave(){const d=S.tb.room;const o={players:{[TB_ME]:{left:true}}};
     if(d&&d.host===TB_ME){const nx=tbPlayers(d).find(p=>p.pid!==TB_ME);if(nx)o.host=nx.pid}
     await tbPatch(o);tbExit('ออกจากห้องแล้ว')},
@@ -2920,6 +2934,9 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyR'){e.preventDefault();tbReroll(TB_ME)}
 });
 
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='tbCodeIn'&&S.tb){S.tb.codeIn=t.value}});
+document.addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.isComposing||e.metaKey||e.ctrlKey||!t)return;
+  if(t.id==='tbCodeIn'){e.preventDefault();t.blur();ACT.tbJoin()}else if(t.id==='tbNameIn'){e.preventDefault();ACT.tbName()}});
 /* ---------- ทุกเกม: ⌘/Ctrl + Enter = จบเกม (ถามยืนยันก่อน) ---------- */
 function endInfo(){
   if(S.tab!=='tools'||!S.tool)return null;
@@ -3008,7 +3025,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-24T18:10:00+07:00';
+const SITE_UPDATED='2026-10-24T18:40:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
