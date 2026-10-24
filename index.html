@@ -185,6 +185,13 @@ ul.plain{list-style:none;margin:0;padding:0}
 .qmap button.done{background:var(--sunk);color:var(--ink);border-color:var(--muted)}
 .qmap button.cur{border-color:var(--ink);color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .qmap button.lock{border-style:dashed}
+.qmap button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good);border-style:solid}
+.qmap button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);border-style:solid}
+.qmap button.part{background:var(--sunk);border-color:var(--muted);border-style:solid}
+.explain.verdict.ok{background:var(--good-bg)}
+.explain.verdict.no{background:var(--bad-bg)}
+.explain .prose{margin-top:6px}
+textarea.grow{min-height:46px;resize:vertical;overflow:hidden}
 .quiz>.btn{justify-self:start}
 .qnav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
 .qnav .btn{flex:1 1 140px}
@@ -219,7 +226,7 @@ ul.plain{list-style:none;margin:0;padding:0}
 .qpanel{display:grid;gap:18px}
 .qgroup{display:grid;gap:8px;min-width:0}
 .seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:720px}
-@media (max-width:560px){.seg{grid-template-columns:1fr 1fr}.seg button:last-child{grid-column:1/-1}}
+@media (max-width:560px){.seg{grid-template-columns:1fr 1fr}.seg button:first-child{grid-column:1/-1}}
 .seg button{display:grid;gap:2px;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer}
 .seg button b{font:600 1.15rem/1.1 var(--f-head)}
 .seg button span{font-size:.84rem;color:var(--muted)}
@@ -613,6 +620,8 @@ function inline(s){
     .replace(/\^(\d*[+\-−]|\d+)/g,'<sup>$1</sup>')
     .replace(/&lt;=&gt;/g,'⇌').replace(/-&gt;/g,'→');
 }
+/* short text (MCQ choices) that keeps the line breaks typed in the editor */
+const mline=s=>inline(esc(s||'')).replace(/\r?\n/g,'<br>');
 function md(src){
   const lines=esc(src||'').split(/\r?\n/);let out='',list=null,para=[];
   const fp=()=>{if(para.length){out+='<p>'+inline(para.join('<br>'))+'</p>';para=[]}};
@@ -911,6 +920,32 @@ function curScope(l){const s0=S.learn.scope;let sc=s0&&s0.lid===l.id?s0.sc:null;
   return sc}
 const qsOf=(l,mode,sc)=>{const keep=scopeFilter(l,sc);return (l.questions||[]).map((q,i)=>({q,i})).filter(x=>(mode==='both'||(mode==='meq'?isMEQ(x.q):!isMEQ(x.q)))&&keep(x.q)).map(x=>x.i)};
 const modeName=m=>m==='meq'?'MEQ':m==='both'?'MCQ + MEQ':'MCQ';
+/* every question has a stable key: qid (given when the brother saves), or a text hash for questions saved before keys existed */
+function qHash(s){let h=5381;s=String(s||'');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return 'h'+(h>>>0).toString(36)}
+const qKey=q=>q?(q.qid||qHash(q.q)):'';
+/* question keys this kid has already done in this lesson; results saved before keys existed count every question of that set and type that was there at the time */
+function doneKeys(l,kid){const set=new Set();if(!l||!kid)return set;
+  logs().forEach(e=>{if(e.kind!=='quiz'||e.kid!==kid||e.lessonId!==l.id)return;
+    if(Array.isArray(e.qids)){e.qids.forEach(k=>set.add(k));return}
+    const keep=scopeFilter(l,e.scope||'final');const m=e.mode||'mcq';
+    (l.questions||[]).forEach(q=>{if(keep(q)&&(m==='both'||(m==='meq')===isMEQ(q))&&(+q.born||0)<(+e.at||0))set.add(qKey(q))})});
+  return set}
+const PICKS=[['new','ข้อใหม่','ยังไม่เคยทำ'],['old','ข้อเดิม','เคยทำแล้ว'],['all','ทั้งหมด','ทุกข้อในชุด']];
+const pickName=p=>(PICKS.find(x=>x[0]===p)||PICKS[2])[1];
+function pickFilter(l,order,pick,done){if(pick==='all')return order;const qs=l.questions||[];return order.filter(i=>done.has(qKey(qs[i]))===(pick==='old'))}
+/* topic sets reveal the answer right after each question; Midterm and Final are taken as a whole exam */
+const isPractice=sc=>!!sc&&sc!=='mid'&&sc!=='final';
+/* what "start" will actually run: the chosen type and new/old pick, falling back when a choice has no questions */
+function quizPlan(l,sc,kid){const st=qset();
+  const nm=sc?qsOf(l,'mcq',sc).length:0,ne=sc?qsOf(l,'meq',sc).length:0;
+  let mode=st.mode;
+  if(mode==='both'&&!(nm&&ne))mode=nm?'mcq':'meq';
+  if(mode==='mcq'&&!nm&&ne)mode='meq';if(mode==='meq'&&!ne&&nm)mode='mcq';
+  const done=doneKeys(l,kid);const base=sc?qsOf(l,mode,sc):[];
+  const cnt={all:base.length,new:pickFilter(l,base,'new',done).length};cnt.old=cnt.all-cnt.new;
+  let pick=st.pick||'new';if(!kid)pick='all';else if(!cnt[pick])pick=cnt.new?'new':'all';
+  const per=m=>pickFilter(l,sc?qsOf(l,m,sc):[],pick,done).length;
+  return {nm,ne,mode,pick,cnt,per,done,order:pickFilter(l,base,pick,done)}}
 /* scoring works per question, so a quiz can mix MCQ (1 point each) and MEQ (its own full score) */
 const qFull=it=>isMEQ(it)?qMax(it):1;
 const rGot=(it,r)=>!r?0:isMEQ(it)?(+r.score||0):(r.ok?1:0);
@@ -943,8 +978,9 @@ function vLearn(){
   </section>`;
 }
 
-const QSET_DEF={mode:'mcq',timer:'none',qSec:60,setSec:900};
-function qset(){S.learn.qs=Object.assign({},QSET_DEF,LS.get('qset',{}),S.learn.qs||{});return S.learn.qs}
+/* MCQ + MEQ and "new questions only" are the defaults every time the page opens; only the timer choice is remembered */
+const QSET_DEF={mode:'both',pick:'new',timer:'none',qSec:60,setSec:900};
+function qset(){const saved=Object.assign({},LS.get('qset',{}));delete saved.mode;delete saved.pick;S.learn.qs=Object.assign({},QSET_DEF,saved,S.learn.qs||{});return S.learn.qs}
 const Q_PRESETS=[[30,'30 วิ'],[60,'1 นาที'],[120,'2 นาที'],[300,'5 นาที'],[600,'10 นาที']];
 const SET_PRESETS=[[300,'5 นาที'],[600,'10 นาที'],[900,'15 นาที'],[1800,'30 นาที'],[3600,'60 นาที']];
 function timeChips(kind,cur){
@@ -956,11 +992,10 @@ function vLesson(l){
   const ck='lesson:'+l.id;const tp=l.topics||[];
   const ks=kids();const sel=S.learn.player&&kidById(S.learn.player)?S.learn.player:null;
   const st=qset();const sc=curScope(l);
-  const nm=sc?qsOf(l,'mcq',sc).length:0,ne=sc?qsOf(l,'meq',sc).length:0;
-  if(st.mode==='both'&&!(nm&&ne))st.mode=nm?'mcq':'meq';
-  if(st.mode==='mcq'&&!nm&&ne)st.mode='meq';if(st.mode==='meq'&&!ne&&nm)st.mode='mcq';
-  const n=st.mode==='both'?nm+ne:st.mode==='meq'?ne:nm;const allQ=openQCount(l,'mcq')+openQCount(l,'meq');const mt=midTids(l);
-  const setHint=st.timer==='q'?`จับเวลาข้อละ ${fmtDur(st.qSec)} หมดเวลาแล้วไปเฉลยทันที`:st.timer==='set'?`ทั้งชุด ${n} ข้อ ภายใน ${fmtDur(st.setSec)} หมดเวลาแล้วข้อที่เหลือนับเป็น 0`:'ทำตามสบาย ไม่มีนับถอยหลัง หน้าสรุปจะบอกเวลาที่ใช้';
+  const P=quizPlan(l,sc,sel);const nm=P.nm,ne=P.ne,mode=P.mode,pick=P.pick;
+  const n=P.order.length;const allQ=openQCount(l,'mcq')+openQCount(l,'meq');const mt=midTids(l);const prac=isPractice(sc);
+  const setHint=(prac?'ตอบแล้วกดตรวจ เฉลยขึ้นทันทีทีละข้อ · ':'ทำทั้งชุดแล้วส่งทีเดียว เฉลยตอนส่ง · ')+(st.timer==='q'?`จับเวลาข้อละ ${fmtDur(st.qSec)}${prac?' หมดเวลาแล้วขึ้นเฉลยข้อนั้น':' หมดเวลาแล้วข้ามไปข้อถัดไป'}`:st.timer==='set'?`ทั้งชุด ${n} ข้อ ภายใน ${fmtDur(st.setSec)}${prac?' เวลาหยุดเดินตอนอ่านเฉลย':''} หมดเวลาแล้วข้อที่เหลือนับเป็น 0`:'ไม่มีนับถอยหลัง หน้าสรุปจะบอกเวลาที่ใช้');
+  const segN=(m,tot)=>pick==='all'?`${tot} ข้อ`:`${pickName(pick)} ${P.per(m)} ข้อ`;
   const doneIn=s=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id&&(e.scope||'final')===s).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
   const foot=s=>{const a=qsOf(l,'mcq',s).length,b=qsOf(l,'meq',s).length;const hid=setHidden(l,s);
     const eye=S.bro?`<button class="btn sm ghost eye ${hid?'off':''}" data-act="toggleSet" data-id="${esc(s)}" aria-pressed="${!hid}" title="${hid?'แตะเพื่อเปิดให้น้องเห็น':'แตะเพื่อซ่อนจากน้อง'}">${hid?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>ซ่อนจากน้อง':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>น้องเห็นควิซนี้'}</button>`:'';
@@ -997,77 +1032,102 @@ function vLesson(l){
   </section>
   ${plain(l.content)?`<section class="sec"><h3 class="label">เนื้อหาเพิ่มเติม</h3><div class="prose">${md(l.content)}</div></section>`:''}
   <section class="sec" id="quizPanel"><div class="panel qpanel">
-    <div><h2>ควิซ</h2><p class="muted small">ทำครั้งแรกของแต่ละชุดและแต่ละแบบได้แต้มเข้าบ้าน MCQ ได้แต้มตามข้อที่ถูก MEQ ได้ตามคะแนนที่ได้</p></div>
+    <div><h2>ควิซ</h2><p class="muted small">ข้อที่ทำครั้งแรกได้แต้มเข้าบ้าน MCQ ได้ข้อละ 1 แต้มถ้าถูก MEQ ได้ตามคะแนนที่ได้ ข้อที่เคยทำแล้วทำซ้ำได้เป็นรอบฝึก ไม่นับแต้มเพิ่ม</p></div>
     ${allQ?`
     <div class="qgroup"><span class="label">ชุดข้อสอบ</span><div class="chips">${ordered.map(s=>`<button class="chip ${s==='mid'||s==='final'?'examchip':''} ${setHidden(l,s)?'hidchip':''}" data-act="qsScope" data-id="${esc(s)}" data-stay="1" aria-pressed="${sc===s}">${esc(scopeName(l,s))}${setHidden(l,s)?' · ซ่อน':''}</button>`).join('')}</div></div>
     <div class="qgroup"><span class="label">ใครทำ</span><div class="pawns">${ks.map(k=>pawnBtn(k,'quizKid',sel===k.id,'lg')).join('')}</div></div>
+    ${sel?`<div class="qgroup"><span class="label">ทำข้อไหน</span><div class="seg">${PICKS.map(([v,nmP,sub])=>`<button type="button" data-act="qsPick" data-id="${v}" aria-pressed="${pick===v}" ${P.cnt[v]?'':'disabled'}><b>${nmP}</b><span>${sub} · ${P.cnt[v]} ข้อ</span></button>`).join('')}</div>
+      ${P.cnt.all&&!P.cnt.new?`<p class="muted small">${esc(kidById(sel).code)} ทำครบทุกข้อในชุดนี้แล้ว รอบนี้เป็นรอบฝึก ไม่ได้แต้มเพิ่ม</p>`:P.cnt.old?`<p class="muted small">มีข้อใหม่ ${P.cnt.new} ข้อที่ ${esc(kidById(sel).code)} ยังไม่เคยทำ ข้อใหม่ได้แต้มเข้าบ้าน ข้อเดิมเป็นรอบฝึก</p>`:''}</div>`:''}
     <div class="qgroup"><span class="label">แบบข้อสอบ</span><div class="seg">
-      <button type="button" data-act="qsMode" data-id="mcq" aria-pressed="${st.mode==='mcq'}" ${nm?'':'disabled'}><b>MCQ</b><span>ตัวเลือก · ${nm} ข้อ</span></button>
-      <button type="button" data-act="qsMode" data-id="meq" aria-pressed="${st.mode==='meq'}" ${ne?'':'disabled'}><b>MEQ</b><span>เขียนตอบ · ${ne} ข้อ</span></button>
-      <button type="button" data-act="qsMode" data-id="both" aria-pressed="${st.mode==='both'}" ${nm&&ne?'':'disabled'}><b>MCQ + MEQ</b><span>ทั้งสองแบบ · ${nm+ne} ข้อ</span></button></div></div>
+      <button type="button" data-act="qsMode" data-id="both" aria-pressed="${mode==='both'}" ${nm&&ne?'':'disabled'}><b>MCQ + MEQ</b><span>ทั้งสองแบบ · ${segN('both',nm+ne)}</span></button>
+      <button type="button" data-act="qsMode" data-id="mcq" aria-pressed="${mode==='mcq'}" ${nm?'':'disabled'}><b>MCQ</b><span>ตัวเลือก · ${segN('mcq',nm)}</span></button>
+      <button type="button" data-act="qsMode" data-id="meq" aria-pressed="${mode==='meq'}" ${ne?'':'disabled'}><b>MEQ</b><span>เขียนตอบ · ${segN('meq',ne)}</span></button></div></div>
     <div class="qgroup"><span class="label">จับเวลา</span><div class="chips">
       <button class="chip" data-act="qsTimer" data-id="none" aria-pressed="${st.timer==='none'}">ไม่จับเวลา</button>
       <button class="chip" data-act="qsTimer" data-id="q" aria-pressed="${st.timer==='q'}">จับทีละข้อ</button>
       <button class="chip" data-act="qsTimer" data-id="set" aria-pressed="${st.timer==='set'}">จับทั้งชุด</button></div>
       ${st.timer!=='none'?timeChips(st.timer,st.timer==='q'?st.qSec:st.setSec):''}
       <p class="muted small">${setHint}</p></div>
-    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&n?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+modeName(st.mode)+' ของ '+esc(kidById(sel).code)}</button></div>`
+    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&n?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+modeName(mode)+(pick!=='all'&&P.cnt.old?' · '+pickName(pick):'')+' '+n+' ข้อ ของ '+esc(kidById(sel).code)}</button></div>`
     :`<p class="muted">${(l.questions||[]).length&&!S.bro?'ยังไม่มีควิซที่เปิดให้ทำ รอพี่เปิดชุดข้อสอบก่อน':'บทนี้ยังไม่มีโจทย์'+(S.bro?' กดแก้ไขควิซเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่ชุดไหน':'')}</p>`}
   </div></section>`;
 }
 
 /* quiz engine: exam style — move freely between questions, change answers, submit once; MEQ is graded after submitting */
 function quizNow(){return Date.now()}
-function startQuizFor(lessonId,kid){
-  const l=Store.d.lessons[lessonId];const st=qset();const sc=curScope(l);if(!sc)return;const order=qsOf(l,st.mode,sc);if(!order.length)return;
+function startQuizFor(lessonId,kid,again){
+  const l=Store.d.lessons[lessonId];const st=qset();const sc=curScope(l);if(!sc)return;
+  const P=quizPlan(l,sc,kid);const order=again?again.order.filter(i=>(l.questions||[])[i]):P.order;if(!order.length)return;
   const now=quizNow();
-  S.quiz={lessonId,kid,scope:sc,mode:st.mode,timer:st.timer,qSec:st.qSec,setSec:st.setSec,order,i:0,phase:'answer',
-    ans:order.map(()=>({pick:null,text:'',locked:false,timeout:false,left:st.qSec})),scores:{},gi:0,confirm:false,res:[],
-    startAt:now,qEnd:st.timer==='q'?now+st.qSec*1000:null,setEnd:st.timer==='set'?now+st.setSec*1000:null,done:false};
+  S.quiz={lessonId,kid,scope:sc,mode:again?again.mode:P.mode,pick:again?again.pick:P.pick,practice:isPractice(sc),timer:st.timer,qSec:st.qSec,setSec:st.setSec,order,i:0,phase:'answer',
+    ans:order.map(()=>({pick:null,text:'',locked:false,revealed:false,timeout:false,left:st.qSec})),scores:{},gi:0,gList:[],confirm:false,res:[],
+    startAt:now,paused:0,pauseAt:null,qEnd:st.timer==='q'?now+st.qSec*1000:null,setEnd:st.timer==='set'?now+st.setSec*1000:null,done:false};
   quizLoop();render();window.scrollTo({top:0});
 }
+/* practice (topic) sets: while the answer of the current question is showing, the whole-set clock stops */
+function quizPause(q){if(!q)return;const now=quizNow();const r=q.practice&&q.phase==='answer'&&!q.done&&q.ans[q.i]&&q.ans[q.i].revealed;
+  if(r&&q.pauseAt==null)q.pauseAt=now;
+  else if(!r&&q.pauseAt!=null){const d=now-q.pauseAt;q.paused+=d;if(q.setEnd)q.setEnd+=d;q.pauseAt=null}}
+function quizReveal(q,pos){const a=q.ans[pos];if(!a||a.revealed)return;
+  if(pos===q.i){const b=document.getElementById('meqAns');if(b)a.text=b.value;if(q.timer==='q'&&q.qEnd&&!a.locked)a.left=Math.max(0,(q.qEnd-quizNow())/1000);q.qEnd=null}
+  a.locked=true;a.revealed=true;quizPause(q)}
+const nextOpen=q=>{const n=q.order.length;for(let k=1;k<=n;k++){const p=(q.i+k)%n;if(!q.ans[p].revealed)return p}return -1};
+const usedSecs=q=>Math.max(0,((q.endAt||quizNow())-q.startAt-(q.paused||0))/1000);
 const qItem=(q,pos)=>{const l=Store.d.lessons[q.lessonId];return l&&(l.questions||[])[q.order[pos]]};
 function curQ(){const q=S.quiz;return qItem(q,q.i)}
 const isAnswered=(q,pos)=>{const it=qItem(q,pos)||{};const a=q.ans[pos];return isMEQ(it)?!!(a.text||'').trim():a.pick!=null};
 function meqPositions(q){return q.order.map((ix,pos)=>pos).filter(pos=>isMEQ(qItem(q,pos)||{}))}
 function quizLeave(){const q=S.quiz;if(q.timer==='q'&&q.qEnd&&!q.ans[q.i].locked){q.ans[q.i].left=Math.max(0,(q.qEnd-quizNow())/1000)}q.qEnd=null;const b=document.getElementById('meqAns');if(b&&!q.ans[q.i].locked)q.ans[q.i].text=b.value}
 function quizGo(pos){const q=S.quiz;if(pos<0||pos>=q.order.length)return;quizLeave();q.i=pos;q.confirm=false;
-  if(q.timer==='q'&&!q.ans[pos].locked)q.qEnd=quizNow()+q.ans[pos].left*1000;render();window.scrollTo({top:0})}
+  if(q.timer==='q'&&!q.ans[pos].locked)q.qEnd=quizNow()+q.ans[pos].left*1000;quizPause(q);render();window.scrollTo({top:0})}
 function vQuiz(){
   const q=S.quiz;const l=Store.d.lessons[q.lessonId];if(!l){S.quiz=null;return vLearn()}
   const k=kidById(q.kid);const n=q.order.length;
   if(q.done)return vQuizResult(q,l,k);
   if(q.phase==='grade')return vQuizGrade(q,l,k);
   const it=curQ();if(!it){q.done=true;return vQuizResult(q,l,k)}
-  const a=q.ans[q.i];const isE=isMEQ(it);const lock=a.locked;
-  const done=q.order.filter((_,p)=>isAnswered(q,p)).length;
+  const a=q.ans[q.i];const isE=isMEQ(it);const lock=a.locked;const prac=q.practice;const rev=prac&&a.revealed;
+  const done=q.order.filter((_,p)=>isAnswered(q,p)).length;const nRev=q.order.filter((_,p)=>q.ans[p].revealed).length;const ansd=isAnswered(q,q.i);
   let body='';
   if(!isE){
-    body=`<div class="choices">${(it.choices||[]).map((c,j)=>`<button class="choice ${a.pick===j?'sel':''}" data-act="pick" data-id="${j}" aria-pressed="${a.pick===j}" ${lock?'disabled':''}><span class="L">${LET[j]}</span><span>${inline(esc(c))}</span></button>`).join('')}</div>
+    const cls=j=>rev?(j===it.answer?'right':a.pick===j?'wrong':''):(a.pick===j?'sel':'');
+    body=`<div class="choices">${(it.choices||[]).map((c,j)=>`<button class="choice ${cls(j)}" data-act="pick" data-id="${j}" aria-pressed="${a.pick===j}" ${lock?'disabled':''}><span class="L">${LET[j]}</span><span>${mline(c)}</span></button>`).join('')}</div>
       ${a.pick!=null&&!lock?'<button class="btn sm ghost" data-act="clearPick">ล้างคำตอบข้อนี้</button>':''}`;
+    if(rev){const ok=a.pick!=null&&a.pick===it.answer;
+      body+=`<div class="explain verdict ${ok?'ok':'no'}" role="status"><b>${ok?'ถูกต้อง':(a.pick==null?(a.timeout?'หมดเวลา':'ไม่ได้ตอบ'):'ยังไม่ถูก')+' · เฉลยคือ '+LET[it.answer]}</b>${it.explain?`<div class="prose">${md(it.explain)}</div>`:''}</div>`}
   }else{
     body=`<label class="field"><span>คำตอบของ ${esc(k?k.code:'')}</span><textarea id="meqAns" class="meq-box" data-input="meq" placeholder="เขียนคำตอบ อธิบายเป็นขั้นตอน" ${lock?'readonly':''}>${esc(a.text)}</textarea></label>`;
+    if(rev){const mx=qMax(it);const sc=q.scores[q.i];
+      body+=`<div class="explain" role="status"><b>แนวคำตอบ</b>${it.key||it.answer?`<div class="prose">${md(it.key||it.answer||'')}</div>`:'<div class="muted">ยังไม่ได้ใส่แนวคำตอบ</div>'}${it.explain?`<div class="prose">${md(it.explain)}</div>`:''}</div>
+      <div class="qgroup"><span class="label">ให้คะแนนข้อนี้ (เต็ม ${mx}) · เทียบกับแนวคำตอบ</span><div class="chips">${Array.from({length:mx+1},(_,s)=>`<button class="chip" data-act="pScore" data-id="${s}" aria-pressed="${sc===s}">${s}</button>`).join('')}</div></div>`}
   }
-  const cEnd=q.timer==='q'?(lock?null:q.qEnd):q.timer==='set'?q.setEnd:null;
-  const clock=q.timer==='none'?'':`<span class="clock ${cEnd&&cEnd-quizNow()<=10000?'warn':''}" id="qClock" aria-label="เวลาที่เหลือ">${cEnd?fmtTime((cEnd-quizNow())/1000):'—'}</span>`;
-  const left=n-done;
+  const cEnd=q.timer==='q'?(lock?null:q.qEnd):q.timer==='set'?q.setEnd:null;const ref=q.pauseAt!=null?q.pauseAt:quizNow();
+  const clock=q.timer==='none'?'':`<span class="clock ${cEnd&&cEnd-ref<=10000?'warn':''}" id="qClock" aria-label="เวลาที่เหลือ">${cEnd?fmtTime((cEnd-ref)/1000):'—'}</span>`;
+  const left=n-done;const prog=prac?nRev:done;
+  const mark=p=>{if(!prac||!q.ans[p].revealed)return '';const x=qItem(q,p)||{};if(isMEQ(x)){const s=q.scores[p];return s==null?'':s>=qMax(x)?'ok':s>0?'part':'no'}return q.ans[p].pick===x.answer?'ok':'no'};
+  const nx=prac?nextOpen(q):-1;const needScore=isE&&rev&&q.scores[q.i]==null;
+  const nav=prac?`<div class="qnav"><button class="btn big" data-act="qPrev" ${q.i?'':'disabled'}>← ข้อก่อน</button>${!rev?`<button class="btn big primary" id="qCheckBtn" data-act="qCheck" ${ansd?'':'disabled'}>ตรวจคำตอบ</button>`:nx>=0?`<button class="btn big primary" data-act="qGo" data-id="${nx}" ${needScore?'disabled':''}>ข้อต่อไป →</button>`:`<button class="btn big primary" data-act="qSubmit" ${needScore?'disabled':''}>ดูผล</button>`}</div>
+    ${!rev?`<div class="btns">${!ansd?'<button class="btn sm ghost" data-act="qCheck">ไม่รู้ ดูเฉลยเลย</button>':''}${nx>=0&&nx!==q.i?`<button class="btn sm ghost" data-act="qGo" data-id="${nx}">ข้ามไปก่อน</button>`:''}</div>`:needScore?'<p class="muted small">ให้คะแนนข้อนี้ก่อน แล้วค่อยไปข้อต่อไป</p>':''}`
+    :`<div class="qnav"><button class="btn big" data-act="qPrev" ${q.i?'':'disabled'}>← ข้อก่อน</button>${q.i+1<n?'<button class="btn big primary" data-act="qNext">ข้อต่อไป →</button>':''}</div>`;
+  const endWord=prac?'จบชุดนี้':'ส่งข้อสอบ';
+  const sub=prac&&nRev===n?'':`<div class="qsubmit">${q.confirm?`<div class="banner">ยังไม่ได้ตอบ ${left} ข้อ ${prac?'จบเลยไหม':'ส่งเลยไหม'} ข้อที่ไม่ได้ตอบจะนับเป็น 0</div><div class="btns"><button class="btn primary" data-act="qSubmit">ยืนยัน${endWord}</button><button class="btn ghost" data-act="qSubmitCancel">กลับไปทำต่อ</button></div>`
+      :`<button class="btn ${!prac&&q.i+1===n?'primary big':''}" data-act="qSubmitAsk">${endWord}${prac?' ดูผล':''}</button><span class="muted small">${left?'ยังไม่ได้ตอบ '+left+' ข้อ':'ตอบครบทุกข้อแล้ว'}</span>`}</div>`;
   return `<section class="quiz">
-    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(done/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ตอบแล้ว ${done}/${n}</span>${clock}<button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
-    <nav class="qmap" aria-label="เลือกข้อ">${q.order.map((_,p)=>`<button type="button" class="${p===q.i?'cur':''} ${isAnswered(q,p)?'done':''} ${q.ans[p].locked?'lock':''}" data-act="qGo" data-id="${p}" aria-label="ข้อ ${p+1}${isAnswered(q,p)?' ตอบแล้ว':''}" ${p===q.i?'aria-current="true"':''}>${p+1}</button>`).join('')}</nav>
-    <div class="chips"><span class="tag">ข้อ ${q.i+1}/${n}</span>${isE?`<span class="tag">MEQ · เต็ม ${qMax(it)} คะแนน</span>`:`<span class="tag">MCQ · 1 คะแนน</span>`}${lock?`<span class="tag">${a.timeout?'หมดเวลาข้อนี้':'ล็อกแล้ว'}</span>`:''}</div>
+    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}<button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
+    <nav class="qmap" aria-label="เลือกข้อ">${q.order.map((_,p)=>`<button type="button" class="${p===q.i?'cur':''} ${isAnswered(q,p)?'done':''} ${q.ans[p].locked?'lock':''} ${mark(p)}" data-act="qGo" data-id="${p}" aria-label="ข้อ ${p+1}${isAnswered(q,p)?' ตอบแล้ว':''}" ${p===q.i?'aria-current="true"':''}>${p+1}</button>`).join('')}</nav>
+    <div class="chips"><span class="tag">ข้อ ${q.i+1}/${n}</span>${isE?`<span class="tag">MEQ · เต็ม ${qMax(it)} คะแนน</span>`:`<span class="tag">MCQ · 1 คะแนน</span>`}${lock?`<span class="tag">${a.timeout?'หมดเวลาข้อนี้':rev?'ตรวจแล้ว':'ล็อกแล้ว'}</span>`:''}${rev&&q.timer==='set'&&nx>=0?'<span class="tag">เวลาหยุดระหว่างอ่านเฉลย</span>':''}</div>
     <div class="qtext">${md(it.q)}</div>${body}
-    <div class="qnav"><button class="btn big" data-act="qPrev" ${q.i?'':'disabled'}>← ข้อก่อน</button>${q.i+1<n?'<button class="btn big primary" data-act="qNext">ข้อต่อไป →</button>':''}</div>
-    <div class="qsubmit">${q.confirm?`<div class="banner">ยังไม่ได้ตอบ ${left} ข้อ ส่งเลยไหม ข้อที่ไม่ได้ตอบจะนับเป็น 0</div><div class="btns"><button class="btn primary" data-act="qSubmit">ยืนยันส่งข้อสอบ</button><button class="btn ghost" data-act="qSubmitCancel">กลับไปทำต่อ</button></div>`
-      :`<button class="btn ${q.i+1===n?'primary big':''}" data-act="qSubmitAsk">ส่งข้อสอบ</button><span class="muted small">${left?'ยังไม่ได้ตอบ '+left+' ข้อ':'ตอบครบทุกข้อแล้ว'}</span>`}</div>
+    ${nav}
+    ${sub}
   </section>`;
 }
 function vQuizGrade(q,l,k){
-  const list=meqPositions(q);const pos=list[q.gi];const it=qItem(q,pos)||{};const a=q.ans[pos];const mx=qMax(it);const sc=q.scores[pos];
+  const list=q.gList||[];const pos=list[q.gi];const it=qItem(q,pos)||{};const a=q.ans[pos];const mx=qMax(it);const sc=q.scores[pos];
   return `<section class="quiz">
     <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(q.gi/list.length*100).toFixed(1)}%"></i></div><span class="label">ให้คะแนน MEQ ${q.gi+1}/${list.length} · ข้อ ${pos+1}</span></div>
     <div class="qtext">${md(it.q)}</div>
     <div class="meq-yours"><span class="label">คำตอบของ ${esc(k?k.code:'')}${a.timeout?' · หมดเวลา':''}</span><div class="prose">${(a.text||'').trim()?md(a.text):'<span class="muted">ไม่ได้เขียนคำตอบ</span>'}</div></div>
-    <div class="explain"><b>แนวคำตอบ</b>${it.key||it.answer?`<div class="prose">${md(it.key||it.answer||'')}</div>`:'<div class="muted">ยังไม่ได้ใส่แนวคำตอบ</div>'}${it.explain?`<div class="small muted">${md(it.explain)}</div>`:''}</div>
+    <div class="explain"><b>แนวคำตอบ</b>${it.key||it.answer?`<div class="prose">${md(it.key||it.answer||'')}</div>`:'<div class="muted">ยังไม่ได้ใส่แนวคำตอบ</div>'}${it.explain?`<div class="prose">${md(it.explain)}</div>`:''}</div>
     <div class="qgroup"><span class="label">ให้คะแนน (เต็ม ${mx})</span><div class="chips">${Array.from({length:mx+1},(_,s)=>`<button class="chip" data-act="gradeScore" data-id="${s}" aria-pressed="${sc===s}">${s}</button>`).join('')}</div></div>
     <div class="qnav"><button class="btn big" data-act="gradePrev" ${q.gi?'':'disabled'}>← ข้อก่อน</button><button class="btn big primary" data-act="gradeNext" ${sc==null?'disabled':''}>${q.gi+1<list.length?'ข้อต่อไป →':'ดูผล'}</button></div>
   </section>`;
@@ -1078,46 +1138,59 @@ function quizBuildRes(q){
     return {ok:a.pick!=null&&a.pick===it.answer,picked:a.pick,timeout:a.timeout&&a.pick==null,skipped:a.pick==null}});
 }
 function quizSubmit(){
-  const q=S.quiz;if(!q||q.phase!=='answer')return;quizLeave();q.endAt=quizNow();q.confirm=false;clearInterval(qTick);
-  if(meqPositions(q).length){q.phase='grade';q.gi=0;render();window.scrollTo({top:0})}else{quizBuildRes(q);finishQuiz()}
+  const q=S.quiz;if(!q||q.phase!=='answer')return;quizLeave();
+  if(q.pauseAt!=null){q.paused+=quizNow()-q.pauseAt;q.pauseAt=null}
+  q.endAt=quizNow();q.confirm=false;clearInterval(qTick);
+  /* MEQ already scored right after its answer (topic sets) is not graded again */
+  q.gList=meqPositions(q).filter(p=>q.scores[p]==null);
+  if(q.gList.length){q.phase='grade';q.gi=0;render();window.scrollTo({top:0})}else{quizBuildRes(q);finishQuiz()}
 }
 function vQuizResult(q,l,k){
   const qs=l.questions||[];const {got,full}=qTotals(q,qs);
-  const used=((q.endAt||quizNow())-q.startAt)/1000;
+  const msg=q.pts?`ได้ ${q.pts} แต้มเข้าบ้าน จากข้อที่ทำครั้งแรก ${q.fresh} ข้อ${q.old?` · อีก ${q.old} ข้อเคยทำแล้ว เป็นรอบฝึก`:''}`
+    :q.fresh?'ครั้งนี้ยังไม่ได้แต้ม ลองทบทวนหัวข้ออีกรอบ':q.old?'ทุกข้อในรอบนี้เคยทำแล้ว เป็นรอบฝึก ไม่นับแต้มเพิ่ม':'ไม่ได้ตอบข้อไหนเลย ยังไม่ได้แต้ม';
   return `<section class="quiz"><div class="panel result">${pawn(k,'lg')}<span class="label">${esc(l.title)} · ${esc(scopeName(l,q.scope))} · ${modeName(q.mode)}</span><div class="score">${got}/${full}</div>
-    <p class="muted small">ใช้เวลา ${fmtDur(used)}${q.timer==='set'?' จาก '+fmtDur(q.setSec):q.timer==='q'?' · จับเวลาข้อละ '+fmtDur(q.qSec):''}</p>
-    <p>${q.firstTime?(got?`ได้ ${got} แต้มเข้าบ้าน`:'ครั้งนี้ยังไม่ได้แต้ม ลองทบทวนหัวข้ออีกรอบ'):'เคยทำชุด '+esc(scopeName(l,q.scope))+' '+modeName(q.mode)+' นี้แล้ว รอบนี้เป็นรอบฝึก ไม่นับแต้มเพิ่ม'}</p>
+    <p class="muted small">ใช้เวลา ${fmtDur(usedSecs(q))}${q.timer==='set'?' จาก '+fmtDur(q.setSec):q.timer==='q'?' · จับเวลาข้อละ '+fmtDur(q.qSec):''}${q.practice&&q.paused>=1000?' · ไม่นับเวลาอ่านเฉลย':''}</p>
+    <p>${msg}</p>
     ${got===full&&full?'<p><b>เต็มทุกข้อ</b></p>':''}
     <ol class="review">${q.order.map((ix,i)=>{const it=qs[ix]||{};const r=q.res[i]||{};const e=isMEQ(it);const ok=e?(+r.score||0)>=qMax(it):r.ok;
       const mark=e?`${r.score!=null?r.score:0}/${qMax(it)}`:(r.ok?'ถูก':'ผิด');
       const detail=!e&&!r.ok?`<span class="small muted">${r.picked!=null?'ตอบ '+LET[r.picked]+' · ':''}เฉลย ${LET[it.answer]}</span>`:'';
       return `<li class="${ok?'ok':'no'}"><span class="rv">${mark}</span><span class="rq">${i+1}. ${esc(plain(it.q).slice(0,80))}${plain(it.q).length>80?'…':''} ${detail}</span>${r.timeout?'<span class="tag">หมดเวลา</span>':r.skipped?'<span class="tag">ไม่ได้ตอบ</span>':''}</li>`}).join('')}</ol>
-    <div class="btns"><button class="btn" data-act="retryQuiz">ทำอีกรอบ</button><button class="btn primary" data-act="endQuiz">กลับบทเรียน</button></div></div></section>`;
+    <div class="btns"><button class="btn" data-act="retryQuiz">ทำชุดเดิมอีกรอบ</button><button class="btn primary" data-act="endQuiz">กลับบทเรียน</button></div></div></section>`;
 }
 let qTick=null;
 function quizLoop(){clearInterval(qTick);if(S.quiz&&S.quiz.timer==='none')return;qTick=setInterval(()=>{
   const q=S.quiz;if(!q||q.done||q.phase!=='answer'){clearInterval(qTick);return}
-  const now=quizNow();const el=document.getElementById('qClock');
+  quizPause(q);const now=quizNow();const ref=q.pauseAt!=null?q.pauseAt:now;const el=document.getElementById('qClock');
   const end=q.timer==='q'?(q.ans[q.i].locked?null:q.qEnd):q.timer==='set'?q.setEnd:null;
-  if(el){if(end){const left=(end-now)/1000;el.textContent=fmtTime(left);el.classList.toggle('warn',left<=10)}else{el.textContent='—';el.classList.remove('warn')}}
-  if(end&&now>=end)quizTimeout();
+  if(el){if(end){const left=(end-ref)/1000;el.textContent=fmtTime(left);el.classList.toggle('warn',left<=10)}else{el.textContent='—';el.classList.remove('warn')}}
+  if(end&&q.pauseAt==null&&now>=end)quizTimeout();
 },250)}
 function quizTimeout(){
   const q=S.quiz;if(!q)return;
   if(q.timer==='set'){quizSubmit();return}
-  const a=q.ans[q.i];const b=document.getElementById('meqAns');if(b)a.text=b.value;
+  const a=q.ans[q.i];
+  /* topic sets: time up shows this question's answer; Midterm/Final: lock it and move on */
+  if(q.practice){a.timeout=true;quizReveal(q,q.i);a.left=0;render();return}
+  const b=document.getElementById('meqAns');if(b)a.text=b.value;
   a.locked=true;a.timeout=true;a.left=0;q.qEnd=null;
   const next=q.order.findIndex((_,p)=>p>q.i&&!q.ans[p].locked);
   if(next>=0)quizGo(next);else{const any=q.order.findIndex((_,p)=>!q.ans[p].locked);if(any>=0)quizGo(any);else quizSubmit()}
 }
+/* points come only from questions this kid answers for the first time; questions done before are practice */
 async function finishQuiz(){
   const q=S.quiz;const l=Store.d.lessons[q.lessonId];const qs=l.questions||[];
   clearInterval(qTick);q.endAt=q.endAt||quizNow();
   const {got,full}=qTotals(q,qs);
-  q.firstTime=!logs().some(e=>e.kind==='quiz'&&e.kid===q.kid&&e.lessonId===q.lessonId&&(e.mode||'mcq')===q.mode&&(e.scope||'final')===(q.scope||'final'));
-  q.done=true;
   if(!q.saved){q.saved=true;
-    await Store.put('log',uid(),{kid:q.kid,kind:'quiz',mode:q.mode,scope:q.scope||'final',scopeName:scopeName(l,q.scope),lessonId:l.id,title:l.title,subject:l.subject,score:got,total:full,perfect:got===full&&full>0,pts:q.firstTime?got:0,secs:Math.round((q.endAt-q.startAt)/1000),timer:q.timer,at:Date.now()});}
+    const prior=doneKeys(l,q.kid);let pts=0,fresh=0,old=0;const qids=[];
+    q.order.forEach((ix,pos)=>{const it=qs[ix];const r=q.res[pos];if(!it||!r)return;const key=qKey(it);
+      if(prior.has(key)){old++;if(!r.skipped)qids.push(key);return}
+      if(r.skipped)return;fresh++;pts+=rGot(it,r);qids.push(key)});
+    Object.assign(q,{pts,fresh,old,done:true});
+    await Store.put('log',uid(),{kid:q.kid,kind:'quiz',mode:q.mode,pick:q.pick||'all',scope:q.scope||'final',scopeName:scopeName(l,q.scope),lessonId:l.id,title:l.title,subject:l.subject,score:got,total:full,perfect:got===full&&full>0,pts,qids,secs:Math.round(usedSecs(q)),timer:q.timer,at:Date.now()});}
+  q.done=true;
   render();window.scrollTo({top:0});
 }
 
@@ -1311,7 +1384,7 @@ function fmtApply(kind){
   else{ins=kind==='arrow'?' -> ':' <=> ';caret=a+ins.length}
   el.value=el.value.slice(0,a)+ins+el.value.slice(b);
   try{el.focus({preventScroll:true});el.setSelectionRange(caret,caret)}catch(e){}
-  FMT.start=FMT.end=caret;fmtPreview();
+  FMT.start=FMT.end=caret;autoGrow(el);fmtPreview();
 }
 function bsCellForm(c,r){const b=bsBoardNow();const cell=b.cats[c].qs[r];const v=bVal(b,c,r);
   openSheet(esc(b.cats[c].name)+' · '+v,`${fmtBar()}
@@ -1557,7 +1630,10 @@ function adminAccess(){
     ${reqs.length?`<div class="panel"><span class="label">คำขอสิทธิ์</span>${reqs.map(r=>`<div class="kidrow"><span class="pawn" style="--c:#8A6A3B">${esc((r.name||'?').slice(0,2))}</span><div><b>${esc(r.name||'ไม่มีชื่อ')}</b><div class="small muted">${ago(r.at)}</div></div><div class="btns"><button class="btn sm primary" data-act="approveAdmin" data-id="${esc(r.id)}">อนุมัติ</button><button class="btn sm ghost" data-act="rejectAdmin" data-id="${esc(r.id)}">ปฏิเสธ</button></div></div>`).join('')}</div>`:''}
   </section>`;
 }
-function blankQ(type,topic){return {type:type||'mcq',topic:topic||'',q:'',choices:['','','',''],answer:0,explain:'',key:'',max:2}}
+function blankQ(type,topic){return {type:type||'mcq',topic:topic||'',q:'',choices:['','','',''],answer:0,explain:'',key:'',max:2,qid:'',born:null}}
+const rowsOf=s=>Math.min(12,Math.max(1,String(s||'').split('\n').length));
+/* grow a multi-line box to fit what is typed */
+function autoGrow(el){if(!el||!el.classList||!el.classList.contains('grow'))return;el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
 function blankT(){return {tid:'t'+uid(),name:'',stars:0,goals:''}}
 function topicOpts(d,cur,withMid){
   const fin=!cur||cur==='final';
@@ -1568,8 +1644,8 @@ function lessonForm(id,part,qf){
   S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?(l.content||''):'',
     topics:l&&l.topics?l.topics.map(t=>({tid:t.tid||('t'+uid()),name:t.name||'',stars:+t.stars||0,goals:(t.goals||[]).join('\n')})):[blankT()],
     midAfter:l?(l.midAfter||''):'',bulkTopic:'',hidden:null,
-    questions:l?(l.questions||[]).map(q=>isMEQ(q)?{type:'meq',topic:q.topic||'',q:q.q||'',choices:['','','',''],answer:0,explain:q.explain||'',key:q.key!=null?q.key:(q.answer||''),max:qMax(q)}
-      :{type:'mcq',topic:q.topic||'',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2}):[],
+    questions:l?(l.questions||[]).map(q=>isMEQ(q)?{type:'meq',topic:q.topic||'',q:q.q||'',choices:['','','',''],answer:0,explain:q.explain||'',key:q.key!=null?q.key:(q.answer||''),max:qMax(q),qid:qKey(q),born:+q.born||0}
+      :{type:'mcq',topic:q.topic||'',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2,qid:qKey(q),born:+q.born||0}):[],
     example:l?!!l.example:false};
   /* new quiz sets start hidden from the kids until the brother opens them */
   S.draft.hidden=l?(l.hidden||[]).slice():['mid','final',...S.draft.topics.map(t=>t.tid)];
@@ -1617,8 +1693,8 @@ ${d.part!=='quiz'?`
       <textarea id="q${i}_q" style="min-height:70px" placeholder="โจทย์" aria-label="โจทย์ข้อ ${i+1}">${esc(q.q)}</textarea>
       ${q.type==='meq'?`<textarea id="q${i}_k" style="min-height:80px" placeholder="แนวคำตอบ / เกณฑ์ให้คะแนน" aria-label="แนวคำตอบ">${esc(q.key)}</textarea>
         <label class="mini"><span>คะแนนเต็ม</span><input type="number" id="q${i}_m" min="1" max="20" value="${esc(q.max)}"></label>`
-      :q.choices.map((c,j)=>`<div class="crow"><input type="radio" name="q${i}_ans" value="${j}" ${q.answer===j?'checked':''} aria-label="ตัวเลือก ${LET[j]} ถูก"><input type="text" id="q${i}_c${j}" value="${esc(c)}" placeholder="ตัวเลือก ${LET[j]}"></div>`).join('')+`<div class="btns"><button class="btn sm ghost" data-act="cAdd" data-id="${i}" ${q.choices.length>=6?'disabled':''}>เพิ่มตัวเลือก</button>${q.choices.length>2?`<button class="btn sm ghost" data-act="cDel" data-id="${i}">ลดตัวเลือก</button>`:''}</div><small class="muted">กดวงกลมหน้าตัวเลือกที่ถูก</small>`}
-      <input type="text" id="q${i}_e" value="${esc(q.explain)}" placeholder="คำอธิบายเพิ่มเติม (ไม่ใส่ก็ได้)" aria-label="คำอธิบาย">
+      :q.choices.map((c,j)=>`<div class="crow"><input type="radio" name="q${i}_ans" value="${j}" ${q.answer===j?'checked':''} aria-label="ตัวเลือก ${LET[j]} ถูก"><textarea class="grow" id="q${i}_c${j}" rows="${rowsOf(c)}" placeholder="ตัวเลือก ${LET[j]}" aria-label="ตัวเลือก ${LET[j]} ของข้อ ${i+1}">${esc(c)}</textarea></div>`).join('')+`<div class="btns"><button class="btn sm ghost" data-act="cAdd" data-id="${i}" ${q.choices.length>=6?'disabled':''}>เพิ่มตัวเลือก</button>${q.choices.length>2?`<button class="btn sm ghost" data-act="cDel" data-id="${i}">ลดตัวเลือก</button>`:''}</div><small class="muted">กดวงกลมหน้าตัวเลือกที่ถูก</small>`}
+      <textarea class="grow" id="q${i}_e" rows="${Math.max(2,rowsOf(q.explain))}" placeholder="คำอธิบายเฉลยเพิ่มเติม (ไม่ใส่ก็ได้) กด Enter ขึ้นบรรทัดใหม่ได้" aria-label="คำอธิบายเฉลยข้อ ${i+1}">${esc(q.explain)}</textarea>
     </fieldset>`).join('')}
     <div class="btns"><button class="btn" data-act="qAdd" data-id="mcq">เพิ่ม MCQ</button><button class="btn" data-act="qAdd" data-id="meq">เพิ่ม MEQ</button></div>
     <small class="muted">โจทย์ใหม่จะอยู่ในชุดเดียวกับข้อล่าสุด เปลี่ยนได้ที่ช่อง "อยู่ในชุด"</small>
@@ -1627,6 +1703,7 @@ ${d.part!=='quiz'?`
       <small class="muted">เว้นบรรทัดระหว่างข้อ · มีตัวเลือก = MCQ ใส่ * หน้าตัวที่ถูก · ไม่มีตัวเลือก = MEQ ใส่ ตอบ: แนวคำตอบ และ คะแนน: คะแนนเต็ม · E: คือคำอธิบาย</small>
       <div class="btns"><button class="btn" data-act="bulkAdd">แปลงเป็นโจทย์</button></div></div></details>`:''}`,
     `<button class="btn primary" data-act="saveLesson">บันทึกบทเรียน</button><button class="btn ghost" data-act="closeSheet">ยกเลิก</button>`);
+  requestAnimationFrame(()=>document.querySelectorAll('#sheetCard textarea.grow').forEach(autoGrow));
 }
 function syncDraft(){
   const d=S.draft;if(!d)return;
@@ -1667,10 +1744,13 @@ async function saveLesson(){
   if(!d.title){toast('ใส่ชื่อบทก่อนบันทึก');return}
   const topics=d.topics.filter(t=>t.name.trim()||t.goals.trim()).map(t=>({tid:t.tid,name:t.name.trim(),stars:t.stars||0,goals:t.goals.split('\n').map(s=>s.replace(/^\s*[-•]\s*/,'').trim()).filter(Boolean)}));
   const tids=topics.map(t=>t.tid);const okTopic=x=>x==='mid'||x==='final'||tids.includes(x)?x:'final';
-  const qs=d.questions.filter(q=>q.q.trim()).map(q=>{
-    if(q.type==='meq')return {type:'meq',topic:okTopic(q.topic),q:q.q.trim(),key:(q.key||'').trim(),max:Math.max(1,+q.max||1),explain:q.explain};
+  /* each question keeps a key and the time it was added, so the site knows which ones each kid has already done */
+  const seen=new Set(),now=Date.now();
+  const tag=q=>{let qid=q.qid&&!seen.has(q.qid)?q.qid:'q'+uid();seen.add(qid);return {qid,born:q.born!=null?q.born:now}};
+  const qs=d.questions.filter(q=>q.q.trim()).map(q=>{const t=tag(q);const ex=(q.explain||'').trim();
+    if(q.type==='meq')return {type:'meq',topic:okTopic(q.topic),q:q.q.trim(),key:(q.key||'').trim(),max:Math.max(1,+q.max||1),explain:ex,...t};
     const kept=q.choices.map((c,j)=>({c:c.trim(),j})).filter(x=>x.c);
-    return {type:'mcq',topic:okTopic(q.topic),q:q.q.trim(),choices:kept.map(x=>x.c),answer:kept.findIndex(x=>x.j===q.answer),explain:q.explain}});
+    return {type:'mcq',topic:okTopic(q.topic),q:q.q.trim(),choices:kept.map(x=>x.c),answer:kept.findIndex(x=>x.j===q.answer),explain:ex,...t}});
   const bad=qs.find(q=>q.type==='mcq'&&(q.choices.length<2||q.answer<0));
   if(bad){toast('มี MCQ ที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
   const id=d.id||uid();const old=d.id&&Store.d.lessons[d.id];
@@ -1772,12 +1852,12 @@ const ACT={
   lkid(t){S.learn.kid=S.learn.kid===t.dataset.id?'all':t.dataset.id;render()},
   openLesson(t){S.learn.open=t.dataset.id;S.confirm=null;render();window.scrollTo({top:0})},
   closeLesson(){S.learn.open=null;render()},
-  quizKid(t){S.learn.player=t.dataset.id;render()},
+  quizKid(t){S.learn.player=t.dataset.id;qset().pick='new';render()},
   async toggleSet(t){const l=Store.d.lessons[S.learn.open];if(!l||!S.bro)return;const sc=t.dataset.id;const h=new Set(l.hidden||[]);
     if(h.has(sc))h.delete(sc);else h.add(sc);await Store.put('lessons',l.id,Object.assign({},l,{hidden:[...h]}));toast(h.has(sc)?'ซ่อน '+scopeName(l,sc)+' จากน้องแล้ว':'เปิด '+scopeName(l,sc)+' ให้น้องเห็นแล้ว')},
-  qsScope(t){const l=Store.d.lessons[S.learn.open];if(!l)return;S.learn.scope={lid:l.id,sc:t.dataset.id};render();
+  qsScope(t){const l=Store.d.lessons[S.learn.open];if(!l)return;S.learn.scope={lid:l.id,sc:t.dataset.id};qset().pick='new';render();
     if(!t.dataset.stay){const el=document.getElementById('quizPanel');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}},
-  qsMode(t){qset().mode=t.dataset.id;LS.set('qset',S.learn.qs);render()},
+  qsMode(t){qset().mode=t.dataset.id;render()},
   qsTimer(t){qset().timer=t.dataset.id;LS.set('qset',S.learn.qs);render()},
   qsTime(t){const st=qset();const v=+t.dataset.id;if(st.timer==='q')st.qSec=v;else st.setSec=v;LS.set('qset',st);render()},
   startQuiz(t){if(!S.learn.player)return;startQuizFor(t.dataset.id,S.learn.player)},
@@ -1789,10 +1869,13 @@ const ACT={
   qSubmitAsk(){const q=S.quiz;quizLeave();const left=q.order.filter((_,p)=>!isAnswered(q,p)).length;if(left){q.confirm=true;if(q.timer==='q'&&!q.ans[q.i].locked)q.qEnd=quizNow()+q.ans[q.i].left*1000;render()}else quizSubmit()},
   qSubmitCancel(){const q=S.quiz;q.confirm=false;render()},
   qSubmit(){quizSubmit()},
-  gradeScore(t){const q=S.quiz;q.scores[meqPositions(q)[q.gi]]=+t.dataset.id;render()},
+  gradeScore(t){const q=S.quiz;q.scores[q.gList[q.gi]]=+t.dataset.id;render()},
+  qCheck(){const q=S.quiz;if(!q||!q.practice||q.phase!=='answer')return;quizReveal(q,q.i);q.confirm=false;render()},
+  pScore(t){const q=S.quiz;if(!q||!q.ans[q.i]||!q.ans[q.i].revealed)return;q.scores[q.i]=+t.dataset.id;render()},
+  qsPick(t){qset().pick=t.dataset.id;render()},
   gradePrev(){const q=S.quiz;if(q.gi>0){q.gi--;render();window.scrollTo({top:0})}},
-  gradeNext(){const q=S.quiz;const list=meqPositions(q);if(q.scores[list[q.gi]]==null)return;if(q.gi+1<list.length){q.gi++;render();window.scrollTo({top:0})}else{quizBuildRes(q);finishQuiz()}},
-  retryQuiz(){const q=S.quiz;S.learn.scope={lid:q.lessonId,sc:q.scope||'final'};Object.assign(qset(),{mode:q.mode,timer:q.timer,qSec:q.qSec,setSec:q.setSec});startQuizFor(q.lessonId,q.kid)},
+  gradeNext(){const q=S.quiz;const list=q.gList;if(q.scores[list[q.gi]]==null)return;if(q.gi+1<list.length){q.gi++;render();window.scrollTo({top:0})}else{quizBuildRes(q);finishQuiz()}},
+  retryQuiz(){const q=S.quiz;S.learn.scope={lid:q.lessonId,sc:q.scope||'final'};Object.assign(qset(),{timer:q.timer,qSec:q.qSec,setSec:q.setSec});startQuizFor(q.lessonId,q.kid,{order:q.order,mode:q.mode,pick:q.pick})},
   endQuiz(){clearInterval(qTick);const q=S.quiz;S.quiz=null;S.learn.open=q?q.lessonId:null;render()},
   lessonForm(t){lessonForm(t.dataset.id||null)},
   async delLesson(t){await Store.del('lessons',t.dataset.id);S.learn.open=null;S.confirm=null;toast('ลบบทเรียนแล้ว');render()},
@@ -2493,7 +2576,7 @@ document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.c
 document.addEventListener('selectionchange',()=>fmtTrack(document.activeElement));
 document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-fmt]');if(b)e.preventDefault()},true);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-fmt]');if(b){e.preventDefault();fmtApply(b.dataset.fmt)}});
-document.addEventListener('input',e=>{if(e.target===FMT.el)fmtTrack(e.target);if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz&&S.quiz.ans&&!S.quiz.ans[S.quiz.i].locked)S.quiz.ans[S.quiz.i].text=e.target.value});
+document.addEventListener('input',e=>{autoGrow(e.target);if(e.target===FMT.el)fmtTrack(e.target);if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz&&S.quiz.ans&&!S.quiz.ans[S.quiz.i].locked){S.quiz.ans[S.quiz.i].text=e.target.value;const cb=document.getElementById('qCheckBtn');if(cb)cb.disabled=!e.target.value.trim()}});
 document.addEventListener('change',e=>{
   const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
   if(c==='qtype'){syncDraft();paintLessonForm()}
@@ -2507,7 +2590,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-24T02:44:00+07:00';
+const SITE_UPDATED='2026-10-24T12:20:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
