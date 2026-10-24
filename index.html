@@ -538,6 +538,72 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .pb-crow b{font:600 .98rem var(--f-head);overflow-wrap:anywhere}
 .pb-crow input{font-variant-numeric:tabular-nums;text-align:right}
 @media (max-width:480px){.pb-crow{grid-template-columns:auto minmax(0,1fr) 92px;row-gap:6px}.pb-crow .btn{grid-column:span 1}.pb-crow .btn:first-of-type{grid-column:2}}
+
+/* คำต้องห้าม: one phone per player; in circle mode the phone faces outward and the word fills the screen */
+.tb{display:grid;gap:14px;min-width:0}
+.tb-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.tb-two{grid-template-columns:1fr}}
+.tb-me{display:flex;align-items:center;gap:10px}
+.tb-me b{font-family:var(--f-head);font-weight:600}
+.tb-join{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.tb-join input{width:100%;min-width:0;font:600 1.7rem/1 var(--f-head);letter-spacing:.18em;text-align:center;font-variant-numeric:tabular-nums;padding:10px 12px}
+.tb-code{font:700 clamp(3.2rem,16vw,5.6rem)/1 var(--f-head);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.tb-code span{display:inline-block;width:.35em}
+.tb-rules{margin:0;padding-left:1.3em;display:grid;gap:4px}
+.tb-seg{grid-template-columns:1fr 1fr;max-width:none}
+.tb-seg button:first-child{grid-column:auto}
+@media (max-width:480px){.tb-seg{grid-template-columns:1fr}}
+.tb-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tb-bar .btn{margin-left:auto}
+.tb-pill{display:inline-flex;align-items:center;min-height:34px;font:600 .9rem/1 var(--f-head);padding:0 12px;border-radius:999px;background:var(--sunk);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tb-rows{display:grid;gap:8px}
+.tb-row{--c:#6B7785;display:grid;grid-template-columns:24px auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:10px 12px;border-radius:16px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--c);min-width:0}
+.tb-row.me{background:color-mix(in srgb,var(--c) 7%,var(--surface))}
+.tb-row.out{opacity:.5}
+.tb-row.out .tb-word{text-decoration:line-through}
+.tb-no{font:600 .95rem/1 var(--f-head);color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.tb-who{display:grid;gap:2px;min-width:0}
+.tb-who b{font:600 1rem/1.25 var(--f-head);overflow-wrap:anywhere}
+.tb-word{font:600 clamp(1.35rem,5.4vw,1.9rem)/1.3 var(--f-head);overflow-wrap:anywhere}
+.tb-word.mine{font:500 1rem/1.3 var(--f-head);color:var(--muted)}
+.tb-tags{display:flex;gap:4px;flex-wrap:wrap}
+.tb-tag{display:inline-block;font:500 .7rem/1 var(--f-head);padding:4px 7px;border-radius:5px;background:var(--sunk);color:var(--muted);vertical-align:2px}
+.tb-tag.host{background:var(--ink);color:var(--paper)}
+.tb-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tb-acts .btn.danger{min-width:64px}
+@media (max-width:480px){.tb-row{grid-template-columns:20px auto minmax(0,1fr)}.tb-acts{grid-column:1/-1;justify-content:stretch}.tb-acts .btn{flex:1}}
+.tb-hidden{display:flex;justify-content:space-between;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:12px 14px;border-radius:16px;border:1.5px dashed var(--line);background:var(--sunk)}
+.tb-hidden>div{display:grid;gap:2px}
+.tb-hidden b{font:600 1.05rem var(--f-head)}
+.tb-gone{--c:#6B7785;display:grid;gap:4px;justify-items:center;text-align:center;padding:16px;border-radius:18px;background:color-mix(in srgb,var(--c) 12%,var(--surface));border:1.5px solid var(--c)}
+.tb-gone b{font:700 clamp(2rem,9vw,3rem)/1.25 var(--f-head);overflow-wrap:anywhere}
+.tb-note{margin:0}
+.tb-ask{--c:#6B7785;display:flex;gap:14px;align-items:center;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--c) 10%,var(--surface));border:1px solid var(--line)}
+.tb-askword{font:700 clamp(1.8rem,7vw,2.6rem)/1.25 var(--f-head);overflow-wrap:anywhere}
+.tb-endname{font-family:var(--f-head);font-weight:600;font-size:1.1rem}
+/* the outward-facing word: a fixed dark card in both themes so it reads the same across the table */
+.tb-full{--c:#6B7785;position:fixed;inset:0;z-index:30;background:#10161C;color:#fff;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;text-align:center;
+  padding:calc(22px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.tb-band{position:absolute;left:0;right:0;top:0;height:12px;background:var(--c)}
+.tb-top{display:flex;align-items:center;justify-content:center;gap:10px;font:500 1.05rem/1.2 var(--f-head);color:rgba(255,255,255,.82)}
+.tb-top b{font-weight:600;color:#fff}
+.tb-big{display:grid;place-items:center;font-family:var(--f-head);font-weight:700;line-height:1.3;overflow-wrap:anywhere;word-break:break-word;padding-inline:4px;min-height:0}
+.tb-under{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center}
+.tb-full .btn{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.32)}
+.tb-full .btn:hover{border-color:#fff}
+.tb-full :focus-visible{outline-color:#fff}
+.tb-pill.dark{background:rgba(255,255,255,.12);color:#fff}
+.tb-full.warn{background:#F2B21B;color:#17212B}
+.tb-full.warn .btn{background:#17212B;color:#fff;border-color:#17212B}
+.tb-warn{display:grid;place-items:center;align-content:center;gap:10px}
+.tb-warn svg{width:84px;height:84px}
+.tb-warn b{font:700 clamp(1.8rem,8vw,3rem)/1.2 var(--f-head)}
+.tb-warn span{font:500 1.1rem var(--f-head)}
+.tb-count{font:700 clamp(5rem,26vw,9rem)/1 var(--f-head);font-variant-numeric:tabular-nums}
+@media (hover:none){.tb-keys{display:none}}
+.tb-keylist{font-size:.88rem;color:var(--muted);display:flex;gap:8px 16px;flex-wrap:wrap}
+.tb-keylist span{white-space:nowrap}
+.tb-none button.pawn[aria-pressed="false"]{opacity:1}
 </style>
 </head>
 <body>
@@ -573,7 +639,7 @@ window.FIREBASE_CONFIG = {
 <!-- ===== จบส่วนตั้งค่า ===== -->
 <script>
 /* ข้อมูลตั้งต้นของบ้าน: ใส่ตอนฐานข้อมูลยังว่าง และเพิ่มเฉพาะของใหม่ (ver สูงกว่าที่เคยใส่) */
-window.HOUSE_SEED = {"v": 6, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 6}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก หมอบ, เช็ค, ตาม หรือเพิ่ม\n- คนที่ไม่หมอบจนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่นหมอบหมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้องตามเท่าไร เพิ่มได้ขั้นต่ำเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/flip7"]};
+window.HOUSE_SEED = {"v": 7, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 6, "games/taboo": 7}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก หมอบ, เช็ค, ตาม หรือเพิ่ม\n- คนที่ไม่หมอบจนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่นหมอบหมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้องตามเท่าไร เพิ่มได้ขั้นต่ำเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}, "taboo": {"at": 1792850000000, "helper": "taboo", "kind": "party", "min": 3, "max": 12, "minutes": 15, "name": "คำต้องห้าม", "props": "มือถือหรือไอแพดคนละเครื่อง", "rules": "## เล่นยังไง\n- ทุกคนเปิดตัวช่วยคำต้องห้ามในเครื่องของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลัก\n- เริ่มเกมแล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเอง แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร\n- คุยกันไปเรื่อยๆ หลอกล่อให้คนอื่นเผลอพูดคำของเขา\n- ใครเผลอพูด ใครก็ได้กด “โดน” ที่ชื่อคนนั้น คนนั้นตกรอบ คนสุดท้ายที่เหลือชนะ\n\n## นั่งยังไง\n- นั่งเป็นวงกลม: จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น\n- นั่งเป็นแถวหรืออยู่คนละที่: จอโชว์คำของทุกคน ยกเว้นของตัวเอง\n\n## คีย์ลัด\n- Space เริ่ม/พักเกม · 1–9 คนที่โดน · H ซ่อนคำ · R เปลี่ยนคำ\n- ⌘/Ctrl + Z ย้อนคนล่าสุดที่โดน · ⌘/Ctrl + Enter จบเกม"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/flip7"]};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -601,7 +667,7 @@ const kindName=id=>(KINDS.find(k=>k[0]===id)||[0,'เกม'])[1];
 const POSTTYPES=[['news','ข่าวในบ้าน'],['plan','นัดหมาย'],['memory','ความทรงจำ'],['story','เรื่องเล่า']];
 const postType=id=>(POSTTYPES.find(k=>k[0]===id)||[0,'โพสต์'])[1];
 const SWATCHES=['#2F5BD3','#D23F77','#D9940F','#23935F','#7650CC','#E5612A','#0E8C9C','#8A6A3B','#C2416B','#4A5868'];
-const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['flip7','ตัวช่วย Flip 7'],['poker','ตัวช่วยโป๊กเกอร์'],['timer','จับเวลาและสุ่ม']];
+const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['flip7','ตัวช่วย Flip 7'],['poker','ตัวช่วยโป๊กเกอร์'],['timer','จับเวลาและสุ่ม'],['taboo','ตัวช่วยคำต้องห้าม']];
 
 function bandFits(levels,band){
   if(!levels||!levels.length||!band) return true;
@@ -1223,10 +1289,11 @@ const TOOL_LIST=[
   {id:'uno',name:'ตัวช่วย UNO',desc:'บอกว่าตาใคร หมุนทางไหน ต้องจั่วกี่ใบ'},
   {id:'flip7',name:'Flip 7',desc:'นับแต้มแยกคน เรียงตามคะแนน ใส่หลายเลขแล้ว Enter ทีเดียว มีปุ่มเลข ×2 และ +15 ตั้งเป้าได้'},
   {id:'poker',name:'โป๊กเกอร์',desc:'นับชิปและเดิมพัน Texas Hold\'em บอกตาใคร ต้องตามเท่าไร แบ่งกองย่อยตอน All-in ให้เอง'},
+  {id:'taboo',name:'คำต้องห้าม',desc:'ทุกคนใช้มือถือของตัวเอง เข้าห้องด้วยรหัส 6 หลัก ได้คำต้องห้ามคนละคำ ใครเผลอพูดตกรอบ'},
   {id:'score',name:'กระดานคะแนน',desc:'เก็บแต้มบอร์ดเกม แบบแข่งกันหรือช่วยกัน'},
   {id:'timer',name:'จับเวลาและสุ่ม',desc:'นับถอยหลัง สุ่มคนเริ่ม ทอยลูกเต๋า โยนเหรียญ'}
 ];
-const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},flip7:{view:vFlip7},poker:{view:vPoker},timer:{view:vTimer}};
+const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},flip7:{view:vFlip7},poker:{view:vPoker},timer:{view:vTimer},taboo:{view:vTaboo}};
 function vTools(){
   if(S.tool&&TOOLS[S.tool]){const t=TOOL_LIST.find(x=>x.id===S.tool)||TOOLS[S.tool];
     return `<section class="sec"><div class="sec-head"><div><button class="back" data-act="closeTool">← ตัวช่วยทั้งหมด</button><h2>${esc(t.name||'')}</h2></div></div>${TOOLS[S.tool].view()}</section>`}
@@ -2563,6 +2630,331 @@ document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.id==='pbRzIn'&&
   const b=document.getElementById('pbRzGo');if(b)b.textContent=pbRzLabel(S.poker,v)});
 function scoreAdd(k,n){const s=S.score;s.hist=s.hist||[];if(k==='team')s.team=(s.team||0)+n;else{const p=s.players[+k];if(!p)return;p.pts=(p.pts||0)+n}s.hist.push({k,n});persist();render()}
 
+/* ---------- คำต้องห้าม: ทุกคนใช้มือถือของตัวเอง เข้าห้องเดียวกันด้วยรหัส 6 หลัก ---------- */
+/* คำตั้งต้น 5 หมวด หมวดละ 100 คำ เป็นคำที่ได้ยินหรือพูดกันทุกวัน (ความถี่ 7–10 จาก 10) */
+const TB_CATS=[{"id":"talk","name":"คำติดปาก","w":["อะไร","ทำไม","เมื่อไหร่","เมื่อ","ที่ไหน","ใคร","ยังไง","เท่าไหร่","กี่","ไหม","หรือ","ใช่","ไม่","จริง","เลย","แล้ว","ยัง","ก็","และ","แต่","เพราะ","ถ้า","ว่า","ด้วย","อีก","มาก","หน่อย","นิดเดียว","เยอะ","ทุก","บาง","เอง","กัน","ได้","ต้อง","ควร","อยาก","คง","อาจจะ","เคย","กำลัง","จะ","โอเค","เออ","อืม","เฮ้ย","ว้าว","โอ้โห","เดี๋ยว","ตอนนี้","เมื่อกี้","พอ","ครับ","ค่ะ","นะ","จ้า","ขอบคุณ","ขอโทษ","สวัสดี","ไม่เป็นไร","แน่นอน","ก่อน","ทีหลัง","ตลอด","บ่อย","แค่","ทั้งหมด","อันนี้","อันนั้น","นี่","นั่น","ตรงนี้","ตรงนั้น","แบบนี้","เหมือน","คือ","เป็น","มี","อยู่","ให้","กับ","ของ","ที่","ใน","บน","จาก","ถึง","เกือบ","จัง","สุดๆ","งั้น","ไม่รู้","ก็ได้","อ๋อ","อ้าว","แป๊บ","เหรอ","อย่า","เปล่า","ทุกวัน"]},{"id":"verb","name":"ทำอะไร","w":["กิน","นอน","ไป","มา","ดู","ฟัง","พูด","บอก","ถาม","ตอบ","เล่น","ทำ","เรียน","อ่าน","เขียน","เดิน","วิ่ง","นั่ง","ยืน","ตื่น","อาบน้ำ","แปรงฟัน","ล้าง","เก็บ","หยิบ","เอา","ซื้อ","จ่าย","หา","เจอ","รอ","เปิด","ปิด","ใส่","ถอด","ใช้","ชอบ","รัก","รู้","คิด","จำ","ลืม","เข้าใจ","รู้สึก","เห็น","ได้ยิน","หัวเราะ","ร้องไห้","ยิ้ม","ช่วย","โทร","ส่ง","กด","ดื่ม","เปลี่ยน","ลอง","เริ่ม","หยุด","จบ","ชนะ","แพ้","ขับ","ขี่","ขึ้น","ลง","เข้า","ออก","กลับ","นับ","เลือก","แบ่ง","ทิ้ง","หาย","ตก","พัง","ล้ม","โดน","ตี","จับ","ดึง","กอด","เรียก","ร้องเพลง","เต้น","วาด","ถ่ายรูป","ฝัน","หลับ","สอน","สอบ","แต่งตัว","รีบ","แข่ง","ทะเลาะ","คุย","บ่น","ขอ","ทำงาน","เที่ยว","ชาร์จ"]},{"id":"feel","name":"เป็นยังไง","w":["ดี","เก่ง","สวย","หล่อ","น่ารัก","ใหญ่","เล็ก","สูง","เตี้ย","อ้วน","ผอม","ยาว","สั้น","ร้อน","หนาว","เย็น","อุ่น","หิว","อิ่ม","ง่วง","เหนื่อย","เจ็บ","ป่วย","สบาย","สนุก","เบื่อ","ดีใจ","เสียใจ","โกรธ","กลัว","ตกใจ","งง","เขิน","อาย","เหงา","รำคาญ","ตื่นเต้น","มีความสุข","เศร้า","เครียด","ขี้เกียจ","ขยัน","ใจดี","ดุ","ซน","ตลก","แปลก","ใหม่","เก่า","แพง","ถูก","เร็ว","ช้า","ไกล","ใกล้","ง่าย","ยาก","หนัก","เบา","สะอาด","สกปรก","เปียก","อร่อย","เผ็ด","หวาน","เค็ม","เปรี้ยว","มืด","สว่าง","ดัง","เงียบ","ว่าง","ยุ่ง","เต็ม","ผิด","ถูกต้อง","พร้อม","สาย","ทัน","แข็ง","นิ่ม","เหม็น","หอม","แดง","เขียว","ฟ้า","ดำ","ขาว","เหลือง","ชมพู","ม่วง","เท่","แย่","เจ๋ง","สุดยอด","น่ากลัว","น่าเบื่อ","อันตราย","สำคัญ","แก่"]},{"id":"stuff","name":"ของกินของใช้","w":["ข้าว","น้ำ","ไข่","ไก่","หมู","ปลา","กุ้ง","ผัก","ผลไม้","ขนม","นม","กาแฟ","ชา","น้ำแข็ง","ขนมปัง","ก๋วยเตี๋ยว","มาม่า","ส้มตำ","ข้าวผัด","กะเพรา","ไอติม","ช็อกโกแลต","เค้ก","ลูกอม","น้ำตาล","เกลือ","น้ำปลา","ซอส","กล้วย","ส้ม","มะม่วง","ไส้กรอก","ลูกชิ้น","ไก่ทอด","ชานม","น้ำเปล่า","จาน","ชาม","ช้อน","ส้อม","แก้ว","ขวด","ตู้เย็น","ทีวี","โทรศัพท์","มือถือ","ไอแพด","คอม","แอร์","พัดลม","ไฟ","ประตู","หน้าต่าง","โต๊ะ","เก้าอี้","เตียง","หมอน","ผ้าห่ม","สบู่","แชมพู","ยาสีฟัน","แปรงสีฟัน","ผ้าเช็ดตัว","เสื้อ","กางเกง","กระโปรง","รองเท้า","ถุงเท้า","หมวก","แว่น","กระเป๋า","ร่ม","นาฬิกา","ปากกา","ดินสอ","ยางลบ","สมุด","หนังสือ","กระดาษ","ที่ชาร์จ","หูฟัง","รีโมท","กุญแจ","เงิน","ถุง","กล่อง","ขยะ","ทิชชู่","ยา","ของเล่น","ลูกบอล","ไพ่","จักรยาน","รถ","ไวไฟ","แบต","โซฟา","ผ้า","น้ำหวาน","หมูปิ้ง"]},{"id":"around","name":"คน เวลา สถานที่","w":["พ่อ","แม่","พี่","น้อง","ยาย","ตา","ปู่","ย่า","ลุง","ป้า","น้า","เพื่อน","ครู","หมอ","เด็ก","ผู้ใหญ่","ผู้ชาย","ผู้หญิง","คน","เรา","ฉัน","เธอ","เขา","มัน","หนู","แก","ตัวเอง","ทุกคน","บ้าน","ห้อง","ห้องน้ำ","ห้องนอน","ครัว","โรงเรียน","ห้าง","ร้าน","ตลาด","เซเว่น","โรงพยาบาล","สวน","ถนน","ข้างนอก","ข้างใน","ข้างบน","ข้างล่าง","ซ้าย","ขวา","หน้า","หลัง","วัน","คืน","เช้า","เที่ยง","บ่าย","ดึก","พรุ่งนี้","เมื่อวาน","วันนี้","อาทิตย์","เดือน","ปี","ชั่วโมง","นาที","เวลา","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า","สิบ","ร้อย","เสาร์","จันทร์","วันหยุด","การบ้าน","เกม","หมา","แมว","ยุง","ฝน","แดด","ลม","หัว","มือ","ขา","ปาก","ฟัน","ผม","หู","ท้อง","ตัว","ชื่อ","เรื่อง","งาน","เสียง","รูป"]}];
+const tbMeta=()=>Store.d.meta.taboo||{};
+function tbCats(){const m=tbMeta();return TB_CATS.map(c=>({id:c.id,name:c.name,w:c.w})).concat((m.cats||[]).filter(c=>c&&c.id).map(c=>({id:c.id,name:c.name||'หมวดของบ้าน',w:[],custom:true})))}
+function tbWords(cid){const c=tbCats().find(x=>x.id===cid);if(!c)return[];const m=tbMeta();const del=new Set((m.del&&m.del[cid])||[]);const seen=new Set();const out=[];
+  for(const w of c.w.concat((m.add&&m.add[cid])||[])){const t=String(w||'').trim();if(!t||del.has(t)||seen.has(t))continue;seen.add(t);out.push(t)}return out}
+function tbPool(cats){const s=new Set();(cats||[]).forEach(c=>tbWords(c).forEach(w=>s.add(w)));return Array.from(s)}
+
+const TB_ME=(()=>{let v=LS.get('tbMe',null);if(!v){v='c'+uid();LS.set('tbMe',v)}return v})();
+function tbInit(){if(!S.tb)S.tb={code:LS.get('tbRoom',null),room:null,loaded:false,sub:null,subCode:null,hide:false,reveal:0,seenRound:0,outs:null}}
+function tbWho(){const w=LS.get('tbWho',null);if(!w)return null;
+  if(w.kid){const k=kidById(w.kid);return k?{kid:k.id,name:k.code,code:k.code,color:okColor(k.color)}:null}
+  if(w.name){const n=String(w.name).trim().slice(0,20);if(!n)return null;let h=0;for(const ch of n)h=(h*31+ch.codePointAt(0))>>>0;return {kid:'',name:n,code:Array.from(n).slice(0,2).join(''),color:SWATCHES[h%SWATCHES.length]}}
+  return null}
+const tbPawn=(p,cls)=>playerPawn({id:p.kid||'',name:p.name||'?',code:p.code||String(p.name||'?').slice(0,2),color:p.color},cls);
+const tbPlayers=d=>Object.keys((d&&d.players)||{}).map(id=>Object.assign({},d.players[id],{pid:id})).filter(p=>!p.left).sort((a,b)=>(a.joinedAt||0)-(b.joinedAt||0)||a.pid.localeCompare(b.pid));
+const tbIn=d=>tbPlayers(d).filter(p=>p.inGame);
+const tbAlive=d=>tbIn(d).filter(p=>!p.out);
+const tbMe=d=>(d&&d.players&&d.players[TB_ME])||null;
+const tbHostOk=d=>!!(d&&d.players&&d.players[d.host]&&!d.players[d.host].left);
+const tbIsHost=d=>!!d&&(d.host===TB_ME||(!tbHostOk(d)&&(tbPlayers(d)[0]||{}).pid===TB_ME));
+function tbClock(d){if(!d||!d.startedAt)return '0:00';const end=d.status==='end'&&d.endedAt?d.endedAt:(d.paused&&d.pausedAt?d.pausedAt:Date.now());
+  const s=Math.max(0,Math.floor((end-d.startedAt-(+d.pausedTotal||0))/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+
+/* the room lives in one document: rooms/<รหัส> */
+const tbRef=c=>Store.db.collection('rooms').doc(c);
+function tbFail(e){const c=String((e&&(e.code||e.name||e.message))||'');
+  toast(/permission/i.test(c)?'ห้องเกมยังเปิดไม่ได้ ให้พี่เพิ่ม Rules ของ rooms ใน Firebase ก่อน':'เชื่อมต่อห้องไม่ได้ ลองใหม่อีกครั้ง')}
+async function tbPatch(o){const c=S.tb&&S.tb.code;if(!c||!Store.db)return false;
+  try{if(Store.kind==='firebase')await tbRef(c).set(o,{merge:true});else await tbRef(c).update(o);return true}catch(e){tbFail(e);return false}}
+function tbSub(){tbInit();const c=S.tb.code;if(!c||!Store.db||S.tb.subCode===c)return;tbUnsub();S.tb.subCode=c;S.tb.loaded=false;
+  try{S.tb.sub=tbRef(c).onSnapshot(s=>tbOnRoom(s&&s.exists?s.data():null),e=>{S.tb.sub=null;S.tb.subCode=null;tbFail(e);tbExit()})}catch(e){S.tb.subCode=null;tbFail(e)}}
+function tbUnsub(){if(S.tb&&S.tb.sub){try{S.tb.sub()}catch(e){}}if(S.tb){S.tb.sub=null;S.tb.subCode=null}}
+function tbExit(msg){tbUnsub();Object.assign(S.tb,{code:null,room:null,loaded:false,hide:false,reveal:0,seenRound:0,outs:null});LS.set('tbRoom',null);tbWake(false);if(msg)toast(msg);render()}
+function tbOnRoom(d){
+  const first=!S.tb.loaded;S.tb.loaded=true;
+  if(!d){tbExit(first?'ไม่เจอห้องนี้แล้ว':'ห้องนี้ปิดไปแล้ว');return}
+  const me=tbMe(d);
+  if(!me||me.left){tbExit(first?'':'คุณออกจากห้องแล้ว');return}
+  if(d.status==='play'&&me.inGame&&d.round!==S.tb.seenRound){S.tb.seenRound=d.round;S.tb.hide=false;S.tb.reveal=d.mode==='circle'?Date.now()+3200:0}
+  /* someone was just caught: beep, and buzz the phone of whoever it was */
+  const outs={};tbIn(d).forEach(p=>{if(p.out)outs[p.pid]=p.outAt||1});
+  if(S.tb.outs&&d.round===S.tb.outsRound){const fresh=Object.keys(outs).filter(id=>!S.tb.outs[id]);if(fresh.length)tbBeep(fresh.includes(TB_ME))}
+  S.tb.outs=outs;S.tb.outsRound=d.round;
+  S.tb.room=d;
+  /* last one standing: the host (or whoever is first in the room) closes the round */
+  if(d.status==='play'&&!d.paused&&tbIsHost(d)&&tbIn(d).length>=2&&tbAlive(d).length<=1)tbFinish();
+  changed();
+}
+let tbLock=null;
+async function tbWake(on){try{if(on&&!tbLock&&navigator.wakeLock&&document.visibilityState==='visible'){tbLock=await navigator.wakeLock.request('screen');tbLock.addEventListener('release',()=>{tbLock=null})}
+  else if(!on&&tbLock){const l=tbLock;tbLock=null;await l.release()}}catch(e){}}
+const tbWants=()=>!!(S.tb&&S.tb.code&&S.tb.room&&S.tb.room.status==='play'&&S.tab==='tools'&&S.tool==='taboo');
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&tbWants())tbWake(true)});
+let tbAC=null;
+function tbBeep(mine){try{if(navigator.vibrate)navigator.vibrate(mine?[250,120,250]:120)}catch(e){}
+  try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;tbAC=tbAC||new C();const t=tbAC.currentTime;
+    [[740,0],[520,.16]].forEach(([f,o])=>{const g=tbAC.createGain();const s=tbAC.createOscillator();s.type='triangle';s.frequency.value=f;g.gain.setValueAtTime(.0001,t+o);g.gain.exponentialRampToValueAtTime(.25,t+o+.02);g.gain.exponentialRampToValueAtTime(.0001,t+o+.15);s.connect(g);g.connect(tbAC.destination);s.start(t+o);s.stop(t+o+.16)})}catch(e){}}
+setInterval(()=>{if(!(S.tab==='tools'&&S.tool==='taboo'&&S.tb&&S.tb.room))return;const el=document.getElementById('tbClock');if(el)el.textContent=tbClock(S.tb.room);
+  const rv=document.getElementById('tbRevealN');if(rv){const left=Math.ceil((S.tb.reveal-Date.now())/1000);if(left<=0)render();else if(rv.textContent!==String(left))rv.textContent=left}},250);
+
+/* game moves */
+async function tbFinish(){const d=S.tb.room;if(!d||d.status!=='play')return;const o={status:'end',endedAt:Date.now(),paused:false,winner:tbAlive(d).map(p=>p.pid)};
+  if(d.paused&&d.pausedAt)o.pausedTotal=(+d.pausedTotal||0)+(Date.now()-d.pausedAt);await tbPatch(o)}
+async function tbStart(){const d=S.tb.room;if(!d)return;if(!tbIsHost(d)){toast('ให้หัวห้องเป็นคนกดเริ่ม');return}
+  const ps=tbPlayers(d);if(ps.length<2){toast('ต้องมีคนในห้องอย่างน้อย 2 คน');return}
+  const pool=tbPool(d.cats);if(pool.length<ps.length){toast('คำในหมวดที่เลือกไม่พอ เลือกหมวดเพิ่มอีก');return}
+  const recent=new Set(LS.get('tbRecent',[]).concat(d.used||[]));let fresh=shuffle(pool.filter(w=>!recent.has(w)));if(fresh.length<ps.length)fresh=shuffle(pool);
+  const players={};const words=[];ps.forEach((p,i)=>{players[p.pid]={word:fresh[i],inGame:true,out:false,outAt:0,outBy:'',rr:0};words.push(fresh[i])});
+  LS.set('tbRecent',LS.get('tbRecent',[]).concat(words).slice(-300));
+  await tbPatch({status:'play',host:tbHostOk(d)?d.host:TB_ME,round:(+d.round||0)+1,startedAt:Date.now(),endedAt:0,paused:false,pausedAt:0,pausedTotal:0,winner:[],saved:false,used:(d.used||[]).concat(words).slice(-300),players})}
+function tbAskOut(pid){const d=S.tb.room;if(!d||d.status!=='play')return;if(d.paused){toast('เกมพักอยู่ กดเล่นต่อก่อน');return}
+  const p=(d.players||{})[pid];if(!p||!p.inGame||p.out||p.left)return;const self=pid===TB_ME;
+  const me=tbMe(d);const iSee=!self||!me.inGame||me.out;
+  openSheet(self?'ฉันพูดคำต้องห้ามแล้ว?':esc(p.name)+' พูดคำต้องห้ามแล้ว?',
+    `<div class="tb-ask" style="--c:${okColor(p.color)}">${tbPawn(p,'lg')}<div>${iSee?`<span class="label">คำต้องห้ามของ ${esc(p.name)}</span><div class="tb-askword">${esc(p.word)}</div>`:'<span class="muted">กดยืนยันแล้วจะเห็นคำของตัวเอง</span>'}</div></div><p class="muted small">ยืนยันแล้ว ${self?'คุณ':esc(p.name)}จะตกรอบ ถ้ากดผิดกดย้อนกลับได้</p>`,
+    `<button class="btn dangerfill big" data-act="tbOutGo" data-id="${esc(pid)}" data-enter>โดนแล้ว ตกรอบ</button><button class="btn ghost big" data-act="closeSheet">ยังไม่โดน</button>`)}
+async function tbUndo(){const d=S.tb.room;if(!d||(d.status!=='play'&&d.status!=='end'))return;
+  const last=tbIn(d).filter(p=>p.out).sort((a,b)=>(b.outAt||0)-(a.outAt||0))[0];if(!last){toast('ยังไม่มีใครโดน');return}
+  const o={players:{[last.pid]:{out:false,outAt:0,outBy:''}}};if(d.status==='end')Object.assign(o,{status:'play',winner:[],endedAt:0,saved:false});
+  if(await tbPatch(o))toast(last.name+' กลับเข้าเกมแล้ว')}
+async function tbPause(){const d=S.tb.room;if(!d||d.status!=='play')return;
+  if(d.paused)await tbPatch({paused:false,pausedAt:0,pausedTotal:(+d.pausedTotal||0)+Math.max(0,Date.now()-(d.pausedAt||Date.now()))});
+  else await tbPatch({paused:true,pausedAt:Date.now()})}
+async function tbReroll(pid){const d=S.tb.room;if(!d||d.status!=='play')return;if(d.paused){toast('เกมพักอยู่');return}
+  const p=(d.players||{})[pid];if(!p||!p.inGame||p.out)return;if((+p.rr||0)>=1){toast('เปลี่ยนคำได้คนละครั้งเดียวต่อรอบ');return}
+  const now=new Set(tbIn(d).map(x=>x.word));const used=new Set(d.used||[]);const pool=tbPool(d.cats);
+  let c=pool.filter(w=>!now.has(w)&&!used.has(w));if(!c.length)c=pool.filter(w=>!now.has(w));if(!c.length){toast('ไม่มีคำเหลือให้เปลี่ยน');return}
+  const w=c[Math.floor(Math.random()*c.length)];
+  if(await tbPatch({players:{[pid]:{word:w,rr:(+p.rr||0)+1}},used:(d.used||[]).concat(w).slice(-300)}))toast(pid===TB_ME?'เปลี่ยนคำของคุณแล้ว':'เปลี่ยนคำของ '+p.name+' แล้ว')}
+
+/* views */
+const TB_KEYS=[['Space','เริ่มเกม / พักเกม'],['1–9','คนที่ 1–9 โดนแล้ว'],['H','ซ่อน / โชว์คำของตัวเอง'],['R','เปลี่ยนคำของตัวเอง'],['⌘/Ctrl + Z','ย้อนคนล่าสุดที่โดน'],['⌘/Ctrl + Enter','จบเกม'],['Esc','ปิดหน้าต่าง']];
+const tbKeys=all=>`<div class="${all?'tb-keylist':'f7-keys tb-keys'}">${TB_KEYS.map(([k,v])=>`<span><kbd>${k}</kbd> ${v}</span>`).join('')}</div>`;
+const TB_RULES=`<ol class="tb-rules">
+  <li>ทุกคนเปิดเว็บนี้ในมือถือของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลักเข้าห้อง</li>
+  <li>เริ่มเกมแล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเองเด็ดขาด แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร</li>
+  <li>คุยกันไปเรื่อยๆ หลอกล่อให้คนอื่นเผลอพูดคำของเขา</li>
+  <li>ใครเผลอพูด ใครก็ได้กด “โดน” ที่ชื่อคนนั้น แล้วคนนั้นตกรอบ คนสุดท้ายที่เหลือชนะ</li>
+</ol>
+<p class="small muted"><b>นั่งเป็นวงกลม</b> จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น · <b>นั่งเป็นแถวหรืออยู่คนละที่</b> จอโชว์คำของทุกคน ยกเว้นของตัวเอง</p>`;
+function tbHome(){
+  const who=tbWho();const w=LS.get('tbWho',null)||{};const ks=kids();
+  return `<div class="tb">
+    <div class="stage">
+      <div><h3>เราคือใคร</h3><p class="muted small">เลือกชื่อของตัวเองก่อน ใช้ชื่อนี้ทุกครั้งที่เข้าห้องจากเครื่องนี้</p></div>
+      ${ks.length?`<div class="pawns ${w.kid?'':'tb-none'}">${ks.map(k=>pawnBtn(k,'tbKid',w.kid===k.id,'lg')).join('')}</div>`:''}
+      <div class="row2"><label class="field"><span>หรือพิมพ์ชื่อ (เพื่อนหรือแขก)</span><input type="text" id="tbNameIn" maxlength="20" value="${esc(w.name||'')}" placeholder="เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="tbName">ใช้ชื่อนี้</button></div></div>
+      ${who?`<p class="tb-me">${tbPawn(who)} <span>เล่นในชื่อ <b>${esc(who.name)}</b></span></p>`:''}
+    </div>
+    <div class="tb-two">
+      <div class="stage"><div><h3>สร้างห้องใหม่</h3><p class="muted small">ได้รหัส 6 หลักให้คนอื่นกรอกเข้ามา</p></div>
+        <button class="btn primary big" data-act="tbCreate" ${who&&!S.tb.busy?'':'disabled'}>${S.tb.busy?'กำลังสร้างห้อง…':who?'สร้างห้อง':'เลือกชื่อก่อน'}</button></div>
+      <div class="stage"><div><h3>เข้าห้องด้วยรหัส</h3><p class="muted small">ขอรหัสจากคนที่สร้างห้อง</p></div>
+        <div class="tb-join"><input type="text" id="tbCodeIn" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="000000" aria-label="รหัสห้อง 6 หลัก"><button class="btn primary big" data-act="tbJoin" ${who?'':'disabled'}>เข้าห้อง</button></div></div>
+    </div>
+    <details class="rules panel" open><summary>วิธีเล่น</summary><div class="prose small" style="margin-top:8px">${TB_RULES}</div></details>
+    <div class="panel"><div class="sec-head"><h3>หมวดคำ</h3>${S.bro?'<button class="btn sm" data-act="tbWordsForm">แก้คำในคลัง</button>':''}</div>
+      <div class="chips" style="margin-top:10px">${tbCats().map(c=>`<span class="chip" aria-pressed="false">${esc(c.name)} <span class="n">${tbWords(c.id).length}</span></span>`).join('')}</div></div>
+    <div class="panel"><h3>คีย์ลัด</h3><p class="small muted" style="margin:4px 0 10px">ใช้ได้เมื่อต่อคีย์บอร์ด ไม่มีคีย์บอร์ดก็กดปุ่มบนจอได้หมด</p>${tbKeys(true)}</div>
+  </div>`;
+}
+function tbLobby(d){
+  const ps=tbPlayers(d);const host=tbIsHost(d);const cats=d.cats||[];const code=String(d.code||S.tb.code);
+  const row=(p,i)=>`<div class="tb-row" style="--c:${okColor(p.color)}"><span class="tb-no">${i+1}</span>${tbPawn(p)}<div class="tb-who"><b>${esc(p.name)}</b><span class="tb-tags">${p.pid===d.host?'<span class="tb-tag host">หัวห้อง</span>':''}${p.pid===TB_ME?'<span class="tb-tag">คุณ</span>':''}</span></div>
+    <div class="tb-acts">${host&&p.pid!==TB_ME?`<button class="btn sm ghost" data-act="tbKick" data-id="${esc(p.pid)}">เอาออก</button>`:''}</div></div>`;
+  return `<div class="tb">
+    <div class="stage center"><span class="label">รหัสห้อง</span><div class="tb-code" aria-label="รหัสห้อง ${esc(code)}">${esc(code.slice(0,3))}<span> </span>${esc(code.slice(3))}</div>
+      <p class="muted small">คนอื่นเปิดเว็บนี้ → ตัวช่วยเล่น → คำต้องห้าม → กรอกรหัสนี้</p></div>
+    <div class="stage"><div class="sec-head"><h3>คนในห้อง ${ps.length} คน</h3></div><div class="tb-rows">${ps.map(row).join('')}</div>
+      ${ps.length<2?'<p class="muted small">รอคนเข้าห้องอีกอย่างน้อย 1 คน</p>':''}</div>
+    <div class="stage">
+      <div><h3>นั่งยังไง</h3>${host?'':'<p class="muted small">หัวห้องเป็นคนเลือก</p>'}</div>
+      <div class="seg tb-seg">
+        <button data-act="tbMode" data-id="circle" aria-pressed="${d.mode!=='line'}" ${host?'':'disabled'}><b>นั่งเป็นวงกลม</b><span>จอโชว์คำของตัวเอง หันจอออกให้คนอื่นดู</span></button>
+        <button data-act="tbMode" data-id="line" aria-pressed="${d.mode==='line'}" ${host?'':'disabled'}><b>เป็นแถว หรืออยู่คนละที่</b><span>จอโชว์คำของทุกคน ยกเว้นของตัวเอง</span></button>
+      </div>
+      <div><h3>หมวดคำ</h3><p class="muted small">เลือกได้หลายหมวด คำจะสุ่มจากทุกหมวดที่เลือกรวมกัน</p></div>
+      <div class="chips">${tbCats().map(c=>`<button class="chip" data-act="tbCat" data-id="${esc(c.id)}" aria-pressed="${cats.includes(c.id)}" ${host?'':'disabled'}>${esc(c.name)} <span class="n">${tbWords(c.id).length}</span></button>`).join('')}</div>
+    </div>
+    <div class="btns">${host?`<button class="btn primary big" data-act="tbStart" ${ps.length>=2?'':'disabled'}>เริ่มเกม <kbd>Space</kbd></button>`:`<span class="tb-pill">รอหัวห้องกดเริ่ม</span>${tbHostOk(d)?'':'<button class="btn sm ghost" data-act="tbBeHost">เป็นหัวห้องแทน</button>'}`}
+      <button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
+  </div>`;
+}
+function tbBar(d){const a=tbAlive(d).length,n=tbIn(d).length;
+  return `<div class="tb-bar"><span class="tb-pill">ห้อง ${esc(d.code||S.tb.code)}</span><span class="tb-pill">เหลือ ${a}/${n} คน</span><span class="tb-pill" id="tbClock">${tbClock(d)}</span>
+    <button class="btn sm" data-act="tbPause">${d.paused?'เล่นต่อ':'พักเกม'}</button></div>`}
+function tbList(d,showMine){
+  const me=tbMe(d);
+  return `<div class="tb-rows">${tbIn(d).map((p,i)=>{const mine=p.pid===TB_ME;const see=!mine||showMine;
+    const by=p.out&&p.outBy&&d.players[p.outBy]?d.players[p.outBy].name:'';
+    return `<div class="tb-row ${p.out?'out':''} ${mine?'me':''}" style="--c:${okColor(p.color)}"><span class="tb-no">${i+1}</span>${tbPawn(p)}
+      <div class="tb-who"><b>${esc(p.name)}${mine?' <span class="tb-tag">คุณ</span>':''}</b>${see?`<span class="tb-word">${esc(p.word)}</span>`:'<span class="tb-word mine">คำของคุณ ???</span>'}${p.out?`<span class="small muted">ตกรอบ${by&&p.outBy!==p.pid?' · '+esc(by)+' กด':''}</span>`:''}</div>
+      <div class="tb-acts">${p.out?'':`${(+p.rr||0)<1&&(see||mine)?`<button class="btn sm ghost" data-act="tbReroll" data-id="${esc(p.pid)}">เปลี่ยนคำ</button>`:''}<button class="btn sm danger" data-act="tbOut" data-id="${esc(p.pid)}">โดน</button>`}</div></div>`}).join('')}</div>`}
+function tbFoot(d){const anyOut=tbIn(d).some(p=>p.out);
+  return `<div class="btns"><button class="btn primary" data-act="tbEndAsk">จบเกม</button>${anyOut?'<button class="btn" data-act="tbUndo">ย้อนคนล่าสุดที่โดน</button>':''}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>${tbKeys()}`}
+function tbPlay(d){
+  const me=tbMe(d);const inG=me&&me.inGame;const alive=inG&&!me.out;
+  if(d.paused)return `<div class="tb">${tbBar(d)}<div class="stage center"><div class="turnname">พักเกมอยู่</div><p class="muted">คำของทุกคนซ่อนไว้ก่อน ใครก็กดเล่นต่อได้</p><button class="btn primary big" data-act="tbPause">เล่นต่อ <kbd>Space</kbd></button></div>${tbFoot(d)}</div>`;
+  if(d.mode!=='line'&&alive){
+    if(S.tb.reveal>Date.now())return `<div class="tb-full warn" role="alert"><div></div><div class="tb-warn"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="13" y="4" width="22" height="40" rx="5" fill="none" stroke="currentColor" stroke-width="3.4"/><path d="M4 24h6m28 0h6M7 19l-3 5 3 5m34-10 3 5-3 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>หันจอไปทางคนอื่น</b><span>อย่าแอบดูคำของตัวเองนะ</span><div class="tb-count" id="tbRevealN">${Math.max(1,Math.ceil((S.tb.reveal-Date.now())/1000))}</div></div>
+      <div class="btns" style="justify-content:center"><button class="btn big" data-act="tbShow">โชว์เลย</button></div></div>`;
+    if(!S.tb.hide){const len=Math.max(1,Array.from(String(me.word||'').replace(/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g,'')).length);
+      return `<div class="tb-full" style="--c:${okColor(me.color)}"><i class="tb-band"></i>
+        <div class="tb-top">${tbPawn(me,'sm')}<span>คำต้องห้ามของ <b>${esc(me.name)}</b></span></div>
+        <div class="tb-big" style="font-size:min(${Math.min(30,140/len).toFixed(1)}vw,${Math.min(42,170/len).toFixed(1)}vh)">${esc(me.word)}</div>
+        <div class="tb-under"><span class="tb-pill dark">เหลือ ${tbAlive(d).length}/${tbIn(d).length}</span><span class="tb-pill dark" id="tbClock">${tbClock(d)}</span>
+          ${(+me.rr||0)<1?'<button class="btn" data-act="tbReroll" data-id="'+esc(TB_ME)+'">เปลี่ยนคำ</button>':''}<button class="btn" data-act="tbHide">ซ่อนคำ · ใครโดน</button></div></div>`}
+    return `<div class="tb">${tbBar(d)}<div class="tb-hidden"><div><b>คำของคุณซ่อนอยู่</b><span class="muted small">กดใครโดนแล้วค่อยโชว์คำกลับ</span></div><button class="btn primary" data-act="tbShowAsk">โชว์คำ (หันจอออก) <kbd>H</kbd></button></div>${tbList(d,false)}${tbFoot(d)}</div>`;
+  }
+  const note=!inG?'<div class="banner tb-note">คุณเข้ามาตอนเกมเล่นอยู่ ดูไปก่อน รอบหน้าได้เล่นด้วย</div>'
+    :me.out?`<div class="tb-gone" style="--c:${okColor(me.color)}"><span>คุณตกรอบแล้ว คำของคุณคือ</span><b>${esc(me.word)}</b><span class="small">ยังช่วยกด “โดน” ให้คนอื่นได้</span></div>`:'';
+  return `<div class="tb">${tbBar(d)}${note}${tbList(d,!alive)}${tbFoot(d)}</div>`;
+}
+function tbEnd(d){
+  const ins=tbIn(d);const win=(d.winner||[]).map(id=>d.players[id]).filter(Boolean);const host=tbIsHost(d);
+  const rank=ins.slice().sort((a,b)=>(a.out?1:0)-(b.out?1:0)||(b.outAt||0)-(a.outAt||0));
+  return `<div class="tb"><div class="stage center">
+    ${win.length?`<div class="pawns" style="justify-content:center">${win.map(p=>tbPawn(p,'xl')).join('')}</div>`:''}
+    <div class="turnname">${win.length?esc(win.map(p=>p.name).join(' & '))+' ชนะ':'จบเกม'}</div>
+    <p class="muted">ใช้เวลา ${tbClock(d)} นาที</p>
+    <div class="rank">${rank.map((p,i)=>`<div><span class="no">${i+1}</span>${tbPawn(p)}<span><b>${esc(p.name)}</b><span class="small muted"> · ${esc(p.word)}</span></span><span class="small muted">${p.out?'ตกรอบ':'รอด'}</span></div>`).join('')}</div>
+    ${d.saved?'<p class="muted small">บันทึกผลเข้าบ้านแล้ว</p>':`<button class="btn" data-act="tbSave">บันทึกผลเข้าบ้าน</button>`}
+    <div class="btns" style="justify-content:center">${host?'<button class="btn primary big" data-act="tbStart">เล่นอีกรอบ <kbd>Space</kbd></button><button class="btn" data-act="tbToLobby">เปลี่ยนหมวด / แบบนั่ง</button>':'<span class="tb-pill">รอหัวห้องเริ่มรอบใหม่</span>'}
+      ${ins.some(p=>p.out)?'<button class="btn ghost" data-act="tbUndo">ย้อนคนล่าสุดที่โดน</button>':''}<button class="btn ghost" data-act="tbLeave">ออกจากห้อง</button></div>
+  </div></div>`;
+}
+function vTaboo(){
+  tbInit();
+  if(Store.mode!=='shared'||!Store.db)return `<div class="empty"><b>ต้องเปิดเว็บแบบออนไลน์</b><p>คำต้องห้ามเล่นหลายเครื่องผ่านห้องออนไลน์ เปิดเว็บบ้านจากลิงก์ปกติแล้วลองใหม่</p></div>`;
+  if(S.tb.code){
+    if(S.tb.subCode!==S.tb.code)setTimeout(tbSub,0);
+    setTimeout(()=>tbWake(tbWants()),0);
+    const d=S.tb.room;
+    if(!d||!S.tb.loaded)return `<div class="panel muted">กำลังเข้าห้อง ${esc(S.tb.code)}…</div>`;
+    if(d.status==='play')return tbPlay(d);
+    if(d.status==='end')return tbEnd(d);
+    return tbLobby(d);
+  }
+  return tbHome();
+}
+function tbWordsForm(cid){
+  const cats=tbCats();const c=cats.find(x=>x.id===cid)||cats[0];S.tbEdit=c.id;const m=tbMeta();
+  const edited=!c.custom&&(((m.add&&m.add[c.id])||[]).length||((m.del&&m.del[c.id])||[]).length);
+  openSheet('คำในคลังคำต้องห้าม',
+    `<div class="chips">${cats.map(x=>`<button class="chip" data-act="tbWordsForm" data-id="${esc(x.id)}" aria-pressed="${x.id===c.id}">${esc(x.name)} <span class="n">${tbWords(x.id).length}</span></button>`).join('')}<button class="chip" data-act="tbNewCat">+ หมวดใหม่</button></div>
+    ${c.custom?`<label class="field"><span>ชื่อหมวด</span><input type="text" id="tbCatName" maxlength="30" value="${esc(c.name)}"></label>`:''}
+    <label class="field"><span>คำในหมวด “${esc(c.name)}” (${tbWords(c.id).length} คำ)</span><textarea id="tbWordsIn" rows="10">${esc(tbWords(c.id).join(' '))}</textarea>
+      <small>คั่นแต่ละคำด้วยเว้นวรรค จุลภาค หรือขึ้นบรรทัดใหม่ · ลบคำที่ไม่อยากได้ทิ้ง หรือพิมพ์คำใหม่ต่อท้ายได้เลย · เปลี่ยนหมวดก่อนกดบันทึก คำที่แก้จะหาย</small></label>`,
+    `<button class="btn primary" data-act="tbWordsSave" data-id="${esc(c.id)}">บันทึก</button>${c.custom?`<button class="btn danger" data-act="tbCatDel" data-id="${esc(c.id)}">ลบหมวดนี้</button>`:edited?`<button class="btn ghost" data-act="tbWordsReset" data-id="${esc(c.id)}">กลับเป็นคำตั้งต้น</button>`:''}<button class="btn ghost" data-act="closeSheet">ปิด</button>`)}
+const tbEndAsk=()=>askEndGame();
+
+Object.assign(ACT,{
+  tbKid(t){const w=LS.get('tbWho',null)||{};LS.set('tbWho',w.kid===t.dataset.id?null:{kid:t.dataset.id});render()},
+  tbName(){const n=val('tbNameIn');if(!n){toast('พิมพ์ชื่อก่อน');return}LS.set('tbWho',{name:n.slice(0,20)});render()},
+  async tbCreate(){tbInit();const who=tbWho();if(!who){toast('เลือกชื่อก่อน');return}if(!Store.db)return;S.tb.busy=true;render();
+    let code=null;
+    try{for(let i=0;i<8;i++){const c=String(100000+Math.floor(Math.random()*900000));const s=await tbRef(c).get();if(!s.exists||Date.now()-((s.data()||{}).at||0)>12*3600e3){code=c;break}}}
+    catch(e){S.tb.busy=false;tbFail(e);render();return}
+    if(!code){S.tb.busy=false;toast('สร้างห้องไม่สำเร็จ ลองใหม่อีกครั้ง');render();return}
+    const now=Date.now();let cats=LS.get('tbCats',null);if(!Array.isArray(cats)||!cats.length)cats=TB_CATS.map(c=>c.id);
+    const room={code,at:now,host:TB_ME,mode:LS.get('tbMode','circle')==='line'?'line':'circle',cats,status:'lobby',round:0,paused:false,pausedAt:0,pausedTotal:0,startedAt:0,endedAt:0,winner:[],saved:false,used:[],
+      players:{[TB_ME]:Object.assign({},who,{joinedAt:now,left:false,inGame:false,word:'',rr:0,out:false,outAt:0,outBy:''})}};
+    try{await tbRef(code).set(room)}catch(e){S.tb.busy=false;tbFail(e);render();return}
+    S.tb.busy=false;S.tb.code=code;LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render()},
+  async tbJoin(){tbInit();const who=tbWho();if(!who){toast('เลือกชื่อก่อน');return}const code=val('tbCodeIn').replace(/\D/g,'');
+    if(code.length!==6){toast('ใส่รหัสห้อง 6 หลัก');return}if(!Store.db)return;
+    let d=null;try{const s=await tbRef(code).get();d=s.exists?s.data():null}catch(e){tbFail(e);return}
+    if(!d){toast('ไม่เจอห้อง '+code+' ลองตรวจรหัสอีกที');return}
+    const prev=(d.players||{})[TB_ME];const me=Object.assign({},who,{left:false});
+    if(!prev||prev.left)Object.assign(me,{joinedAt:Date.now(),inGame:false,word:'',rr:0,out:false,outAt:0,outBy:''});
+    S.tb.code=code;
+    if(!await tbPatch({players:{[TB_ME]:me}})){S.tb.code=null;return}
+    LS.set('tbRoom',code);S.tb.loaded=false;S.tb.room=null;tbSub();render();if(d.status==='play'&&(!prev||prev.left||!prev.inGame))toast('เกมกำลังเล่นอยู่ รอบหน้าได้เล่นด้วย')},
+  async tbLeave(){const d=S.tb.room;const o={players:{[TB_ME]:{left:true}}};
+    if(d&&d.host===TB_ME){const nx=tbPlayers(d).find(p=>p.pid!==TB_ME);if(nx)o.host=nx.pid}
+    await tbPatch(o);tbExit('ออกจากห้องแล้ว')},
+  tbKick(t){const d=S.tb.room;if(!tbIsHost(d))return;tbPatch({players:{[t.dataset.id]:{left:true}}})},
+  tbBeHost(){tbPatch({host:TB_ME})},
+  tbMode(t){const d=S.tb.room;if(!tbIsHost(d))return;const m=t.dataset.id==='line'?'line':'circle';LS.set('tbMode',m);tbPatch({mode:m})},
+  tbCat(t){const d=S.tb.room;if(!tbIsHost(d))return;const id=t.dataset.id;let c=(d.cats||[]).slice();
+    if(c.includes(id)){if(c.length<2){toast('ต้องเลือกอย่างน้อย 1 หมวด');return}c=c.filter(x=>x!==id)}else c.push(id);LS.set('tbCats',c);tbPatch({cats:c})},
+  tbStart(){tbStart()},
+  tbToLobby(){const d=S.tb.room;if(!tbIsHost(d))return;tbPatch({status:'lobby'})},
+  tbOut(t){tbAskOut(t.dataset.id)},
+  async tbOutGo(t){const pid=t.dataset.id;closeSheet();const d=S.tb.room;if(!d||d.status!=='play')return;const p=(d.players||{})[pid];if(!p||p.out)return;
+    if(!await tbPatch({players:{[pid]:{out:true,outAt:Date.now(),outBy:TB_ME}}}))return;
+    const now=S.tb.room;const left=tbAlive(now).filter(x=>x.pid!==pid);if(now.status==='play'&&left.length<=1)tbFinish()},
+  tbUndo(){tbUndo()},
+  tbPause(){tbPause()},
+  tbReroll(t){tbReroll(t.dataset.id)},
+  tbHide(){const d=S.tb&&S.tb.room;if(!d||d.status!=='play'||d.mode==='line')return;const me=tbMe(d);if(!me||!me.inGame||me.out)return;
+    if(S.tb.hide)ACT.tbShowAsk();else{S.tb.hide=true;S.tb.reveal=0;render()}},
+  tbShowAsk(){S.tb.hide=false;S.tb.reveal=Date.now()+3200;render()},
+  tbShow(){S.tb.reveal=0;render()},
+  tbEndAsk(){tbEndAsk()},
+  async tbSave(){const d=S.tb.room;if(!d||d.status!=='end'||d.saved)return;if(!await tbPatch({saved:true}))return;
+    const pl=p=>p.kid&&kidById(p.kid)?{id:p.kid}:{name:p.name,code:p.code,color:p.color};
+    const ins=tbIn(d);const win=(d.winner||[]).map(id=>d.players[id]).filter(Boolean);
+    try{await saveGameSession({game:'คำต้องห้าม',players:ins.map(pl),winners:win.map(pl),pts:{}});toast('บันทึกผลเข้าบ้านแล้ว')}catch(e){toast('บันทึกผลไม่สำเร็จ')}},
+  tbWordsForm(t){tbWordsForm(t&&t.dataset&&t.dataset.id||S.tbEdit||TB_CATS[0].id)},
+  async tbNewCat(){const m=JSON.parse(JSON.stringify(tbMeta()));m.cats=(m.cats||[]).concat({id:'u'+uid(),name:'หมวดใหม่'});
+    if(await Store.put('meta','taboo',m))tbWordsForm(m.cats[m.cats.length-1].id)},
+  async tbWordsSave(t){const id=t.dataset.id;const c=tbCats().find(x=>x.id===id);if(!c)return;
+    const words=Array.from(new Set(($('#tbWordsIn')||{value:''}).value.split(/[\s,，、]+/).map(s=>s.trim()).filter(Boolean)));
+    if(!words.length&&!c.custom){toast('ต้องมีคำอย่างน้อย 1 คำ');return}
+    const base=new Set(c.w);const m=JSON.parse(JSON.stringify(tbMeta()));m.add=m.add||{};m.del=m.del||{};
+    m.add[id]=words.filter(w=>!base.has(w));m.del[id]=c.w.filter(w=>!words.includes(w));
+    if(c.custom){const n=val('tbCatName');m.cats=(m.cats||[]).map(x=>x.id===id?Object.assign({},x,{name:n||x.name}):x)}
+    if(await Store.put('meta','taboo',m)){closeSheet();toast('บันทึกคำแล้ว '+words.length+' คำ');render()}},
+  async tbWordsReset(t){const id=t.dataset.id;const m=JSON.parse(JSON.stringify(tbMeta()));if(m.add)delete m.add[id];if(m.del)delete m.del[id];
+    if(await Store.put('meta','taboo',m)){toast('กลับเป็นคำตั้งต้นแล้ว');tbWordsForm(id)}},
+  async tbCatDel(t){const id=t.dataset.id;const m=JSON.parse(JSON.stringify(tbMeta()));m.cats=(m.cats||[]).filter(x=>x.id!==id);if(m.add)delete m.add[id];if(m.del)delete m.del[id];
+    if(await Store.put('meta','taboo',m)){closeSheet();toast('ลบหมวดแล้ว');render()}}
+});
+document.addEventListener('keydown',e=>{
+  if(!(S.tab==='tools'&&S.tool==='taboo'&&S.tb&&S.tb.code&&S.tb.room)||!$('#sheet').hidden||e.isComposing)return;
+  const a=document.activeElement;if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;
+  const d=S.tb.room;
+  if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.code==='KeyZ'){e.preventDefault();tbUndo();return}
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.code==='Space'){e.preventDefault();if(d.status==='play')tbPause();else if(tbIsHost(d))tbStart();return}
+  const dig=/^(Digit|Numpad)([1-9])$/.exec(e.code||'');
+  if(dig){if(d.status==='play'){const p=tbIn(d)[+dig[2]-1];if(p){e.preventDefault();tbAskOut(p.pid)}}return}
+  if(e.code==='KeyH'){e.preventDefault();ACT.tbHide();return}
+  if(e.code==='KeyR'){e.preventDefault();tbReroll(TB_ME)}
+});
+
+/* ---------- ทุกเกม: ⌘/Ctrl + Enter = จบเกม (ถามยืนยันก่อน) ---------- */
+function endInfo(){
+  if(S.tab!=='tools'||!S.tool)return null;
+  switch(S.tool){
+    case 'bsgs':{const s=S.bs;if(!s||s.phase==='setup'||s.phase==='end')return null;return {name:'Baan Suay Game Show',note:'ไปหน้าสรุปคะแนนเลย ช่องที่ยังไม่เปิดจะไม่ได้เล่น',go:()=>ACT.bsEndNow()}}
+    case 'uno':{const u=S.uno;if(!u||u.phase!=='play')return null;return {name:'UNO',note:'ไปหน้าเลือกว่าใครลงไพ่ใบสุดท้าย',go:()=>ACT.unoEnd()}}
+    case 'score':{const s=S.score;if(!s||s.phase!=='play')return null;
+      if(s.mode==='coop')return {name:s.game||'เกมช่วยกัน',note:'ทีมผ่านด่านมั้ย',choices:[{label:'ผ่านด่าน',go:()=>ACT.scCoop({dataset:{id:'win'}})},{label:'ยังไม่ผ่าน',go:()=>ACT.scCoop({dataset:{id:'lose'}})}]};
+      return {name:s.game||'กระดานคะแนน',note:'ไปหน้าสรุปอันดับ',go:()=>ACT.scEnd()}}
+    case 'flip7':{const f=S.flip;if(!f||f.phase!=='play'||!(f.players||[]).length)return null;return {name:'Flip 7',note:'ไปหน้าสรุปแต้ม',go:()=>ACT.f7End()}}
+    case 'poker':{const P=S.poker;if(!P)return null;if(P.h&&(P.phase==='hand'||P.phase==='show'))return {block:'ยังอยู่กลางมือ เล่นมือนี้ให้จบก่อนแล้วค่อยจบเกม'};
+      if(P.phase!=='ready'||!(P.players||[]).length)return null;return {name:'โป๊กเกอร์',note:'ไปหน้าสรุปชิป',go:()=>ACT.pbEnd()}}
+    case 'taboo':{const d=S.tb&&S.tb.room;if(!d||d.status!=='play')return null;const a=tbAlive(d);
+      return {name:'คำต้องห้าม · ห้อง '+(d.code||S.tb.code),note:a.length?'คนที่ยังไม่ตกรอบ ('+a.map(p=>p.name).join(', ')+') ชนะร่วมกัน':'',go:()=>tbFinish()}}
+  }
+  return null;
+}
+function askEndGame(){const t=endInfo();if(!t){toast('ตอนนี้ยังไม่มีเกมที่กำลังเล่นอยู่');return}if(t.block){toast(t.block);return}
+  S.endGo=t;const cs=t.choices||[{label:'จบเกม',go:t.go}];const one=cs.length===1;
+  openSheet('จบเกมเลยมั้ย?',`<p><b class="tb-endname">${esc(t.name)}</b>${t.note?`<br><span class="muted">${esc(t.note)}</span>`:''}</p>${one?'<p class="muted small">กด Enter หรือ ⌘/Ctrl + Enter อีกครั้งเพื่อยืนยัน · Esc เพื่อเล่นต่อ</p>':''}`,
+    cs.map((c,i)=>`<button class="btn ${i?'':'primary'} big" data-act="endGo" data-id="${i}" ${one?'data-endgo data-enter':''}>${esc(c.label)}</button>`).join('')+'<button class="btn ghost big" data-act="closeSheet">เล่นต่อ</button>')}
+ACT.endGo=t=>{const g=S.endGo;S.endGo=null;closeSheet();if(!g)return;const c=(g.choices||[{go:g.go}])[+t.dataset.id||0];if(c&&c.go)c.go()};
+window.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.isComposing)return;
+  if(!$('#sheet').hidden){const b=$('#sheetCard [data-endgo]');if(b){e.preventDefault();e.stopImmediatePropagation();b.click()}return}
+  if(S.tab!=='tools'||!S.tool)return;
+  e.preventDefault();e.stopImmediatePropagation();askEndGame();
+},true);
+/* Enter confirms the main button of a small confirm popup */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.metaKey||e.ctrlKey||e.altKey||e.shiftKey||e.isComposing||$('#sheet').hidden)return;
+  const a=document.activeElement;if(a&&(a.tagName==='TEXTAREA'||(a.tagName==='BUTTON'&&$('#sheetCard').contains(a))))return;
+  const b=$('#sheetCard [data-enter]');if(b){e.preventDefault();b.click()}
+});
+
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-act]');
   if(!t){if(e.target.id==='sheet')closeSheet();return}
@@ -2616,7 +3008,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-24T12:40:00+07:00';
+const SITE_UPDATED='2026-10-24T18:10:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();

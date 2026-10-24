@@ -16,6 +16,11 @@ service cloud.firestore {
       allow create, update: if google() && request.auth.uid == uid;
       allow delete: if isAdmin();
     }
+    // ห้องเกมคำต้องห้าม: ทุกคนที่เปิดเว็บสร้างห้อง เข้าห้อง และเล่นในห้องได้ พี่ลบห้องได้
+    match /rooms/{code} {
+      allow read, create, update: if signedIn() && code.matches('^[0-9]{6}$');
+      allow delete: if isAdmin();
+    }
     // ข้อมูลบ้าน: ทุกคนอ่านได้ น้องเพิ่มผลควิซ/เกม/โพสต์ได้ ที่เหลือแก้ได้เฉพาะพี่
     match /{col}/{id} {
       allow read: if signedIn();
