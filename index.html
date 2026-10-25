@@ -526,6 +526,8 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .pb-pothead b{font:700 1.5rem/1 var(--f-head);font-variant-numeric:tabular-nums}
 .pb-picks{display:flex;gap:8px;flex-wrap:wrap}
 .pb-pick{display:inline-flex;gap:8px;align-items:center;min-height:44px;padding:6px 14px 6px 6px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;font:500 .98rem var(--f-head);color:var(--ink)}
+.pb-pick kbd{margin-left:6px}
+@media (hover:none){.pb-pick kbd{display:none}}
 .pb-pick[aria-pressed="true"]{border-color:var(--good);background:var(--good-bg);box-shadow:inset 0 0 0 1px var(--good)}
 .pb-last{display:grid;gap:8px;padding:14px;border-radius:16px;background:var(--good-bg);border:1px solid color-mix(in srgb,var(--good) 40%,transparent)}
 .pb-lastrow{font-size:1rem}
@@ -2612,16 +2614,16 @@ function pbHandView(P){
   </div>`;
 }
 function pbShowView(P){
-  const h=P.h;const pots=pbPots(h);const w=P.ui.win||{};const ok=pots.every((pt,k)=>(w[k]||[]).length);const many=pots.length>1;
+  const h=P.h;const pots=pbPots(h);const w=P.ui.win||{};const ok=pots.every((pt,k)=>(w[k]||[]).length);const many=pots.length>1;let nk=0;const kn=()=>{nk++;return nk<=10?`<kbd>${nk%10}</kbd>`:''};
   return `<div class="pb">
     <div class="pb-top"><div><span class="label">มือที่ ${h.no}</span><div class="pb-street">เปิดไพ่โชว์</div></div><div class="pb-pot"><span class="label">กองกลาง</span><b>${pbN(pbPot(h))}</b></div></div>
     <div class="pb-deal">${h.runout?'<b>ไม่มีใครเดิมพันต่อได้แล้ว</b> เปิดไพ่กลางให้ครบ 5 ใบ แล้ว':''}ทุกคนที่ยังไม่ Fold เปิดไพ่ แตะเลือกคนชนะ${many?'ของแต่ละกอง':''} ถ้าเสมอแตะได้หลายคน ชิปจะแบ่งเท่ากัน</div>
     ${many?'<p class="muted small" style="margin:0">มีกองย่อยเพราะมีคน All-in ด้วยชิปน้อยกว่าคนอื่น คนนั้นชนะได้เฉพาะกองที่ตัวเองลงถึง</p>':''}
     ${pots.map((pt,k)=>`<div class="pb-potbox"><div class="pb-pothead"><h3>${many?(k?'กองย่อย '+k:'กองหลัก'):'กองกลาง'}</h3><b>${pbN(pt.amt)}</b></div>
-      ${pt.el.length>1?`<div class="pb-picks" role="group" aria-label="คนชนะ">${pt.el.map(i=>`<button type="button" class="pb-pick" data-act="pbWin" data-k="${k}" data-id="${i}" aria-pressed="${(w[k]||[]).includes(i)}">${playerPawn(P.players[i],'sm')}<span>${esc(playerName(P.players[i]))}</span></button>`).join('')}</div>${many?`<p class="muted small" style="margin:0">ลุ้นกองนี้ได้ ${pt.el.length} คน</p>`:''}`
+      ${pt.el.length>1?`<div class="pb-picks" role="group" aria-label="คนชนะ">${pt.el.map(i=>`<button type="button" class="pb-pick" data-act="pbWin" data-k="${k}" data-id="${i}" aria-pressed="${(w[k]||[]).includes(i)}">${kn()}${playerPawn(P.players[i],'sm')}<span>${esc(playerName(P.players[i]))}</span></button>`).join('')}</div>${many?`<p class="muted small" style="margin:0">ลุ้นกองนี้ได้ ${pt.el.length} คน</p>`:''}`
         :`<p class="small" style="margin:0">เป็นของ <b>${esc(playerName(P.players[pt.el[0]]))}</b> ไม่ต้องเลือก</p>`}</div>`).join('')}
     <div class="btns"><button class="btn primary big" data-act="pbPay" ${ok?'':'disabled'}>${ok?'จ่ายชิป':'เลือกคนชนะให้ครบก่อน'}</button><button class="btn" data-act="pbUndo" ${P.hist.length?'':'disabled'}>ย้อนกลับ</button></div>
-    <div class="f7-keys"><span><kbd>Enter</kbd> จ่ายชิป</span><span><kbd>⌘/Ctrl</kbd> <kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys">${nk?`<span>กดเลข <kbd>1</kbd>${nk>1?`–<kbd>${Math.min(nk,10)%10}</kbd>`:''} เลือกคนชนะตามเลขบนปุ่ม</span>`:''}<span><kbd>Enter</kbd> จ่ายชิป</span><span><kbd>⌘/Ctrl</kbd> <kbd>Z</kbd> ย้อนกลับ</span></div>
     <details class="rules"><summary>สิ่งที่เกิดในมือนี้</summary><ol class="pb-log">${h.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>
   </div>`;
 }
@@ -2733,6 +2735,8 @@ document.addEventListener('keydown',e=>{
     else if(ent&&P.ui.open)go(()=>pbOpenRz(P));
     else if(e.key==='Escape'&&(P.ui.open||P.ui.allin))go(()=>{P.ui.allin=false;pbCloseRz(P)});
     return}
+  const dg=/^(Digit|Numpad)([0-9])$/.exec(k||'');
+  if(P.phase==='show'&&h&&dg){const b=document.querySelectorAll('.pb-pick')[(+dg[2]+9)%10];if(b)go(()=>b.click());return}
   if(P.phase==='show'&&h){if(ent){const w=P.ui.win||{};if(pbPots(h).every((pt,j)=>(w[j]||[]).length))go(()=>ACT.pbPay())}return}
   if(P.phase==='end')return;
   if(P.phase==='ready'&&P.players.length){if((ent||k==='KeyN')&&pbRoles(P))go(()=>ACT.pbDeal());return}
@@ -3291,7 +3295,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-25T19:40:00+07:00';
+const SITE_UPDATED='2026-10-25T19:45:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
