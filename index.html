@@ -938,9 +938,13 @@ async function extLoad(loud){
   try{const raw=b64d(el.textContent.trim());const key=await xbKey(pass,raw.slice(0,16));
     const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(16,28)},key,raw.slice(28));
     const code=await xbUnzip(new Uint8Array(pt));XB.key=key;XB.state='on';
-    (new Function('H',code))(window.House);if(loud)toast('เปิดส่วนเสริมแล้ว');render();
+    await xbRun(code);if(loud)toast('เปิดส่วนเสริมแล้ว');render();
   }catch(e){XB.state=e&&e.name==='OperationError'?'bad':'off';if(loud)toast(XB.state==='bad'?'รหัสไม่ถูก':'เปิดส่วนเสริมไม่ได้ ลองอัปเดตเบราว์เซอร์');render()}
 }
+/* run the unlocked code; where eval is blocked by the page's security policy, load it as a script instead */
+async function xbRun(code){try{(new Function('H',code))(window.House)}catch(e){if(!(e instanceof EvalError))throw e;
+  const u=URL.createObjectURL(new Blob(['(function(H){'+code+'\n})(window.House)'],{type:'text/javascript'}));
+  await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=u;sc.onload=ok;sc.onerror=()=>no(new Error('blocked'));document.head.appendChild(sc)})}}
 async function xbSeal(obj){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},XB.key,new TextEncoder().encode(JSON.stringify(obj))));
   const out=new Uint8Array(12+ct.length);out.set(iv);out.set(ct,12);return b64e(out)}
 async function xbOpen(str){const raw=b64d(str);const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},XB.key,raw.slice(12));return JSON.parse(new TextDecoder().decode(pt))}
