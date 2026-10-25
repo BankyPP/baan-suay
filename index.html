@@ -498,6 +498,7 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .pb-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pb-acts .btn{min-height:58px;font-size:1.08rem;padding:0 10px}
 .pb-allin{border-color:var(--star);color:var(--ink);background:color-mix(in srgb,var(--star) 18%,var(--surface))}
+.pb-allin.arm{background:var(--bad);border-color:var(--bad);color:#fff;font-size:.98rem;line-height:1.25}
 .pb-rz{display:grid;gap:10px;padding:12px;border-radius:14px;background:var(--sunk)}
 .pb-rz .field>span{line-height:1.45}
 .pb-rzrow{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;gap:8px}
@@ -2557,7 +2558,7 @@ function pbSetupView(P){
     <div class="field"><span>Blind (Small / Big) ลงบังคับก่อนแจกไพ่ทุกมือ</span>
       <div class="chips">${PB_BLINDS.map(([a,b])=>`<button class="chip" data-act="pbBlindC" data-id="${a}/${b}" aria-pressed="${P.sb===a&&P.bb===b}">${a}/${b}</button>`).join('')}</div>
       <div class="pb-two"><label class="field"><span>Small blind</span><input type="text" inputmode="numeric" id="pbSBIn" value="${P.sb}" data-change="pbSetup"></label><label class="field"><span>Big blind</span><input type="text" inputmode="numeric" id="pbBBIn" value="${P.bb}" data-change="pbSetup"></label></div></div>
-    <div class="btns"><button class="btn primary big" data-act="pbGo" ${o.length>=2?'':'disabled'}>${o.length>=2?`เข้าโต๊ะ ${o.length} คน · คนละ ${pbN(P.start)}`:'ต้องมีอย่างน้อย 2 คน'}</button>${o.length?'<button class="btn ghost" data-act="pbClear">ล้างคนเล่น</button>':''}</div>
+    <div class="btns"><button class="btn primary big" data-act="pbGo" ${o.length>=2?'':'disabled'}>${o.length>=2?`เข้าโต๊ะ ${o.length} คน · คนละ ${pbN(P.start)}`:'ต้องมีอย่างน้อย 2 คน'}</button>${o.length>=2?'<span class="f7-keys"><span><kbd>Enter</kbd> เข้าโต๊ะ</span></span>':''}${o.length?'<button class="btn ghost" data-act="pbClear">ล้างคนเล่น</button>':''}</div>
   </div>`;
 }
 function pbLastHTML(P){
@@ -2575,7 +2576,7 @@ function pbReadyView(P){
     <div class="pb-top"><div><span class="label">Blind ${pbN(P.sb)}/${pbN(P.bb)}${P.hands?' · เล่นไปแล้ว '+P.hands+' มือ':''}</span><div class="pb-street">${P.hands?'มือที่ '+(P.hands+1):'พร้อมเริ่มมือแรก'}</div></div><div class="pb-pot"><span class="label">ชิปทั้งโต๊ะ</span><b>${pbN(total)}</b></div></div>
     <p class="muted small" style="margin:0">เรียงตามที่นั่ง แตะตัวคนเพื่อย้ายปุ่ม Dealer (D) ปกติปุ่มเลื่อนไปทางซ้ายเองทุกมือ</p>
     <div class="pb-seats">${P.players.map((p,i)=>pbSeat(P,i,{roles:r||{},tap:'pbDealer'})).join('')}</div>
-    ${r?`<button class="btn primary big" data-act="pbDeal">เริ่มมือที่ ${P.hands+1}</button>`:'<div class="f7-goal" role="status"><b>เหลือคนมีชิปไม่ถึง 2 คน</b> · ซื้อชิปเพิ่มให้ใครสักคน หรือกดจบเกม</div>'}
+    ${r?`<button class="btn primary big" data-act="pbDeal">เริ่มมือที่ ${P.hands+1}</button><div class="f7-keys"><span><kbd>Enter</kbd> เริ่มมือ</span><span><kbd>⌘/Ctrl</kbd> <kbd>Z</kbd> ย้อนกลับ</span><span><kbd>⌘/Ctrl</kbd> <kbd>Enter</kbd> จบเกม</span></div>`:'<div class="f7-goal" role="status"><b>เหลือคนมีชิปไม่ถึง 2 คน</b> · ซื้อชิปเพิ่มให้ใครสักคน หรือกดจบเกม</div>'}
     <div class="btns"><button class="btn sm" data-act="pbChipsForm">ชิปและซื้อเพิ่ม</button><button class="btn sm" data-act="pbBlindForm">เปลี่ยน Blind</button><button class="btn sm" data-act="pbAddForm">+ เพิ่มคนเล่น</button><button class="btn sm" data-act="pbUndo" ${P.hist.length?'':'disabled'}>ย้อนกลับ</button></div>
     <div class="btns"><button class="btn" data-act="pbEnd">จบเกม</button>${S.confirm==='pbnew'?'<button class="btn dangerfill" data-act="pbNew">ยืนยัน: ล้างชิปแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="pbnew">เริ่มเกมใหม่</button>'}</div>
   </div>`;
@@ -2593,7 +2594,7 @@ function pbHandView(P){
       <div class="pb-acts">
         <button class="btn big danger" data-act="pbDo" data-id="fold">Fold</button>
         ${need>0?`<button class="btn big primary" data-act="pbDo" data-id="call">${callA>=p.chips?'Call All-in '+pbN(callA):'Call '+pbN(callA)}</button>`:'<button class="btn big primary" data-act="pbDo" data-id="check">Check</button>'}
-        ${can?`<button class="btn big" data-act="pbRz" aria-expanded="${P.ui.open?'true':'false'}">${h.curBet>0?'Raise':'Bet'}</button><button class="btn big pb-allin" data-act="pbDo" data-id="allin">All-in ${pbN(p.chips)}</button>`:''}
+        ${can?`<button class="btn big" data-act="pbRz" aria-expanded="${P.ui.open?'true':'false'}">${h.curBet>0?'Raise':'Bet'}</button><button class="btn big pb-allin${P.ui.allin?' arm':''}" data-act="pbDo" data-id="allin">${P.ui.allin?'แตะอีกครั้ง ยืนยัน All-in '+pbN(p.chips):'All-in '+pbN(p.chips)}</button>`:''}
       </div>
       ${can&&P.ui.open?`<div class="pb-rz">
         <label class="field" for="pbRzIn"><span>${h.curBet>0?'Raise to':'Bet'} (ยอดรวมของเราในรอบนี้) · ไม่มีขั้นต่ำ แค่ต้องมากกว่า ${pbN(h.curBet)} · สูงสุด ${pbN(r.max)}</span></label>
@@ -2601,7 +2602,9 @@ function pbHandView(P){
         <div class="pb-quick"><button type="button" class="chip" data-act="pbQuick" data-id="half">ครึ่งกอง</button><button type="button" class="chip" data-act="pbQuick" data-id="pot">เต็มกอง</button><button type="button" class="chip" data-act="pbQuick" data-id="max">All-in</button></div>
         <div class="pb-rznow" id="pbRzNow">${pbRzNow(P,rz)}</div>
         <button type="button" class="btn primary big" id="pbRzGo" data-act="pbRaiseGo">${pbRzLabel(P,rz)}</button>
+        <div class="f7-keys"><span>พิมพ์จำนวนแล้วกด <kbd>Enter</kbd></span><span><kbd>Esc</kbd> ปิด</span></div>
       </div>`:''}
+      <div class="f7-keys"><span><kbd>F</kbd> Fold</span><span><kbd>C</kbd> ${need>0?'Call':'Check'}</span>${can?`<span><kbd>${h.curBet>0?'R':'B'}</kbd> ${h.curBet>0?'Raise':'Bet'}</span><span><kbd>A</kbd> All-in (กด 2 ครั้ง)</span>`:''}<span><kbd>⌘/Ctrl</kbd> <kbd>Z</kbd> ย้อนกลับ</span></div>
     </div>
     <div class="pb-seats">${P.players.map((x,j)=>pbSeat(P,j,{roles})).join('')}</div>
     <div class="btns"><button class="btn" data-act="pbUndo" ${P.hist.length?'':'disabled'} title="${esc(P.hist.length?'ย้อน: '+P.hist[P.hist.length-1].label:'')}">ย้อนกลับ</button>${S.confirm==='pbcancel'?'<button class="btn dangerfill" data-act="pbCancel">ยืนยัน: คืนชิปทุกคนแล้วยกเลิกมือนี้</button><button class="btn ghost" data-act="cancelAsk">ไม่ยกเลิก</button>':'<button class="btn ghost" data-act="ask" data-id="pbcancel">ยกเลิกมือนี้</button>'}</div>
@@ -2618,6 +2621,7 @@ function pbShowView(P){
       ${pt.el.length>1?`<div class="pb-picks" role="group" aria-label="คนชนะ">${pt.el.map(i=>`<button type="button" class="pb-pick" data-act="pbWin" data-k="${k}" data-id="${i}" aria-pressed="${(w[k]||[]).includes(i)}">${playerPawn(P.players[i],'sm')}<span>${esc(playerName(P.players[i]))}</span></button>`).join('')}</div>${many?`<p class="muted small" style="margin:0">ลุ้นกองนี้ได้ ${pt.el.length} คน</p>`:''}`
         :`<p class="small" style="margin:0">เป็นของ <b>${esc(playerName(P.players[pt.el[0]]))}</b> ไม่ต้องเลือก</p>`}</div>`).join('')}
     <div class="btns"><button class="btn primary big" data-act="pbPay" ${ok?'':'disabled'}>${ok?'จ่ายชิป':'เลือกคนชนะให้ครบก่อน'}</button><button class="btn" data-act="pbUndo" ${P.hist.length?'':'disabled'}>ย้อนกลับ</button></div>
+    <div class="f7-keys"><span><kbd>Enter</kbd> จ่ายชิป</span><span><kbd>⌘/Ctrl</kbd> <kbd>Z</kbd> ย้อนกลับ</span></div>
     <details class="rules"><summary>สิ่งที่เกิดในมือนี้</summary><ol class="pb-log">${h.log.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>
   </div>`;
 }
@@ -2668,8 +2672,10 @@ Object.assign(ACT,{
     pbReset(P);P.phase='ready';S.confirm=null;persist();render();window.scrollTo({top:0})},
   pbDealer(t){const P=pb();const i=+t.dataset.id;if(!pbHas(P,i)){toast('คนนี้หมดชิปแล้ว');return}P.dealer=i;P.fixD=true;persist();render()},
   pbDeal(){const P=pb();S.confirm=null;if(!pbStartHand(P)){toast('ต้องมีคนมีชิปอย่างน้อย 2 คน');return}persist();render();window.scrollTo({top:0})},
-  pbDo(t){const P=pb();S.confirm=null;const k=t.dataset.id;pbAct(P,k);persist();render()},
-  pbRz(){const P=pb();P.ui.open=!P.ui.open;if(P.ui.open&&!Number.isFinite(P.ui.rz))P.ui.rz=pbMinTo(P,P.h.cur).def;persist();render();
+  pbDo(t){const P=pb();S.confirm=null;const k=t.dataset.id;
+    if(k==='allin'&&!P.ui.allin){P.ui.allin=true;P.ui.open=false;persist();render();return}
+    pbAct(P,k);persist();render()},
+  pbRz(){const P=pb();P.ui.allin=false;P.ui.open=!P.ui.open;if(P.ui.open&&!Number.isFinite(P.ui.rz))P.ui.rz=pbMinTo(P,P.h.cur).def;persist();render();
     if(P.ui.open){const el=document.getElementById('pbRzIn');if(el&&window.innerWidth>700){el.focus();el.select()}}},
   pbStep(t){const P=pb();const h=P.h;if(!h)return;const r=pbMinTo(P,h.cur);const cur=pbInt(val('pbRzIn'));const base=Number.isFinite(cur)?cur:r.def;
     P.ui.rz=Math.max(r.min,Math.min(r.max,base+(+t.dataset.id)*Math.max(1,P.bb)));persist();render()},
@@ -2708,11 +2714,33 @@ Object.assign(ACT,{
 });
 document.addEventListener('keydown',e=>{
   if(!(S.tab==='tools'&&S.tool==='poker'&&S.poker)||!$('#sheet').hidden||e.isComposing)return;
-  const a=document.activeElement;
-  if(a&&a.id==='pbRzIn'){if(e.key==='Enter'){e.preventDefault();ACT.pbRaiseGo()}return}
+  const P=S.poker,a=document.activeElement;
+  if(a&&a.id==='pbRzIn'){if(e.key==='Enter'){e.preventDefault();ACT.pbRaiseGo()}else if(e.key==='Escape'){e.preventDefault();pbCloseRz(P)}return}
   if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
-  if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.pbUndo()}
+  if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.pbUndo();return}
+  if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
+  /* a button that has keyboard focus keeps its own Enter/Space */
+  if((e.key==='Enter'||e.key===' ')&&a&&a.tagName==='BUTTON')return;
+  const go=f=>{e.preventDefault();f()};const k=e.code;const ent=e.key==='Enter';
+  const h=P.h;
+  if(P.phase==='hand'&&h){if(h.cur<0)return;
+    const i=h.cur,s=h.ps[i];const need=Math.max(0,h.curBet-s.bet);const can=pbCanRaise(P,i);const act=id=>go(()=>ACT.pbDo({dataset:{id}}));
+    if(k==='KeyF')act('fold');
+    else if(k==='KeyC')act(need>0?'call':'check');
+    else if(k==='KeyK'&&need===0)act('check');
+    else if((k==='KeyB'||k==='KeyR')&&can)go(()=>pbOpenRz(P));
+    else if(k==='KeyA'&&can)act('allin');
+    else if(ent&&P.ui.open)go(()=>pbOpenRz(P));
+    else if(e.key==='Escape'&&(P.ui.open||P.ui.allin))go(()=>{P.ui.allin=false;pbCloseRz(P)});
+    return}
+  if(P.phase==='show'&&h){if(ent){const w=P.ui.win||{};if(pbPots(h).every((pt,j)=>(w[j]||[]).length))go(()=>ACT.pbPay())}return}
+  if(P.phase==='end')return;
+  if(P.phase==='ready'&&P.players.length){if((ent||k==='KeyN')&&pbRoles(P))go(()=>ACT.pbDeal());return}
+  if(ent&&P.players.length>=2)go(()=>ACT.pbGo());
 });
+function pbOpenRz(P){P.ui.allin=false;if(!P.ui.open){P.ui.open=true;if(!Number.isFinite(P.ui.rz))P.ui.rz=pbMinTo(P,P.h.cur).def;persist();render()}
+  const el=document.getElementById('pbRzIn');if(el){el.focus();el.select()}}
+function pbCloseRz(P){P.ui.open=false;persist();render()}
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.id==='pbRzIn'&&S.poker&&S.poker.h))return;const v=pbInt(t.value);S.poker.ui.rz=Number.isFinite(v)?v:null;LS.set('poker',S.poker);
   const b=document.getElementById('pbRzGo');if(b)b.textContent=pbRzLabel(S.poker,v);const n=document.getElementById('pbRzNow');if(n)n.innerHTML=pbRzNow(S.poker,v)});
 function scoreAdd(k,n){const s=S.score;s.hist=s.hist||[];if(k==='team')s.team=(s.team||0)+n;else{const p=s.players[+k];if(!p)return;p.pts=(p.pts||0)+n}s.hist.push({k,n});persist();render()}
@@ -3263,7 +3291,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-25T19:25:00+07:00';
+const SITE_UPDATED='2026-10-25T19:40:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
