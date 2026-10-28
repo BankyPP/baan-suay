@@ -784,6 +784,29 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .cw-clue.x{border-left-color:var(--line)}
 .cw-clue.done span{color:var(--muted)}
 .cw-board .wa-msg{top:-6px}
+/* ---------- Crossword builder (โหมดพี่) ---------- */
+.xw-box{display:grid;gap:12px}
+.xw-box h3{font-size:1rem}
+.cw-cell.blk{background:var(--cw-line);box-shadow:0 0 0 1px var(--cw-line)}
+.cw-cell.dead{box-shadow:inset 0 0 0 2px var(--cw-bad),0 0 0 1px var(--cw-line)}
+.xw-tools{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.xw-help{display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.xw-pat{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.xw-pat b{font:600 .95rem var(--f-head)}
+.xw-pat code{font:700 1.15rem/1.2 ui-monospace,Menlo,monospace;letter-spacing:.06em}
+.xw-sug{display:flex;gap:6px;flex-wrap:wrap;max-height:220px;overflow:auto}
+.xw-sug button{font:600 .9rem/1 var(--f-body);letter-spacing:.04em;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.xw-sug button.no{opacity:.4;text-decoration:line-through}
+.xw-warn{font-size:.9rem;color:var(--bad)}
+.xw-status{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:.86rem;color:var(--muted)}
+.xw-status .ok{color:var(--good)}
+.xw-status .bad{color:var(--bad)}
+.xw-clues{display:grid;gap:8px}
+.xw-clues h3{font-size:1rem}
+.xw-clue{display:grid;gap:4px}
+.xw-clue>span{font-size:.86rem;color:var(--muted)}
+.xw-clue>span b{font:600 .86rem var(--f-head);color:var(--ink)}
+.xw-clue code{font:600 .86rem ui-monospace,Menlo,monospace;letter-spacing:.08em}
 @media (max-width:420px){.wa-board{gap:6px}.wa-tile{border-radius:8px}.wa-tile span{font-size:.92rem}}
 </style>
 </head>
@@ -890,7 +913,7 @@ function md(src){
 const plain=s=>String(s||'').replace(/[#*>`_^{}]/g,'').replace(/\s+/g,' ').trim();
 
 /* ---------- storage: shared database in the artifact, browser storage elsewhere ---------- */
-const COLS=['kids','lessons','log','posts','games','sessions','meta','boards'];
+const COLS=['kids','lessons','log','posts','games','sessions','meta','boards','xwords'];
 const Store={
   mode:'loading', d:{kids:{},lessons:{},log:{},posts:{},games:{},sessions:{},meta:{},boards:{}}, db:null,
   async init(){
@@ -3438,7 +3461,7 @@ const WA_COLORS=['เหลือง','เขียว','น้ำเงิน',
 const WA_EMO=['🟨','🟩','🟦','🟪'];
 const WA_KINDS=[['all','ทั้งหมด'],['main','ชุดหลัก'],['bonus','BONUS'],['med','MED']];
 S.wa=Object.assign({view:'home',pid:null,kind:'all',who:[]},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;S.wa.busy=false;S.wa.msg=null;
-const waSave=()=>{const {view,pid,cid,kind,who}=S.wa;LS.set('wa',{view,pid,cid,kind,who})};
+const waSave=()=>{const {view,pid,cid,bid,kind,who}=S.wa;LS.set('wa',{view,pid,cid,bid,kind,who})};
 const waTeam=()=>(S.wa.who||[]).filter(id=>kidById(id)).sort();
 const waKey=p=>p.id+'@'+waTeam().join(',');
 const waGame=p=>'Connections '+p.t;
@@ -3541,6 +3564,7 @@ function vWords(){
   const w=S.wa;
   if(w.view==='conn'&&w.pid){const p=waFind(w.pid);if(p)return waPlayView(p);w.pid=null}
   if(w.view==='conn')return waListView();
+  if(w.view==='xbuild'){if(S.bro&&(XW.id=XW.id||w.bid))return xwBuildView();w.view='cross';w.bid=null}
   if(w.view==='cross'){if(w.cid){const p=cwFind(w.cid);if(p)return cwPlayView(p);w.cid=null}return cwListView()}
   const all=waPlayable();const won=all.filter(p=>(waG(p)||{}).over==='win').length;
   return `<section class="sec">
@@ -3550,7 +3574,7 @@ function vWords(){
         <b>Connections</b><span>หา 4 กลุ่ม กลุ่มละ 4 คำที่มีอะไรเหมือนกัน พลาดได้ 5 ครั้ง มีคำใบ้ 3 ระดับ</span>
         <span>${all.length} โจทย์ · ผ่านแล้ว ${won}</span></button>
       <button class="wa-game" data-act="waView" data-id="cross"><div class="wa-xmini">${'0110110001010101000101101'.split('').map(c=>`<i class="${c==='1'?'k':''}"></i>`).join('')}</div>
-        <b>Crossword</b><span>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</span><span>${CW_PUZ.length} โจทย์ · เสร็จแล้ว ${CW_PUZ.filter(p=>(cwG(p)||{}).over==='win').length}</span></button>
+        <b>Crossword</b><span>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</span><span>${cwAll().length} โจทย์ · เสร็จแล้ว ${cwAll().filter(p=>(cwG(p)||{}).over==='win').length}</span></button>
     </div>
     ${waSyncLine()}
   </section>`;
@@ -3627,7 +3651,7 @@ function waAfter(){
     while((sp.scrollWidth>t.clientWidth-6||sp.scrollHeight>t.clientHeight-6)&&fs>9&&n++<30){fs-=.5;sp.style.fontSize=fs+'px'}});
   if(S.wa.fx){S.wa.fx=null}
   {const p=waCur();const g=p&&waG(p);if(g&&g.over&&!g.saved)waRecord(p,g)}
-  cwAfter();{const q=cwCur();const h=q&&cwG(q);if(h&&h.over&&!h.saved)cwRecord(q,h)}
+  cwAfter();xwAfter();{const q=cwCur();const h=q&&cwG(q);if(h&&h.over&&!h.saved)cwRecord(q,h)}
   if(S.wa.msg){const b=document.querySelector('.wa-board,.cw-board');if(b){const m=document.createElement('div');m.className='wa-msg';m.setAttribute('role','status');m.textContent=S.wa.msg;b.appendChild(m);setTimeout(()=>m.remove(),2000)}S.wa.msg=null}
   if(S.wa.view!=='cross'&&!(S.wa.view==='conn'&&S.wa.pid))waSync(false);
 }
@@ -3729,7 +3753,7 @@ const cwKey=p=>p.id+'@'+waTeam().join(',');
 const cwG=p=>CWG[cwKey(p)]||null;
 function cwGet(p){const k=cwKey(p);if(!CWG[k]){CWG[k]={fill:{},bad:{},rev:{},sec:0,over:'',who:waTeam(),at:Date.now()};cwGSave()}return CWG[k]}
 const cwGame=p=>'Crossword '+p.t;
-const cwFind=id=>CW_PUZ.find(p=>p.id===id);
+const cwFind=id=>cwAll().find(p=>p.id===id);
 const cwTime=s=>{s=Math.max(0,s|0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const cwStarted=g=>!!(g&&(Object.keys(g.fill).length||g.over));
 function cwStatus(p){const g=cwG(p);if(!g||!cwStarted(g))return ['','ยังไม่เล่น'];
@@ -3742,8 +3766,9 @@ function cwStart(p,b,g){if(b.of[CWS.r+'_'+CWS.c]&&CWS.pid===p.id)return;CWS.pid=
 function cwListView(){
   return `<section class="sec">
     <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Crossword</h2><p>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</p></div></div>
+    ${xwListBox()}
     ${waWhoPanel('ทำเสร็จทุกคนที่เลือกได้ 5 แต้มบ้าน (นับครั้งแรกที่ทำโจทย์นั้นเสร็จ)')}
-    <div class="wa-list">${CW_PUZ.map(p=>{const [c,s]=cwStatus(p);const b=cwBuild(p);return `<button class="wa-card" data-act="cwOpen" data-id="${esc(p.id)}">
+    <div class="wa-list">${cwAll().map(p=>{const [c,s]=cwStatus(p);const b=cwBuild(p);return `<button class="wa-card" data-act="cwOpen" data-id="${esc(p.id)}">
       <div class="top"><b>${esc(p.t)}</b><span class="wa-st ${c}">${esc(s)}</span></div>
       <span class="muted small">${b.words.filter(w=>w.dir==='a').length} แนวนอน · ${b.words.filter(w=>w.dir==='d').length} แนวตั้ง · ${b.cells.length} ช่อง</span></button>`}).join('')}</div>
   </section>`;
@@ -3777,7 +3802,7 @@ function cwDoneView(p,b,g){const nr=Object.keys(g.rev).length;
   return `<div class="wa-done"><h3>${g.over==='win'?(nr?'เสร็จแล้ว!':'เพอร์เฟกต์!'):'ยอมแพ้'}</h3>
     <p class="muted">เวลา ${cwTime(g.sec)}${g.over==='win'?(nr?` · เปิดเฉลย ${nr} ช่อง`:' · ไม่เปิดเฉลยเลย'):' · เฉลยอยู่บนกระดาน'}</p>
     ${waAwardLine(g)}
-    <div class="btns" style="justify-content:center"><button class="btn" data-act="cwReset">เล่นใหม่</button>${(()=>{const i=CW_PUZ.findIndex(x=>x.id===p.id);const nx=CW_PUZ.slice(i+1).find(x=>(cwG(x)||{}).over!=='win');return nx?`<button class="btn primary" data-act="cwOpen" data-id="${esc(nx.id)}">โจทย์ถัดไป: ${esc(nx.t)}</button>`:''})()}</div></div>`}
+    <div class="btns" style="justify-content:center"><button class="btn" data-act="cwReset">เล่นใหม่</button>${(()=>{const L=cwAll();const i=L.findIndex(x=>x.id===p.id);const nx=L.slice(i+1).find(x=>(cwG(x)||{}).over!=='win');return nx?`<button class="btn primary" data-act="cwOpen" data-id="${esc(nx.id)}">โจทย์ถัดไป: ${esc(nx.t)}</button>`:''})()}</div></div>`}
 
 /* after each render: keep the grid's horizontal scroll, keep the current square in view, run the clock */
 let cwTick=0;
@@ -3854,8 +3879,139 @@ document.addEventListener('keydown',e=>{
   if(k==='Tab'||k==='Enter'){e.preventDefault();cwGoWord(b,g,cwWordIx(b)+(e.shiftKey?-1:1));cwRender()}
 });
 
+/* ---------- Word Arcade: ตัวช่วยแต่ง Crossword (โหมดพี่) ----------
+   พี่วางช่องดำ เติมคำเอง เมื่อช่องเหลือน้อย กดดูคำในคลังที่เข้ากับตัวอักษรที่มีอยู่
+   คำที่จะทำให้คำแนวขวางไม่มีทางเติมต่อได้ ขึ้นจาง ๆ ว่า "ทางตัน" · เก็บในข้อมูลบ้าน ปล่อยให้น้องเล่นเมื่อพร้อม */
+const XW={id:null,doc:null,mode:'fill',sym:true,r:0,c:0,dir:'a',words:null,byLen:null,loading:false,err:false,t:0,sl:null};
+const xwDocs=()=>Object.values(Store.d.xwords||{}).sort((a,b)=>(b.at||0)-(a.at||0));
+function xwLoadWords(){if(XW.byLen||XW.loading)return;XW.loading=true;XW.err=false;
+  fetch('xw-words.txt',{cache:'force-cache'}).then(r=>r.ok?r.text():Promise.reject(new Error(r.status))).then(t=>{const by={};
+    t.split('\n').forEach(w=>{w=w.trim().toUpperCase();if(/^[A-Z]{2,15}$/.test(w))(by[w.length]=by[w.length]||[]).push(w)});XW.byLen=by;XW.loading=false;if(S.wa.view==='xbuild')render()})
+  .catch(()=>{XW.loading=false;XW.err=true;if(S.wa.view==='xbuild')render()})}
+/* slots = every run of 2+ white squares, numbered like a printed crossword */
+function xwSlots(g){const n=g.length,W=(r,c)=>r>=0&&c>=0&&r<n&&c<n&&g[r][c]!=='#';const num={},slots=[],of={};let k=0;
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++){if(!W(r,c))continue;const sa=!W(r,c-1)&&W(r,c+1),sd=!W(r-1,c)&&W(r+1,c);if(sa||sd)num[r+'_'+c]=++k;
+    if(sa){const cells=[];for(let x=c;W(r,x);x++)cells.push([r,x]);slots.push({dir:'a',n:k,cells,key:'a:'+r+'_'+c})}
+    if(sd){const cells=[];for(let y=r;W(y,c);y++)cells.push([y,c]);slots.push({dir:'d',n:k,cells,key:'d:'+r+'_'+c})}}
+  slots.sort((a,b)=>a.dir===b.dir?a.n-b.n:(a.dir==='a'?-1:1));slots.forEach((s,i)=>s.cells.forEach(([r,c])=>{const q=r+'_'+c;(of[q]=of[q]||{})[s.dir]=i}));
+  return {n,W,num,slots,of}}
+const xwCh=(g,r,c)=>{const v=g[r][c];return v==='#'||v==='.'?'':v};
+const xwPat=(g,s)=>s.cells.map(([r,c])=>xwCh(g,r,c)||'.').join('');
+function xwMatch(pat){const L=XW.byLen&&XW.byLen[pat.length];if(!L)return [];if(!/[A-Z]/.test(pat))return L;const re=new RegExp('^'+pat+'$');return L.filter(w=>re.test(w))}
+/* letters that can still sit at position i of a slot, given its current pattern */
+function xwAllowed(pat,i){const set=new Set();for(const w of xwMatch(pat))set.add(w[i]);return set}
+function xwSet(g,r,c,v){const row=g[r];g[r]=row.slice(0,c)+v+row.slice(c+1)}
+function xwSuggest(g,X,si){const s=X.slots[si];const pat=xwPat(g,s);const all=xwMatch(pat);
+  const checks=[];s.cells.forEach(([r,c],i)=>{if(xwCh(g,r,c))return;const o=X.of[r+'_'+c];const cj=o&&o[s.dir==='a'?'d':'a'];if(cj==null)return;
+    const cs=X.slots[cj];const at=cs.cells.findIndex(([y,x])=>y===r&&x===c);checks.push({i,set:xwAllowed(xwPat(g,cs),at)})});
+  const list=all.slice(0,400).map(w=>({w,ok:checks.every(k=>k.set.has(w[k.i]))}));
+  list.sort((a,b)=>(b.ok-a.ok));return {pat,total:all.length,list:list.slice(0,80)}}
+function xwCur(){if(!XW.id)return null;if(!XW.doc||XW.doc.id!==XW.id){const d=Store.d.xwords&&Store.d.xwords[XW.id];if(!d)return null;XW.doc=JSON.parse(JSON.stringify(d));XW.doc.id=XW.id}return XW.doc}
+function xwSave(now){clearTimeout(XW.t);const run=()=>{const d=XW.doc;if(!d)return;d.at=Date.now();Store.put('xwords',d.id,d)};if(now)run();else XW.t=setTimeout(run,900)}
+/* a puzzle the brother released, in the shape the player uses */
+function xwToPuz(d){const g=(d.g||[]).map(r=>r.replace(/#/g,'.'));const X=xwSlots(d.g||[]);const a={},dn={};
+  X.slots.forEach(s=>{(s.dir==='a'?a:dn)[s.n]=(d.clues||{})[s.key]||''});return {id:'x_'+d.id+'_'+waHash(g.join('')),t:d.t||'Crossword',g,a,d:dn,own:1}}
+function xwReady(d){const X=xwSlots(d.g);const empty=[];d.g.forEach((row,r)=>row.split('').forEach((v,c)=>{if(v==='.')empty.push(r+'_'+c)}));
+  const noClue=X.slots.filter(s=>!((d.clues||{})[s.key]||'').trim());const two=X.slots.filter(s=>s.cells.length<3);return {X,empty,noClue,two}}
+const cwAll=()=>CW_PUZ.concat(xwDocs().filter(d=>d.live&&xwReady(d).empty.length===0).map(xwToPuz));
+
+function xwListBox(){if(!S.bro)return '';const ds=xwDocs();
+  return `<div class="panel xw-box"><div class="sec-head"><div><h3>โจทย์ที่พี่แต่ง</h3><p class="muted small">โหมดพี่เห็นคนเดียว · ร่างไว้ได้เรื่อย ๆ กดปล่อยเมื่อพร้อม</p></div><button class="btn primary sm" data-act="xwNew">แต่งโจทย์ใหม่</button></div>
+    ${ds.length?`<div class="wa-list">${ds.map(d=>{const R=xwReady(d);return `<button class="wa-card ${d.live?'':'hid'}" data-act="xwOpen" data-id="${esc(d.id)}">
+      <div class="top"><b>${esc(d.t||'ไม่มีชื่อ')}</b><span class="wa-st ${d.live?'win':''}">${d.live?'ปล่อยแล้ว':'ร่าง'}</span></div>
+      <span class="muted small">${d.g.length}×${d.g.length} · ${R.X.slots.length} คำ${R.empty.length?` · เหลือ ${R.empty.length} ช่อง`:''}${R.noClue.length?` · ยังไม่มีคำใบ้ ${R.noClue.length}`:''}</span></button>`}).join('')}</div>`:''}
+  </div>`}
+function xwBuildView(){const d=xwCur();if(!d){S.wa.view='cross';S.wa.bid=null;XW.id=null;return cwListView()}
+  xwLoadWords();const g=d.g,n=g.length;const X=xwSlots(g);if(!X.W(XW.r,XW.c)&&XW.mode==='fill'){const f=Object.keys(X.of)[0];if(f){[XW.r,XW.c]=f.split('_').map(Number)}}
+  const o=X.of[XW.r+'_'+XW.c];if(o&&o[XW.dir]==null)XW.dir=XW.dir==='a'?'d':'a';const si=o?o[XW.dir]:null;const s=si!=null?X.slots[si]:null;
+  const inS=new Set(s?s.cells.map(([r,c])=>r+'_'+c):[]);const R=xwReady(d);
+  const vw=Math.min(window.innerWidth||400,760)-34;const sz=Math.max(26,Math.min(44,Math.floor(vw/n)));
+  const dead=new Set();if(XW.byLen)X.slots.forEach(t=>{const p=xwPat(g,t);if(/\./.test(p)&&!xwMatch(p).length)t.cells.forEach(([r,c])=>dead.add(r+'_'+c))});
+  const cells=[];for(let r=0;r<n;r++)for(let c=0;c<n;c++){const k=r+'_'+c;const v=g[r][c];
+    if(v==='#'){cells.push(`<button class="cw-cell blk" data-act="xwCell" data-id="${k}" aria-label="ช่องดำ"></button>`);continue}
+    const cur=k===XW.r+'_'+XW.c&&XW.mode==='fill';
+    cells.push(`<button class="cw-cell${cur?' cur':''}${inS.has(k)&&XW.mode==='fill'?' word':''}${dead.has(k)?' dead':''}" data-act="xwCell" data-id="${k}">${X.num[k]?`<small>${X.num[k]}</small>`:''}<span>${v==='.'?'':esc(v)}</span></button>`)}
+  let sug='';
+  if(XW.mode==='fill'&&s){if(!XW.byLen)sug=`<p class="muted small">${XW.err?'โหลดคลังคำไม่ได้ <button class="wa-link" data-act="xwRetry">ลองใหม่</button>':'กำลังโหลดคลังคำ…'}</p>`;
+    else{const q=xwSuggest(g,X,si);const full=!/\./.test(q.pat);
+      sug=`<div class="xw-pat"><b>${s.n} ${s.dir==='a'?'แนวนอน':'แนวตั้ง'}</b><code>${q.pat.split('').map(ch=>ch==='.'?'_':ch).join(' ')}</code><span class="muted small">${s.cells.length} ตัว</span></div>
+      ${full?(q.total?'<p class="muted small">คำนี้อยู่ในคลังคำ</p>':'<p class="muted small">คำนี้ไม่มีในคลัง ใช้ได้ถ้าพี่ตั้งใจ เช่นชื่อเฉพาะหรือวลี</p>')
+        :q.total?`<p class="muted small">เข้าได้ ${q.total} คำ${q.total>80?' (แสดง 80 คำที่ใช้บ่อยก่อน)':''} · คำจาง = ทำให้คำแนวขวางไม่มีทางเติมต่อ</p><div class="xw-sug">${q.list.map(x=>`<button class="${x.ok?'':'no'}" data-act="xwPick" data-id="${x.w}">${x.w}</button>`).join('')}</div>`
+        :'<p class="xw-warn">ไม่มีคำในคลังที่เข้ากับตัวอักษรตอนนี้ ลองเปลี่ยนตัวที่ตัดกัน หรือใส่คำของพี่เอง</p>'}`}}
+  const kb=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+  return `<section class="sec"><div class="wa-play cw-play xw">
+    <div class="wa-head"><div><button class="back" data-act="xwBack">← Crossword</button><h2>แต่งโจทย์</h2></div><span class="wa-st ${d.live?'win':''}">${d.live?'ปล่อยให้น้องเล่นแล้ว':'ร่าง · น้องยังไม่เห็น'}</span></div>
+    <label class="field"><span>ชื่อโจทย์</span><input type="text" id="xwTitle" value="${esc(d.t||'')}" maxlength="40" placeholder="เช่น Banky #4"></label>
+    <div class="xw-tools"><div class="chips"><button class="chip" data-act="xwMode" data-id="fill" aria-pressed="${XW.mode==='fill'}">ใส่ตัวอักษร</button><button class="chip" data-act="xwMode" data-id="black" aria-pressed="${XW.mode==='black'}">วางช่องดำ</button></div>
+      <label class="check small"><input type="checkbox" id="xwSym" ${XW.sym?'checked':''}> ช่องดำสมมาตรแบบ NYT</label></div>
+    ${XW.mode==='black'?'<p class="muted small">แตะช่องเพื่อสลับขาว/ดำ ช่องฝั่งตรงข้ามจะสลับตามเมื่อเปิดสมมาตร</p>':''}
+    <div class="cw-board"><div class="cw-scroll" id="xwScroll"><div class="cw-grid" style="--c:${n};--s:${sz}px">${cells.join('')}</div></div></div>
+    ${XW.mode==='fill'?`<div class="xw-help">${sug}</div>
+    <div class="cw-tools"><button class="btn sm" data-act="xwStep" data-id="-1">‹ คำก่อน</button><button class="btn sm" data-act="xwStep" data-id="1">คำถัดไป ›</button><button class="btn sm" data-act="xwClearWord">ล้างคำนี้</button></div>
+    <div class="cw-kb">${kb.map((row,i)=>`<div>${row.split('').map(k=>`<button data-act="xwKey" data-id="${k}">${k}</button>`).join('')}${i===2?'<button class="wide" data-act="xwKey" data-id="BS" aria-label="ลบ">⌫</button>':''}</div>`).join('')}</div>`:''}
+    <div class="xw-status">${R.empty.length?`<span>เหลือช่องว่าง ${R.empty.length} ช่อง</span>`:'<span class="ok">เติมครบทุกช่องแล้ว</span>'}${R.two.length?`<span class="bad">มีคำยาว 2 ตัว ${R.two.length} คำ (NYT ใช้ 3 ตัวขึ้นไป)</span>`:''}${dead.size?'<span class="bad">มีช่องที่ไม่มีคำในคลังเข้าได้ (ขอบแดง)</span>':''}${R.noClue.length?`<span>ยังไม่มีคำใบ้ ${R.noClue.length} คำ</span>`:''}</div>
+    <div class="xw-clues"><h3>คำใบ้</h3>${X.slots.map(t=>`<label class="xw-clue"><span><b>${t.n} ${t.dir==='a'?'แนวนอน':'แนวตั้ง'}</b> <code>${xwPat(g,t).replace(/\./g,'_')}</code></span>
+      <input type="text" data-xwclue="${t.key}" value="${esc((d.clues||{})[t.key]||'')}" placeholder="เขียนคำใบ้"></label>`).join('')}</div>
+    <div class="btns" style="justify-content:center">${d.live?'<button class="btn" data-act="xwLive" data-id="0">ซ่อนจากน้อง</button>':'<button class="btn primary" data-act="xwLive" data-id="1">ปล่อยให้น้องเล่น</button>'}<button class="btn danger" data-act="xwDel">ลบโจทย์</button></div>
+    <p class="muted small cw-keys" style="text-align:center">พิมพ์ได้เลย · Space = สลับแนว · Tab = คำถัดไป · ลูกศร = เลื่อนช่อง</p>
+  </div></section>`}
+function xwAfter(){const sc=document.getElementById('xwScroll');if(!sc)return;if(XW.sl!=null)sc.scrollLeft=XW.sl;const el=sc.querySelector('.cw-cell.cur');
+  if(el){const a=el.offsetLeft,z=a+el.offsetWidth;if(a<sc.scrollLeft+8)sc.scrollLeft=a-40;else if(z>sc.scrollLeft+sc.clientWidth-8)sc.scrollLeft=z-sc.clientWidth+40}
+  XW.sl=sc.scrollLeft;sc.onscroll=()=>{XW.sl=sc.scrollLeft}}
+function xwRender(){const sc=document.getElementById('xwScroll');if(sc)XW.sl=sc.scrollLeft;render()}
+
+/* ---------- builder actions ---------- */
+ACT.xwNew=()=>{openSheet('แต่งโจทย์ใหม่',`<div class="form"><label class="field"><span>ชื่อโจทย์</span><input type="text" id="xwNewT" maxlength="40" placeholder="เช่น Banky #4"></label>
+  <label class="field"><span>ขนาดกระดาน</span><select id="xwNewN">${[5,6,7,8,9,10,11,12,13,14,15].map(k=>`<option value="${k}" ${k===5?'selected':''}>${k} × ${k}${k===5?' (แบบ NYT Mini)':k===15?' (แบบ NYT รายวัน)':''}</option>`).join('')}</select></label></div>`,
+  '<button class="btn primary big" data-act="xwCreate">เริ่มแต่ง</button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
+ACT.xwCreate=async()=>{const n=Math.min(15,Math.max(3,parseInt(val('xwNewN'),10)||5));const t=val('xwNewT')||`Banky #${CW_PUZ.length+xwDocs().length+1}`;closeSheet();
+  const id=uid();const d={t,g:Array.from({length:n},()=>'.'.repeat(n)),clues:{},live:false,at:Date.now()};await Store.put('xwords',id,d);
+  XW.id=id;XW.doc=null;XW.r=0;XW.c=0;XW.dir='a';XW.mode='fill';XW.sl=null;S.wa.view='xbuild';S.wa.bid=id;waSave();render();window.scrollTo({top:0})};
+ACT.xwOpen=t=>{XW.id=t.dataset.id;XW.doc=null;XW.r=0;XW.c=0;XW.dir='a';XW.mode='fill';XW.sl=null;S.wa.view='xbuild';S.wa.bid=XW.id;waSave();render();window.scrollTo({top:0})};
+ACT.xwBack=()=>{xwSave(true);S.wa.view='cross';S.wa.bid=null;XW.id=null;XW.doc=null;waSave();render();window.scrollTo({top:0})};
+ACT.xwRetry=()=>{XW.err=false;xwLoadWords();render()};
+ACT.xwMode=t=>{XW.mode=t.dataset.id;xwRender()};
+ACT.xwCell=t=>{const d=xwCur();if(!d)return;const [r,c]=t.dataset.id.split('_').map(Number);const n=d.g.length;
+  if(XW.mode==='black'){const v=d.g[r][c]==='#'?'.':'#';xwSet(d.g,r,c,v);if(XW.sym&&!(r===n-1-r&&c===n-1-c))xwSet(d.g,n-1-r,n-1-c,v);xwSave();xwRender();return}
+  if(d.g[r][c]==='#')return;if(r===XW.r&&c===XW.c){const o=xwSlots(d.g).of[r+'_'+c];const nd=XW.dir==='a'?'d':'a';if(o&&o[nd]!=null)XW.dir=nd}else{XW.r=r;XW.c=c}xwRender()};
+function xwSlotNow(d){const X=xwSlots(d.g);const o=X.of[XW.r+'_'+XW.c];if(!o)return {X,s:null,si:null};if(o[XW.dir]==null)XW.dir=XW.dir==='a'?'d':'a';const si=o[XW.dir];return {X,s:X.slots[si],si}}
+function xwGo(X,i,d){if(!X.slots.length)return;const s=X.slots[(i+X.slots.length)%X.slots.length];const e=s.cells.find(([r,c])=>d.g[r][c]==='.')||s.cells[0];XW.r=e[0];XW.c=e[1];XW.dir=s.dir}
+function xwType(ch){const d=xwCur();if(!d||XW.mode!=='fill'||d.g[XW.r][XW.c]==='#')return;xwSet(d.g,XW.r,XW.c,ch);const {s}=xwSlotNow(d);
+  if(s){const p=s.cells.findIndex(([r,c])=>r===XW.r&&c===XW.c);if(p<s.cells.length-1){XW.r=s.cells[p+1][0];XW.c=s.cells[p+1][1]}}xwSave();xwRender()}
+function xwBackKey(){const d=xwCur();if(!d||XW.mode!=='fill')return;if(d.g[XW.r][XW.c]!=='.'&&d.g[XW.r][XW.c]!=='#'){xwSet(d.g,XW.r,XW.c,'.')}
+  else{const {s}=xwSlotNow(d);if(s){const p=s.cells.findIndex(([r,c])=>r===XW.r&&c===XW.c);if(p>0){XW.r=s.cells[p-1][0];XW.c=s.cells[p-1][1];xwSet(d.g,XW.r,XW.c,'.')}}}xwSave();xwRender()}
+ACT.xwKey=t=>{const k=t.dataset.id;if(k==='BS')xwBackKey();else xwType(k)};
+ACT.xwPick=t=>{const d=xwCur();if(!d)return;const {X,s,si}=xwSlotNow(d);if(!s)return;const w=t.dataset.id;if(w.length!==s.cells.length)return;
+  s.cells.forEach(([r,c],i)=>xwSet(d.g,r,c,w[i]));const nx=X.slots.findIndex((x,j)=>j>si&&x.cells.some(([r,c])=>d.g[r][c]==='.'));
+  if(nx>=0)xwGo(X,nx,d);xwSave();xwRender()};
+ACT.xwStep=t=>{const d=xwCur();if(!d)return;const {X,si}=xwSlotNow(d);xwGo(X,(si==null?0:si)+(+t.dataset.id),d);xwRender()};
+ACT.xwClearWord=()=>{const d=xwCur();if(!d)return;const {X,s}=xwSlotNow(d);if(!s)return;
+  s.cells.forEach(([r,c])=>{const o=X.of[r+'_'+c];const other=o[s.dir==='a'?'d':'a'];const keep=other!=null&&X.slots[other].cells.every(([y,x])=>d.g[y][x]!=='.');if(!keep)xwSet(d.g,r,c,'.')});
+  xwSave();xwRender()};
+ACT.xwLive=t=>{const d=xwCur();if(!d)return;if(t.dataset.id==='1'){const R=xwReady(d);
+  if(R.empty.length){toast(`ยังเหลือช่องว่าง ${R.empty.length} ช่อง เติมให้ครบก่อนปล่อย`);return}
+  if(R.noClue.length){toast(`ยังไม่มีคำใบ้ ${R.noClue.length} คำ`);return}d.live=true;xwSave(true);toast('ปล่อยแล้ว น้องเล่นได้ในแท็บ Crossword')}
+  else{d.live=false;xwSave(true);toast('ซ่อนจากน้องแล้ว')}render()};
+ACT.xwDel=()=>{const d=xwCur();if(!d)return;openSheet('ลบโจทย์นี้?',`<p>${esc(d.t||'โจทย์นี้')} จะหายไปจากบ้าน กู้คืนไม่ได้</p>`,'<button class="btn dangerfill big" data-act="xwDelGo">ลบโจทย์</button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
+ACT.xwDelGo=async()=>{const id=XW.id;closeSheet();clearTimeout(XW.t);XW.id=null;XW.doc=null;S.wa.view='cross';S.wa.bid=null;waSave();if(id)await Store.del('xwords',id);toast('ลบแล้ว');render()};
+document.addEventListener('change',e=>{const t=e.target;if(!t||S.wa.view!=='xbuild')return;const d=xwCur();if(!d)return;
+  if(t.id==='xwSym'){XW.sym=t.checked;return}
+  if(t.id==='xwTitle'){d.t=t.value.trim();xwSave(true);return}});
+document.addEventListener('input',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.xwclue||S.wa.view!=='xbuild')return;const d=xwCur();if(!d)return;
+  d.clues=d.clues||{};d.clues[t.dataset.xwclue]=t.value;xwSave()});
+document.addEventListener('keydown',e=>{
+  if(S.tab!=='words'||S.wa.view!=='xbuild'||XW.mode!=='fill'||!$('#sheet').hidden||e.metaKey||e.ctrlKey||e.altKey||e.isComposing)return;
+  const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;const d=xwCur();if(!d)return;const k=e.key;
+  if(/^[a-zA-Z]$/.test(k)){e.preventDefault();xwType(k.toUpperCase());return}
+  if(k==='Backspace'||k==='Delete'){e.preventDefault();xwBackKey();return}
+  const mv={ArrowLeft:[0,-1,'a'],ArrowRight:[0,1,'a'],ArrowUp:[-1,0,'d'],ArrowDown:[1,0,'d']}[k];const n=d.g.length;
+  if(mv){e.preventDefault();if(XW.dir!==mv[2]){XW.dir=mv[2]}else{let r=XW.r,c=XW.c;for(;;){r+=mv[0];c+=mv[1];if(r<0||c<0||r>=n||c>=n)break;if(d.g[r][c]!=='#'){XW.r=r;XW.c=c;break}}}xwRender();return}
+  if(k===' '){e.preventDefault();const o=xwSlots(d.g).of[XW.r+'_'+XW.c];const nd=XW.dir==='a'?'d':'a';if(o&&o[nd]!=null){XW.dir=nd;xwRender()}return}
+  if(k==='Tab'){e.preventDefault();const {X,si}=xwSlotNow(d);xwGo(X,(si==null?0:si)+(e.shiftKey?-1:1),d);xwRender()}
+});
+
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-28T20:26:00+07:00';
+const SITE_UPDATED='2026-10-28T20:35:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
