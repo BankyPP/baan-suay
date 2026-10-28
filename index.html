@@ -3742,7 +3742,7 @@ function cwStart(p,b,g){if(b.of[CWS.r+'_'+CWS.c]&&CWS.pid===p.id)return;CWS.pid=
 function cwListView(){
   return `<section class="sec">
     <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Crossword</h2><p>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</p></div></div>
-    ${waWhoPanel('ผ่านแล้วบันทึกผลเข้าบ้าน')}
+    ${waWhoPanel('ทำเสร็จทุกคนที่เลือกได้ 5 แต้มบ้าน (นับครั้งแรกที่ทำโจทย์นั้นเสร็จ)')}
     <div class="wa-list">${CW_PUZ.map(p=>{const [c,s]=cwStatus(p);const b=cwBuild(p);return `<button class="wa-card" data-act="cwOpen" data-id="${esc(p.id)}">
       <div class="top"><b>${esc(p.t)}</b><span class="wa-st ${c}">${esc(s)}</span></div>
       <span class="muted small">${b.words.filter(w=>w.dir==='a').length} แนวนอน · ${b.words.filter(w=>w.dir==='d').length} แนวตั้ง · ${b.cells.length} ช่อง</span></button>`}).join('')}</div>
@@ -3761,7 +3761,7 @@ function cwPlayView(p){
   const list=dir=>b.words.map((x,i)=>x.dir!==dir?'':`<li><button class="cw-clue${i===wi?' on':''}${i===cross?' x':''}${done(dir,x)?' done':''}" data-act="cwClue" data-id="${i}"><b>${x.n}</b><span>${esc(x.clue||'—')}</span></button></li>`).join('');
   const kb=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
   return `<section class="sec"><div class="wa-play cw-play">
-    <div class="wa-head"><div><button class="back" data-act="waView" data-id="cross">← โจทย์ทั้งหมด</button><h2>${esc(p.t)}</h2>${waTeamLine('ผ่านแล้วบันทึกผลเข้าบ้าน')}</div>
+    <div class="wa-head"><div><button class="back" data-act="waView" data-id="cross">← โจทย์ทั้งหมด</button><h2>${esc(p.t)}</h2>${waTeamLine('ทำเสร็จได้ 5 แต้ม')}</div>
       <div class="cw-timer" aria-label="เวลา"><span id="cwTime">${cwTime(g.sec)}</span></div></div>
     ${g.over?cwDoneView(p,b,g):`<button class="cw-bar" data-act="cwFlip" aria-label="สลับแนว"><b>${w?w.n+(w.dir==='a'?' แนวนอน':' แนวตั้ง'):''}</b><span>${esc(w?w.clue:'')}</span></button>`}
     <div class="cw-board"><div class="cw-scroll" id="cwScroll"><div class="cw-grid" style="--c:${b.C};--s:${s}px">${cells.join('')}</div></div></div>
@@ -3790,8 +3790,9 @@ function cwAfter(){const sc=document.getElementById('cwScroll');
     h.sec++;const t=document.getElementById('cwTime');if(t)t.textContent=cwTime(h.sec);if(h.sec%5===0)cwGSave()},1000)}
 function cwRecord(p,g){if(g.saved)return;g.saved=1;const who=(g.who||[]).filter(id=>kidById(id));g.award={};
   if(!who.length){cwGSave();return}
-  const win=g.over==='win';who.forEach(id=>{g.award[id]=0});cwGSave();
-  saveGameSession({game:cwGame(p),players:who.map(id=>({id})),coop:true,win,pts:{}}).then(()=>toast('บันทึกผลเข้าบ้านแล้ว')).catch(()=>toast('บันทึกผลเข้าบ้านไม่ได้'))}
+  const win=g.over==='win';const pts={};const had=id=>logs().some(e=>e.kid===id&&e.kind==='game'&&e.game===cwGame(p)&&e.win&&(+e.pts||0)>0);
+  who.forEach(id=>{if(win&&!had(id)){pts[id]=5;g.award[id]=5}else g.award[id]=win?'had':0});cwGSave();
+  saveGameSession({game:cwGame(p),players:who.map(id=>({id})),coop:true,win,pts}).then(()=>toast('บันทึกผลเข้าบ้านแล้ว')).catch(()=>toast('บันทึกผลเข้าบ้านไม่ได้'))}
 
 /* ---------- actions ---------- */
 const cwCur=()=>S.wa.view==='cross'&&S.wa.cid?cwFind(S.wa.cid):null;
@@ -3854,7 +3855,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-28T20:22:00+07:00';
+const SITE_UPDATED='2026-10-28T20:26:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
