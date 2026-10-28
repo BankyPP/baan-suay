@@ -695,7 +695,7 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .wa-head h2{font-size:1.5rem}
 .wa-lead{text-align:center;color:var(--muted);font-size:.95rem}
 .wa-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.wa-tile{appearance:none;border:0;border-radius:10px;background:var(--wa-tile);color:var(--wa-tile-ink);min-height:clamp(66px,18vw,84px);padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;min-width:0;overflow:hidden;transition:transform .12s ease,background .12s ease;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.wa-tile{position:relative;appearance:none;border:0;border-radius:10px;background:var(--wa-tile);color:var(--wa-tile-ink);min-height:clamp(66px,18vw,84px);padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;min-width:0;overflow:hidden;transition:transform .12s ease,background .12s ease;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .wa-tile span{display:block;max-width:100%;font:700 1.02rem/1.15 var(--f-body);text-transform:uppercase;letter-spacing:.01em;overflow-wrap:normal;word-break:keep-all;hyphens:none}
 .wa-tile:active{transform:scale(.96)}
 .wa-tile[aria-pressed="true"]{background:var(--wa-sel);color:var(--wa-sel-ink)}
@@ -730,9 +730,14 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .wa-issues b{font:600 .9rem var(--f-head);color:var(--bad)}
 .wa-issues ul{margin:6px 0 0;padding-left:1.2em}
 @keyframes waShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-@keyframes waPop{0%{transform:scale(.94);opacity:.4}100%{transform:scale(1);opacity:1}}
 .wa-tile.shake{animation:waShake .38s ease}
-.wa-bar.pop{animation:waPop .3s ease-out}
+@keyframes waJump{0%,100%{transform:translateY(0)}45%{transform:translateY(-14px)}}
+.wa-tile.jump{animation:waJump .34s ease both}
+.wa-board{position:relative}
+.wa-msg{position:absolute;left:50%;top:-10px;transform:translate(-50%,-100%);z-index:5;background:var(--ink);color:var(--paper);font:500 .95rem/1.2 var(--f-head);padding:9px 16px;border-radius:8px;white-space:nowrap;pointer-events:none;animation:waMsg 1.9s ease forwards}
+@keyframes waMsg{0%{opacity:0;transform:translate(-50%,-80%)}10%,80%{opacity:1;transform:translate(-50%,-100%)}100%{opacity:0;transform:translate(-50%,-100%)}}
+.wa-bar.pop{animation:waPop .32s cubic-bezier(.3,1.4,.5,1)}
+@keyframes waPop{0%{transform:scale(.92)}100%{transform:scale(1)}}
 @media (max-width:420px){.wa-board{gap:6px}.wa-tile{border-radius:8px}.wa-tile span{font-size:.92rem}}
 </style>
 </head>
@@ -3386,7 +3391,7 @@ const WA_SNAP=[{"t":"#1","h":0,"l":5,"d":2,"k":5,"w":["PHONE","BALL","SUITCASE",
 const WA_COLORS=['เหลือง','เขียว','น้ำเงิน','ม่วง'];
 const WA_EMO=['🟨','🟩','🟦','🟪'];
 const WA_KINDS=[['all','ทั้งหมด'],['main','ชุดหลัก'],['bonus','BONUS'],['med','MED']];
-S.wa=Object.assign({view:'home',pid:null,kind:'all'},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;
+S.wa=Object.assign({view:'home',pid:null,kind:'all'},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;S.wa.busy=false;S.wa.msg=null;
 const waSave=()=>{const {view,pid,kind}=S.wa;LS.set('wa',{view,pid,kind})};
 let WAG=LS.get('waG',{});const waGSave=()=>LS.set('waG',WAG);
 const WAS={at:0,list:null,busy:false,err:'',try:0};
@@ -3563,41 +3568,63 @@ function waAfter(){
   document.querySelectorAll('.wa-tile span').forEach(sp=>{const t=sp.parentElement;sp.style.fontSize='';let fs=parseFloat(getComputedStyle(sp).fontSize)||16;let n=0;
     while((sp.scrollWidth>t.clientWidth-6||sp.scrollHeight>t.clientHeight-6)&&fs>9&&n++<30){fs-=.5;sp.style.fontSize=fs+'px'}});
   if(S.wa.fx){S.wa.fx=null}
+  if(S.wa.msg){const b=document.querySelector('.wa-board');if(b){const m=document.createElement('div');m.className='wa-msg';m.setAttribute('role','status');m.textContent=S.wa.msg;b.appendChild(m);setTimeout(()=>m.remove(),2000)}S.wa.msg=null}
   if(S.wa.view!=='cross'&&!(S.wa.view==='conn'&&S.wa.pid))waSync(false);
 }
 
 /* ---------- actions ---------- */
 const waCur=()=>S.wa.view==='conn'&&S.wa.pid?waFind(S.wa.pid):null;
-ACT.waView=t=>{S.wa.view=t.dataset.id;S.wa.pid=null;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waView=t=>{S.wa.view=t.dataset.id;S.wa.busy=false;S.wa.pid=null;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
 ACT.waKind=t=>{S.wa.kind=t.dataset.id;waSave();render()};
-ACT.waOpen=t=>{S.wa.view='conn';S.wa.pid=t.dataset.id;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waOpen=t=>{S.wa.view='conn';S.wa.busy=false;S.wa.pid=t.dataset.id;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
 ACT.waSync=()=>waSync(true);
-ACT.waTile=t=>{const p=waCur();if(!p)return;const g=waGet(p);if(g.over)return;const w=t.dataset.id;S.wa.arm=null;
+ACT.waTile=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(g.over)return;const w=t.dataset.id;S.wa.arm=null;
   const i=g.sel.indexOf(w);if(i>=0)g.sel.splice(i,1);else{if(g.sel.length>=4)return;g.sel.push(w)}waGSave();render()};
-ACT.waDesel=()=>{const p=waCur();if(!p)return;const g=waGet(p);g.sel=[];S.wa.arm=null;waGSave();render()};
-ACT.waShuffle=()=>{const p=waCur();if(!p)return;const g=waGet(p);g.order=shuffle(g.order);S.wa.arm=null;waGSave();render()};
-function waSubmit(){const p=waCur();if(!p)return;const g=waGet(p);if(g.over||g.sel.length!==4)return;S.wa.arm=null;
-  const key=g.sel.slice().sort().join('|');if(g.tries.some(x=>x.k===key)){toast('ทายชุดนี้ไปแล้ว');return}
-  const gs=g.sel.map(w=>waOwn(p,w));g.tries.push({k:key,g:gs});
-  const hit=p.groups.findIndex((x,i)=>!g.solved.includes(i)&&g.sel.every(w=>x.words.includes(w)));
-  if(hit>=0){g.solved.push(hit);g.how[hit]='g';g.cat[hit]=1;g.sel=[];S.wa.fx={type:'pop',gi:hit};
-    if(g.solved.length===4){g.used=waHintsUsed(g);g.over='win';toast(g.miss?'ผ่านแล้ว!':'ผ่านแบบไม่พลาดเลย!')}}
-  else{g.miss++;const best=Math.max(...[0,1,2,3].map(i=>gs.filter(x=>x===i).length));S.wa.fx={type:'shake',w:g.sel.slice()};
-    if(g.miss>=p.lives){waEnd(p,g,'lose');toast('หมดชีวิตแล้ว ดูเฉลยด้านบน')}else toast(best===3?'One away… ขาดอีกคำเดียว':'ยังไม่ใช่')}
-  waGSave();render()}
+ACT.waDesel=()=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);g.sel=[];S.wa.arm=null;waGSave();render()};
+ACT.waShuffle=()=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);g.order=shuffle(g.order);S.wa.arm=null;waGSave();render()};
+/* NYT-style motion: the 4 picked tiles hop one by one, then (if right) float up into the top row and merge into the colour bar */
+const waCalm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+const waTileEl=w=>document.querySelector(`.wa-tile[data-id="${CSS.escape(w)}"]`);
+function waRects(){const r={};document.querySelectorAll('.wa-tile').forEach(el=>{r[el.dataset.id]=el.getBoundingClientRect()});return r}
+function waFlip(before,ms){document.querySelectorAll('.wa-tile').forEach(el=>{const a=before[el.dataset.id];if(!a)return;const b=el.getBoundingClientRect();const dx=a.left-b.left,dy=a.top-b.top;if(!dx&&!dy)return;
+  el.style.transition='none';el.style.transform=`translate(${dx}px,${dy}px)`;el.style.zIndex=g0(el);el.getBoundingClientRect();
+  el.style.transition=`transform ${ms}ms cubic-bezier(.33,.8,.25,1)`;el.style.transform=''})}
+function g0(el){return el.getAttribute('aria-pressed')==='true'?2:1}
+/* swap the given words into the first 4 open slots; tiles already there trade places with them */
+function waToTop(p,g,words){const left=waLeft(p,g);const top=left.slice(0,4);const out=top.filter(w=>!words.includes(w));const inn=words.filter(w=>!top.includes(w));
+  inn.forEach((w,k)=>{const a=g.order.indexOf(w),b=g.order.indexOf(out[k]);g.order[a]=out[k];g.order[b]=w})}
+function waMerge(p,g,words,done){
+  if(waCalm()){done();return}
+  S.wa.busy=true;const before=waRects();waToTop(p,g,words);waGSave();render();waFlip(before,480);
+  setTimeout(()=>{S.wa.busy=false;done()},560)}
+function waSubmit(){const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(g.over||g.sel.length!==4)return;S.wa.arm=null;
+  const sel=g.sel.slice();const key=sel.slice().sort().join('|');if(g.tries.some(x=>x.k===key)){S.wa.msg='ทายชุดนี้ไปแล้ว';render();return}
+  const hit=p.groups.findIndex((x,i)=>!g.solved.includes(i)&&sel.every(w=>x.words.includes(w)));
+  const finish=()=>{const gs=sel.map(w=>waOwn(p,w));g.tries.push({k:key,g:gs});
+    if(hit>=0){g.solved.push(hit);g.how[hit]='g';g.cat[hit]=1;g.sel=[];S.wa.fx={type:'pop',gi:hit};
+      if(g.solved.length===4){g.used=waHintsUsed(g);g.over='win';S.wa.msg=g.miss?'ผ่านแล้ว!':'ผ่านแบบไม่พลาดเลย!'}}
+    else{g.miss++;const best=Math.max(...[0,1,2,3].map(i=>gs.filter(x=>x===i).length));S.wa.fx={type:'shake',w:sel};
+      if(g.miss>=p.lives){waEnd(p,g,'lose');S.wa.msg='หมดชีวิตแล้ว'}else S.wa.msg=best===3?'One away…':'ยังไม่ใช่'}
+    S.wa.busy=false;waGSave();render()};
+  if(waCalm()){finish();return}
+  S.wa.busy=true;sel.forEach((w,i)=>{const el=waTileEl(w);if(el){el.style.animationDelay=(i*110)+'ms';el.classList.add('jump')}});
+  setTimeout(()=>{if(hit<0){finish();return}waMerge(p,g,sel,finish)},110*3+340)}
 ACT.waSubmit=waSubmit;
-ACT.waHint=t=>{const p=waCur();if(!p)return;const g=waGet(p);const i=+t.dataset.id,k=+t.dataset.k;const key=`h${i}${k}`;
+ACT.waHint=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);const i=+t.dataset.id,k=+t.dataset.k;const key=`h${i}${k}`;
   if(S.wa.arm!==key){S.wa.arm=key;render();return}S.wa.arm=null;g.hint[i][k]=1;waGSave();render()};
-ACT.waReveal=t=>{const p=waCur();if(!p)return;const g=waGet(p);if(g.over)return;const i=+t.dataset.id,what=t.dataset.k;const key=what+i;
+ACT.waReveal=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(g.over)return;const i=+t.dataset.id,what=t.dataset.k;const key=what+i;
   if(S.wa.arm!==key){S.wa.arm=key;render();return}S.wa.arm=null;
   if(what==='cat'||what==='all')g.cat[i]=1;
-  if((what==='words'||what==='all')&&!g.solved.includes(i)){g.solved.push(i);g.how[i]='r';g.sel=g.sel.filter(w=>!p.groups[i].words.includes(w));S.wa.fx={type:'pop',gi:i};
-    if(g.solved.length===4){g.used=waHintsUsed(g);g.over='win';p.groups.forEach((x,j)=>{g.cat[j]=1})}}
+  if((what==='words'||what==='all')&&!g.solved.includes(i)){const ws=p.groups[i].words;g.sel=g.sel.filter(w=>!ws.includes(w));
+    const fin=()=>{g.solved.push(i);g.how[i]='r';S.wa.fx={type:'pop',gi:i};
+      if(g.solved.length===4){g.used=waHintsUsed(g);g.over='win';p.groups.forEach((x,j)=>{g.cat[j]=1})}waGSave();render()};
+    window.scrollTo({top:Math.max(0,(document.querySelector('.wa-board')||document.body).getBoundingClientRect().top+window.scrollY-120),behavior:waCalm()?'auto':'smooth'});
+    waMerge(p,g,ws,fin);return}
   waGSave();render()};
-ACT.waReset=()=>{const p=waCur();if(!p)return;openSheet('เล่นโจทย์นี้ใหม่?',`<p>Connections ${esc(p.t)} จะเริ่มใหม่หมด ผลเดิมในเครื่องนี้จะหายไป</p>`,
+ACT.waReset=()=>{const p=waCur();if(!p||S.wa.busy)return;openSheet('เล่นโจทย์นี้ใหม่?',`<p>Connections ${esc(p.t)} จะเริ่มใหม่หมด ผลเดิมในเครื่องนี้จะหายไป</p>`,
   '<button class="btn primary big" data-act="waResetGo" data-enter>เล่นใหม่</button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
 ACT.waResetGo=()=>{const p=waCur();closeSheet();if(!p)return;WAG[p.id]=waNew(p);waGSave();render()};
-ACT.waCopy=()=>{const p=waCur();if(!p)return;const g=waGet(p);
+ACT.waCopy=()=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);
   const txt=`Word Arcade · Connections ${p.t}\n`+g.tries.map(x=>x.g.map(i=>WA_EMO[i]||'⬜').join('')).join('\n');
   (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('คัดลอกผลแล้ว')).catch(()=>toast('คัดลอกไม่ได้'))};
 function waEndInfo(){const p=waCur();if(!p)return null;const g=waG(p);if(!g||g.over||!waStarted(g))return null;
@@ -3609,7 +3636,7 @@ document.addEventListener('keydown',e=>{
   const p=waCur();if(!p)return;const g=waG(p);if(!g||g.over||g.sel.length!==4)return;e.preventDefault();waSubmit()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-28T18:15:00+07:00';
+const SITE_UPDATED='2026-10-28T18:45:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
