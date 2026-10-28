@@ -738,6 +738,12 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 @keyframes waMsg{0%{opacity:0;transform:translate(-50%,-80%)}10%,80%{opacity:1;transform:translate(-50%,-100%)}100%{opacity:0;transform:translate(-50%,-100%)}}
 .wa-bar.pop{animation:waPop .32s cubic-bezier(.3,1.4,.5,1)}
 @keyframes waPop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+.wa-who{display:grid;gap:12px}
+.wa-who h3{font-size:1rem}
+.wa-team{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:.88rem;color:var(--muted)}
+.wa-award{display:flex;gap:8px 16px;flex-wrap:wrap;justify-content:center}
+.wa-award span{display:inline-flex;align-items:center;gap:6px}
+.wa-award b{font:600 .95rem var(--f-head);font-variant-numeric:tabular-nums}
 @media (max-width:420px){.wa-board{gap:6px}.wa-tile{border-radius:8px}.wa-tile span{font-size:.92rem}}
 </style>
 </head>
@@ -3391,8 +3397,11 @@ const WA_SNAP=[{"t":"#1","h":0,"l":5,"d":2,"k":5,"w":["PHONE","BALL","SUITCASE",
 const WA_COLORS=['เหลือง','เขียว','น้ำเงิน','ม่วง'];
 const WA_EMO=['🟨','🟩','🟦','🟪'];
 const WA_KINDS=[['all','ทั้งหมด'],['main','ชุดหลัก'],['bonus','BONUS'],['med','MED']];
-S.wa=Object.assign({view:'home',pid:null,kind:'all'},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;S.wa.busy=false;S.wa.msg=null;
-const waSave=()=>{const {view,pid,kind}=S.wa;LS.set('wa',{view,pid,kind})};
+S.wa=Object.assign({view:'home',pid:null,kind:'all',who:[]},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;S.wa.busy=false;S.wa.msg=null;
+const waSave=()=>{const {view,pid,kind,who}=S.wa;LS.set('wa',{view,pid,kind,who})};
+const waTeam=()=>(S.wa.who||[]).filter(id=>kidById(id)).sort();
+const waKey=p=>p.id+'@'+waTeam().join(',');
+const waGame=p=>'Connections '+p.t;
 let WAG=LS.get('waG',{});const waGSave=()=>LS.set('waG',WAG);
 const WAS={at:0,list:null,busy:false,err:'',try:0};
 (function(){const c=LS.get('waSheet',null);if(c&&Array.isArray(c.list)&&c.list.length){WAS.at=+c.at||0;WAS.list=c.list}})();
@@ -3467,9 +3476,9 @@ function waSyncLine(){
   return `<div class="wa-sync"><span class="dot ${WAS.list&&!WAS.err?'on':''}"></span><span>${st}</span><button class="wa-link" data-act="waSync" ${WAS.busy?'disabled':''}>ดึงใหม่</button></div>${tip}`}
 
 /* ---------- game state (per device; resets by itself if the puzzle is edited in the sheet) ---------- */
-function waNew(p){return {order:shuffle(p.board),sel:[],solved:[],how:{},cat:[0,0,0,0],hint:[[0,0,0],[0,0,0],[0,0,0],[0,0,0]],miss:0,tries:[],over:'',at:Date.now()}}
-const waG=p=>WAG[p.id]||null;
-function waGet(p){if(!WAG[p.id]){WAG[p.id]=waNew(p);waGSave()}return WAG[p.id]}
+function waNew(p){return {order:shuffle(p.board),sel:[],solved:[],how:{},cat:[0,0,0,0],hint:[[0,0,0],[0,0,0],[0,0,0],[0,0,0]],miss:0,tries:[],over:'',who:waTeam(),at:Date.now()}}
+const waG=p=>WAG[waKey(p)]||null;
+function waGet(p){const k=waKey(p);if(!WAG[k]){WAG[k]=waNew(p);waGSave()}return WAG[k]}
 const waOwn=(p,w)=>p.groups.findIndex(g=>g.words.includes(w));
 const waLeft=(p,g)=>g.order.filter(w=>!g.solved.includes(waOwn(p,w)));
 const waStarted=g=>!!(g&&(g.tries.length||g.solved.length||g.cat.some(Boolean)||g.hint.some(h=>h.some(Boolean))));
@@ -3479,6 +3488,12 @@ function waStatus(p){const g=waG(p);if(!g||!waStarted(g))return ['','ยัง�
 function waStars(n){n=Math.max(0,Math.min(5,n|0));return '★'.repeat(n)+`<s>${'★'.repeat(5-n)}</s>`}
 const waStarBox=p=>`<div class="wa-stars"><span>ความยาก <em>${waStars(p.diff)}</em></span><span>ความหลอก <em>${waStars(p.trick)}</em></span></div>`;
 const waHintsUsed=g=>g.over&&g.used!=null?g.used:g.hint.reduce((a,h)=>a+h.filter(Boolean).length,0)+g.cat.filter((c,i)=>c&&g.how[i]!=='g').length;
+function waHadWin(kid,p){return logs().some(e=>e.kid===kid&&e.kind==='game'&&e.game===waGame(p)&&e.win&&(+e.pts||0)>0)}
+function waRecord(p,g){if(g.saved)return;g.saved=1;const who=(g.who||[]).filter(id=>kidById(id));g.award={};
+  if(!who.length){waGSave();return}
+  const win=g.over==='win';const n=Math.max(0,p.lives-g.miss);const pts={};
+  who.forEach(id=>{if(win&&n>0&&!waHadWin(id,p)){pts[id]=n;g.award[id]=n}else g.award[id]=win&&n>0?'had':0});
+  waGSave();saveGameSession({game:waGame(p),players:who.map(id=>({id})),coop:true,win,pts}).then(()=>toast('บันทึกผลเข้าบ้านแล้ว')).catch(()=>toast('บันทึกผลเข้าบ้านไม่ได้'))}
 function waEnd(p,g,kind){g.used=waHintsUsed(g);p.groups.forEach((x,i)=>{if(!g.solved.includes(i)){g.solved.push(i);g.how[i]='e'}g.cat[i]=1});g.sel=[];g.over=kind}
 
 /* ---------- views ---------- */
@@ -3506,6 +3521,8 @@ function waListView(){
   const cnt=k=>all.filter(p=>k==='all'||p.kind===k).length;
   return `<section class="sec">
     <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Connections</h2><p>เลือกโจทย์ แล้วจับคำ 4 คำที่เข้ากลุ่มเดียวกัน</p></div></div>
+    ${kids().length?`<div class="panel wa-who"><div><h3>ใครเล่น</h3><p class="muted small">เลือกได้หลายคน ช่วยกันทายบนจอนี้ ผ่านแล้วทุกคนที่เลือกได้แต้มบ้านเท่ากับชีวิตที่เหลือ (นับครั้งแรกที่ผ่านโจทย์นั้น)</p></div>
+      <div class="pawns">${kids().map(k=>pawnBtn(k,'waWho',waTeam().includes(k.id))).join('')}</div></div>`:''}
     <div class="chips">${WA_KINDS.filter(([k])=>cnt(k)).map(([k,n])=>`<button class="chip" data-act="waKind" data-id="${k}" aria-pressed="${w.kind===k}">${n}<span class="n">${cnt(k)}</span></button>`).join('')}</div>
     ${list.length?`<div class="wa-list">${list.map(p=>{const [c,s]=waStatus(p);return `<button class="wa-card ${p.hidden?'hid':''}" data-act="waOpen" data-id="${esc(p.t)}">
       <div class="top"><b>${esc(p.t)}</b><span class="wa-st ${c}">${esc(s)}</span></div>${waStarBox(p)}
@@ -3537,6 +3554,10 @@ function waHelp(p,g){
           ${done?'':rev(i,'words','ดูคำในกลุ่ม')}${done||g.cat[i]?'':rev(i,'all','ดูทั้งกลุ่ม')}</div></div></div>`}).join('')}
   </div>`;
 }
+function waAwardLine(g){const who=(g.who||[]).filter(id=>kidById(id));
+  if(!who.length)return '<p class="muted small">เล่นแบบไม่บันทึก ไม่ได้แต้มบ้าน</p>';
+  return `<div class="wa-award">${who.map(id=>{const k=kidById(id);const a=(g.award||{})[id];
+    return `<span>${pawn(k,'sm')}<b>${a==='had'?'เคยได้แต้มโจทย์นี้แล้ว':a>0?'+'+a+' แต้ม':'0 แต้ม'}</b></span>`}).join('')}</div>`}
 function waDoneView(p,g){
   const emo=g.tries.map(t=>t.g.map(i=>WA_EMO[i]||'⬜').join('')).join('<br>');
   const hu=waHintsUsed(g);const rv=Object.values(g.how).filter(h=>h==='r').length;
@@ -3545,12 +3566,14 @@ function waDoneView(p,g){
   return `<div class="wa-done"><h3>${head}</h3>
     <p class="muted">พลาด ${g.miss}/${p.lives} · ใช้คำใบ้ ${hu} · ${g.over==='win'?(rv?`เปิดเฉลย ${rv} กลุ่ม`:'ไม่เปิดเฉลยเลย'):'เฉลยอยู่ด้านบน'}</p>
     ${emo?`<div class="wa-emo">${emo}</div>`:''}
+    ${waAwardLine(g)}
     <div class="btns" style="justify-content:center">${emo?'<button class="btn" data-act="waCopy">คัดลอกผล</button>':''}<button class="btn" data-act="waReset">เล่นใหม่</button>${nx?`<button class="btn primary" data-act="waOpen" data-id="${esc(nx.t)}">โจทย์ถัดไป: ${esc(nx.t)}</button>`:''}</div></div>`}
+function waTeamLine(){const t=waTeam();return t.length?`<div class="wa-team"><span class="stack">${t.map(id=>pawn(kidById(id),'sm')).join('')}</span><span>${t.length>1?'เล่นด้วยกัน':'กำลังเล่น'} · ผ่านแล้วได้แต้มเท่าชีวิตที่เหลือ</span></div>`:'<div class="wa-team"><span class="tag ex">เล่นแบบไม่บันทึกแต้ม</span></div>'}
 function waPlayView(p){
   const g=waGet(p);const left=waLeft(p,g);const lives=p.lives-g.miss;
   const shake=S.wa.fx&&S.wa.fx.type==='shake'?S.wa.fx.w:[];
   return `<section class="sec"><div class="wa-play">
-    <div class="wa-head"><div><button class="back" data-act="waView" data-id="conn">← โจทย์ทั้งหมด</button><h2>Connections ${esc(p.t)}</h2></div>${waStarBox(p)}</div>
+    <div class="wa-head"><div><button class="back" data-act="waView" data-id="conn">← โจทย์ทั้งหมด</button><h2>Connections ${esc(p.t)}</h2>${waTeamLine()}</div>${waStarBox(p)}</div>
     ${p.hidden?'<p class="wa-tip">โจทย์นี้ซ่อนอยู่ในชีต น้อง ๆ ยังไม่เห็น (unhide ในชีตเมื่อไรก็ขึ้นเว็บเอง)</p>':''}
     ${g.over?'':'<p class="wa-lead">จับ 4 คำที่อยู่กลุ่มเดียวกัน</p>'}
     <div class="wa-board">${waBars(p,g)}${left.map(w=>`<button class="wa-tile ${shake.includes(w)?'shake':''}" data-act="waTile" data-id="${esc(w)}" aria-pressed="${g.sel.includes(w)}" ${g.over?'disabled':''}><span>${esc(w)}</span></button>`).join('')}</div>
@@ -3568,15 +3591,23 @@ function waAfter(){
   document.querySelectorAll('.wa-tile span').forEach(sp=>{const t=sp.parentElement;sp.style.fontSize='';let fs=parseFloat(getComputedStyle(sp).fontSize)||16;let n=0;
     while((sp.scrollWidth>t.clientWidth-6||sp.scrollHeight>t.clientHeight-6)&&fs>9&&n++<30){fs-=.5;sp.style.fontSize=fs+'px'}});
   if(S.wa.fx){S.wa.fx=null}
+  {const p=waCur();const g=p&&waG(p);if(g&&g.over&&!g.saved)waRecord(p,g)}
   if(S.wa.msg){const b=document.querySelector('.wa-board');if(b){const m=document.createElement('div');m.className='wa-msg';m.setAttribute('role','status');m.textContent=S.wa.msg;b.appendChild(m);setTimeout(()=>m.remove(),2000)}S.wa.msg=null}
   if(S.wa.view!=='cross'&&!(S.wa.view==='conn'&&S.wa.pid))waSync(false);
 }
 
 /* ---------- actions ---------- */
+let waArmT=0;
+function waArm(key){S.wa.arm=key;render();clearTimeout(waArmT);waArmT=setTimeout(function back(){if(S.wa.arm!==key)return;if(S.wa.busy){waArmT=setTimeout(back,400);return}S.wa.arm=null;if(S.tab==='words')render()},3000)}
 const waCur=()=>S.wa.view==='conn'&&S.wa.pid?waFind(S.wa.pid):null;
 ACT.waView=t=>{S.wa.view=t.dataset.id;S.wa.busy=false;S.wa.pid=null;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
 ACT.waKind=t=>{S.wa.kind=t.dataset.id;waSave();render()};
-ACT.waOpen=t=>{S.wa.view='conn';S.wa.busy=false;S.wa.pid=t.dataset.id;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waOpen=t=>{const id=t.dataset.id;
+  if(kids().length&&!waTeam().length&&S.wa.view==='conn'&&!S.wa.pid){S.wa.pend=id;openSheet('ยังไม่ได้เลือกคนเล่น','<p>เลือกน้องที่จะเล่นก่อน ผ่านแล้วจะได้แต้มบ้าน หรือจะลองเล่นโดยไม่บันทึกก็ได้</p>',
+    '<button class="btn primary big" data-act="closeSheet" data-enter>เลือกคนเล่น</button><button class="btn ghost big" data-act="waOpenGo">เล่นโดยไม่บันทึก</button>');return}
+  S.wa.view='conn';S.wa.busy=false;S.wa.pid=id;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waOpenGo=()=>{const id=S.wa.pend;closeSheet();if(!id)return;S.wa.pend=null;S.wa.view='conn';S.wa.busy=false;S.wa.pid=id;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waWho=t=>{const id=t.dataset.id;const w=(S.wa.who||[]).filter(x=>kidById(x));const i=w.indexOf(id);if(i>=0)w.splice(i,1);else w.push(id);S.wa.who=w;waSave();render()};
 ACT.waSync=()=>waSync(true);
 ACT.waTile=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(g.over)return;const w=t.dataset.id;S.wa.arm=null;
   const i=g.sel.indexOf(w);if(i>=0)g.sel.splice(i,1);else{if(g.sel.length>=4)return;g.sel.push(w)}waGSave();render()};
@@ -3611,9 +3642,9 @@ function waSubmit(){const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(
   setTimeout(()=>{if(hit<0){finish();return}waMerge(p,g,sel,finish)},110*3+340)}
 ACT.waSubmit=waSubmit;
 ACT.waHint=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);const i=+t.dataset.id,k=+t.dataset.k;const key=`h${i}${k}`;
-  if(S.wa.arm!==key){S.wa.arm=key;render();return}S.wa.arm=null;g.hint[i][k]=1;waGSave();render()};
+  if(S.wa.arm!==key){waArm(key);return}S.wa.arm=null;g.hint[i][k]=1;waGSave();render()};
 ACT.waReveal=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(g.over)return;const i=+t.dataset.id,what=t.dataset.k;const key=what+i;
-  if(S.wa.arm!==key){S.wa.arm=key;render();return}S.wa.arm=null;
+  if(S.wa.arm!==key){waArm(key);return}S.wa.arm=null;
   if(what==='cat'||what==='all')g.cat[i]=1;
   if((what==='words'||what==='all')&&!g.solved.includes(i)){const ws=p.groups[i].words;g.sel=g.sel.filter(w=>!ws.includes(w));
     const fin=()=>{g.solved.push(i);g.how[i]='r';S.wa.fx={type:'pop',gi:i};
@@ -3623,7 +3654,7 @@ ACT.waReveal=t=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);if(g.o
   waGSave();render()};
 ACT.waReset=()=>{const p=waCur();if(!p||S.wa.busy)return;openSheet('เล่นโจทย์นี้ใหม่?',`<p>Connections ${esc(p.t)} จะเริ่มใหม่หมด ผลเดิมในเครื่องนี้จะหายไป</p>`,
   '<button class="btn primary big" data-act="waResetGo" data-enter>เล่นใหม่</button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
-ACT.waResetGo=()=>{const p=waCur();closeSheet();if(!p)return;WAG[p.id]=waNew(p);waGSave();render()};
+ACT.waResetGo=()=>{const p=waCur();closeSheet();if(!p)return;WAG[waKey(p)]=waNew(p);waGSave();render()};
 ACT.waCopy=()=>{const p=waCur();if(!p||S.wa.busy)return;const g=waGet(p);
   const txt=`Word Arcade · Connections ${p.t}\n`+g.tries.map(x=>x.g.map(i=>WA_EMO[i]||'⬜').join('')).join('\n');
   (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('คัดลอกผลแล้ว')).catch(()=>toast('คัดลอกไม่ได้'))};
@@ -3636,7 +3667,7 @@ document.addEventListener('keydown',e=>{
   const p=waCur();if(!p)return;const g=waG(p);if(!g||g.over||g.sel.length!==4)return;e.preventDefault();waSubmit()});
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-28T18:45:00+07:00';
+const SITE_UPDATED='2026-10-28T19:00:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
