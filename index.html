@@ -655,6 +655,85 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 @media (max-width:480px){.tb-row.res{grid-template-columns:6px auto minmax(0,1fr) auto}.tb-row.res .tb-acts{grid-column:1/-1}}
 .tb-row.res .tb-no{width:0}
 .tb-gst{justify-self:start}
+
+/* ---------- Word Arcade (Connections + Crossword) ---------- */
+:root{--wa-tile:#EAE8DE;--wa-tile-ink:#17212B;--wa-sel:#5B5A51;--wa-sel-ink:#FFFFFF;--wa-g0:#F4D762;--wa-g1:#A2C65E;--wa-g2:#AFC5EF;--wa-g3:#BE89CB;--wa-gink:#14191F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--wa-tile:#2A333D;--wa-tile-ink:#E6ECF1;--wa-sel:#E6ECF1;--wa-sel-ink:#10161C}}
+:root[data-theme="dark"]{--wa-tile:#2A333D;--wa-tile-ink:#E6ECF1;--wa-sel:#E6ECF1;--wa-sel-ink:#10161C}
+.wa-games{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.wa-game{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;display:grid;gap:10px;align-content:start;color:var(--ink)}
+.wa-game:hover{border-color:var(--muted)}
+.wa-game b{font:600 1.15rem/1.2 var(--f-head)}
+.wa-game span{color:var(--muted);font-size:.9rem;line-height:1.45}
+.wa-game .wa-mini{display:grid;grid-template-columns:repeat(4,14px);gap:3px}
+.wa-game .wa-mini i{display:block;width:14px;height:14px;border-radius:3px}
+.wa-xmini{display:grid;grid-template-columns:repeat(5,12px);gap:2px}
+.wa-xmini i{display:block;width:12px;height:12px;border:1px solid var(--muted);border-radius:2px}
+.wa-xmini i.k{background:var(--ink);border-color:var(--ink)}
+.wa-sync{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.86rem;color:var(--muted)}
+.wa-sync .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.wa-sync .dot.on{background:var(--good)}
+.wa-link{background:none;border:0;padding:0;color:var(--focus);font:500 .86rem var(--f-head);cursor:pointer;text-decoration:underline;text-underline-offset:.2em}
+.wa-link:disabled{opacity:.5;cursor:default}
+.wa-tip{font-size:.86rem;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 14px}
+.wa-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.wa-card{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;display:grid;gap:6px;color:var(--ink)}
+.wa-card:hover{border-color:var(--muted)}
+.wa-card.hid{border-style:dashed}
+.wa-card .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wa-card b{font:600 1.05rem/1.2 var(--f-head)}
+.wa-stars{display:grid;gap:2px;font-size:.8rem;color:var(--muted)}
+.wa-stars span{display:flex;gap:6px;align-items:center}
+.wa-stars em{font-style:normal;color:var(--star);letter-spacing:1px}
+.wa-stars em s{text-decoration:none;color:var(--line)}
+.wa-st{font:500 .72rem/1 var(--f-head);padding:5px 8px;border-radius:6px;white-space:nowrap;background:var(--sunk);color:var(--muted)}
+.wa-st.win{background:var(--good-bg);color:var(--good)}
+.wa-st.lose{background:var(--bad-bg);color:var(--bad)}
+.wa-st.go{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.wa-play{display:grid;gap:14px;max-width:640px;margin:0 auto;width:100%}
+.wa-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.wa-head h2{font-size:1.5rem}
+.wa-lead{text-align:center;color:var(--muted);font-size:.95rem}
+.wa-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wa-tile{appearance:none;border:0;border-radius:10px;background:var(--wa-tile);color:var(--wa-tile-ink);min-height:clamp(66px,18vw,84px);padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;min-width:0;overflow:hidden;transition:transform .12s ease,background .12s ease;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.wa-tile span{display:block;max-width:100%;font:700 1.02rem/1.15 var(--f-body);text-transform:uppercase;letter-spacing:.01em;overflow-wrap:normal;word-break:keep-all;hyphens:none}
+.wa-tile:active{transform:scale(.96)}
+.wa-tile[aria-pressed="true"]{background:var(--wa-sel);color:var(--wa-sel-ink)}
+.wa-tile:disabled{cursor:default}
+.wa-bar{grid-column:1/-1;border-radius:10px;min-height:clamp(66px,18vw,84px);display:grid;align-content:center;justify-items:center;gap:2px;padding:8px 10px;text-align:center;color:var(--wa-gink)}
+.wa-bar b{font:600 1rem/1.2 var(--f-head);text-transform:uppercase;letter-spacing:.02em}
+.wa-bar span{font:400 .95rem/1.3 var(--f-body);text-transform:uppercase}
+.wa-bar .rv{font:500 .7rem/1 var(--f-head);text-transform:none;background:rgba(255,255,255,.55);padding:3px 7px;border-radius:999px;margin-top:3px}
+.wa-bar .lock{font:500 .82rem/1.2 var(--f-head);text-transform:none;opacity:.75}
+.wa-g0{background:var(--wa-g0)}.wa-g1{background:var(--wa-g1)}.wa-g2{background:var(--wa-g2)}.wa-g3{background:var(--wa-g3)}
+.wa-lives{display:flex;justify-content:center;align-items:center;gap:8px;color:var(--muted);font-size:.95rem}
+.wa-lives i{width:13px;height:13px;border-radius:50%;background:var(--wa-sel);display:inline-block}
+.wa-lives i.x{background:transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.wa-ctrl{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.wa-ctrl .btn{border-radius:999px;min-width:96px}
+.wa-help{display:grid;gap:8px}
+.wa-help h3{font-size:1rem}
+.wa-hrow{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;align-items:stretch;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 10px}
+.wa-hrow>i{border-radius:5px}
+.wa-hrow .in{display:grid;gap:8px;min-width:0}
+.wa-hbtns{display:flex;gap:6px;flex-wrap:wrap}
+.wa-hb{font:500 .8rem/1.1 var(--f-head);padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;text-align:left}
+.wa-hb.on{background:var(--sunk);border-style:solid;cursor:default}
+.wa-hb.arm{border-color:var(--bad);color:var(--bad)}
+.wa-hb small{font:500 .7rem var(--f-head);color:var(--muted);margin-right:4px}
+.wa-hb .v{font:700 .86rem var(--f-body)}
+.wa-hb.dead{opacity:.45;cursor:default}
+.wa-done{display:grid;gap:10px;justify-items:center;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 16px}
+.wa-done h3{font:600 1.3rem var(--f-head)}
+.wa-emo{font-size:1.35rem;line-height:1.15;letter-spacing:2px}
+.wa-issues{font-size:.86rem;color:var(--muted);background:var(--surface);border:1px dashed var(--bad);border-radius:12px;padding:10px 14px}
+.wa-issues b{font:600 .9rem var(--f-head);color:var(--bad)}
+.wa-issues ul{margin:6px 0 0;padding-left:1.2em}
+@keyframes waShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@keyframes waPop{0%{transform:scale(.94);opacity:.4}100%{transform:scale(1);opacity:1}}
+.wa-tile.shake{animation:waShake .38s ease}
+.wa-bar.pop{animation:waPop .3s ease-out}
+@media (max-width:420px){.wa-board{gap:6px}.wa-tile{border-radius:8px}.wa-tile span{font-size:.92rem}}
 </style>
 </head>
 <body>
@@ -961,7 +1040,7 @@ const typing=()=>{const a=document.activeElement;return a&&$('#view').contains(a
 function changed(){if(typing()){pending=true;return}render()}
 document.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!typing()){pending=false;render()}},0));
 
-const TABS=[['home','หน้าบ้าน'],['points','แต้มบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
+const TABS=[['home','หน้าบ้าน'],['points','แต้มบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['words','Word Arcade'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
 function render(){
   Store.checkAdmin();
   if(S.tab==='admin'&&!S.bro)S.tab='home';
@@ -975,6 +1054,7 @@ function render(){
   const v=$('#view');
   if(Store.mode==='loading'){v.innerHTML='<div class="panel muted">กำลังเปิดประตูบ้าน…</div>';return}
   v.innerHTML=(VIEWS[S.tab]||vHome)();
+  if(S.tab==='words')waAfter();
   if(S.tab==='tools'&&S.tool==='timer')paintTimer();
   if(S.bro&&XB.state==='off'&&LS.get('xk',''))extLoad(false);
   if(EXT.after)try{EXT.after()}catch(e){}
@@ -1753,7 +1833,7 @@ function vAdmin(){
   <section class="sec"><div class="panel small muted">ที่เก็บข้อมูลตอนนี้: ${Store.kind==='firebase'?'Firebase (ทุกเครื่องที่เปิดเว็บนี้เห็นข้อมูลเดียวกัน · โหมดพี่ต้องล็อกอิน)':Store.mode==='shared'?'ฐานข้อมูลของหน้านี้ (ทุกคนที่มีสิทธิ์เปิดเห็นข้อมูลเดียวกัน)':'เบราว์เซอร์ของเครื่องนี้'} ${Store.kind==='firebase'?'':'· โหมดพี่เป็นแค่สวิตช์ซ่อนปุ่มแก้ไข ไม่ใช่รหัสผ่าน'}</div></section>`;
 }
 
-const VIEWS={home:vHome,points:vPoints,learn:vLearn,games:vGames,tools:vTools,wall:vWall,stickers:vStickers,admin:vAdmin};
+const VIEWS={home:vHome,points:vPoints,learn:vLearn,games:vGames,words:vWords,tools:vTools,wall:vWall,stickers:vStickers,admin:vAdmin};
 
 /* ---------- sheets (forms) ---------- */
 function openSheet(title,body,foot){
@@ -3208,6 +3288,7 @@ document.addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.i
 /* ---------- ทุกเกม: ⌘/Ctrl + Enter = จบเกม (ถามยืนยันก่อน) ---------- */
 function endInfo(){
   if(S.bro&&EXT.end){const x=EXT.end();if(x)return x}
+  if(S.tab==='words')return waEndInfo();
   if(S.tab!=='tools'||!S.tool)return null;
   switch(S.tool){
     case 'bsgs':{const s=S.bs;if(!s||s.phase==='setup'||s.phase==='end')return null;return {name:'Baan Suay Game Show',note:'ไปหน้าสรุปคะแนนเลย ช่องที่ยังไม่เปิดจะไม่ได้เล่น',go:()=>ACT.bsEndNow()}}
@@ -3232,7 +3313,7 @@ ACT.endGo=t=>{const g=S.endGo;S.endGo=null;closeSheet();if(!g)return;const c=(g.
 window.addEventListener('keydown',e=>{
   if(e.key!=='Enter'||!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.isComposing)return;
   if(!$('#sheet').hidden){const b=$('#sheetCard [data-endgo]');if(b){e.preventDefault();e.stopImmediatePropagation();b.click()}return}
-  if((S.tab!=='tools'||!S.tool)&&!(S.bro&&EXT.end&&EXT.end()))return;
+  if((S.tab!=='tools'||!S.tool)&&!(S.tab==='words'&&waEndInfo())&&!(S.bro&&EXT.end&&EXT.end()))return;
   e.preventDefault();e.stopImmediatePropagation();askEndGame();
 },true);
 /* Enter confirms the main button of a small confirm popup */
@@ -3294,8 +3375,240 @@ document.addEventListener('keydown',e=>{
   if(!k||!el||el.tagName!=='TEXTAREA'||!$('#fmtPrev')||!$('#sheetCard').contains(el))return;
   e.preventDefault();FMT.el=el;fmtWrap(el,el.selectionStart,el.selectionEnd,k)});
 
+
+/* ---------- Word Arcade: เกมคำภาษาอังกฤษสไตล์ NYT Games (พี่แต่งคำเอง) ----------
+   Connections: ดึงสดจาก Google Sheet "Connections" (export xlsx แบบ 1000 MAI) ถ้าดึงไม่ได้ใช้ชุดที่ฝังไว้ในเว็บ
+   ชีตที่ซ่อนอยู่ = ยังไม่ปล่อย: น้องไม่เห็น โหมดพี่เห็น · unhide ในชีตเมื่อไรก็ขึ้นเว็บเอง
+   Crossword: รอไฟล์โจทย์จากพี่ (ไม่ใช้ Google Sheet) */
+const WA_SHEET='105ghjTFll_4m95Or6asp1M9a0XaowaEZpnAu4ZR0QJA';
+const WA_SNAP_AT='2026-10-28T18:20:00+07:00';
+const WA_SNAP=[{"t":"#1","h":0,"l":5,"d":2,"k":5,"w":["PHONE","BALL","SUITCASE","BROW","DOOR","CRANE","WI-FI","TRAIN","SHIP","LID","GLASSES","BARRIER","ROCKET","SIGN","PLANE","WORKER"],"g":[["Vehicles used to travel long distances",["TRAIN","PLANE","SHIP","ROCKET"],["TRAIN","CRANE","Travel"]],["What you might see at a construction site",["BARRIER","SIGN","CRANE","WORKER"],["SIGN","SHIP","Building"]],["Things you can add a passcode to",["DOOR","PHONE","SUITCASE","WI-FI"],["SUITCASE","BROW","Access"]],["Eye___",["LID","BROW","GLASSES","BALL"],["BALL","PHONE","Look"]]]},{"t":"#2","h":0,"l":5,"d":2,"k":1,"w":["HAIL","TRIANGL","METEORS","SPILL","SNOW","BOIL","MEDIUM","HALFWAY","CIRCL","RAIN","POUR","DRINK","CUB","MIDDLE","SQUAR","CENTER"],"g":[["Things that fall from the sky",["SNOW","METEORS","RAIN","HAIL"],["HAIL","BOIL","Blue"]],["Midpoint / Equal distances from two points",["CENTER","MIDDLE","HALFWAY","MEDIUM"],["MEDIUM","CUB","50"]],["What you can do with water",["POUR","DRINK","SPILL","BOIL"],["DRINK","SNOW","Flow"]],["Shapes with the last \"E\" removed",["SQUAR","TRIANGL","CIRCL","CUB"],["CIRCL","MIDDLE","2D/3D"]]]},{"t":"#3","h":0,"l":5,"d":2,"k":4,"w":["BLUE","SHINY","CROWD","BUTTON","DOORBELL","GLOWING","STRAW","LION","BRIGHT","SWITCH","RASP","JAGUAR","BLACK","HORN","DINOSAUR","LIGHT"],"g":[["Things you can press to operate",["SWITCH","BUTTON","DOORBELL","HORN"],["DOORBELL","LIGHT","Fingers"]],["Shining / Giving light",["LIGHT","BRIGHT","GLOWING","SHINY"],["GLOWING","JAGUAR","Not black"]],["Cover your ears…these can roar!",["LION","DINOSAUR","CROWD","JAGUAR"],["LION","RASP","Turn volume down"]],["___berries",["STRAW","BLACK","BLUE","RASP"],["BLUE","HORN","Yum"]]]},{"t":"#4","h":0,"l":5,"d":2,"k":3,"w":["TASTED","PAIN","SAW","TOUCHED","CHOPSTICK","LAMP","SPOON","HURT","BEED","SORE","PORT","KETTLE","MUTTOH","ACHE","SMELLED","KNIFE"],"g":[["Four of the five senses (in past tense)",["SAW","TOUCHED","SMELLED","TASTED"],["TASTED","KNIFE","Heard"]],["Discomfort",["PAIN","ACHE","SORE","HURT"],["SORE","BEED","Ouch!"]],["Items found in a kitchen",["KNIFE","SPOON","CHOPSTICK","KETTLE"],["CHOPSTICK","SAW","Plate"]],["Animal products but the last letter is changed",["LAMP","PORT","BEED","MUTTOH"],["PORT","HURT","Protein"]]]},{"t":"#5","h":0,"l":5,"d":1,"k":2,"w":["RUN","POT","SEA","KAY","SIS","BOX","TOW","BRO","BEE","MOM","CAN","DAD","FLY","ROW","YOU","JAR"],"g":[["Family members (in short?)",["MOM","DAD","SIS","BRO"],["SIS","YOU","FAM"]],["Containers",["POT","BOX","CAN","JAR"],["CAN","MOM","BAG"]],["Moving vehicles",["ROW","FLY","RUN","TOW"],["ROW","POT","CAR"]],["Sounds like certain English alphabets",["BEE","SEA","KAY","YOU"],["BEE","FLY","ABC"]]]},{"t":"#6","h":0,"l":5,"d":2,"k":4,"w":["ACCURATE","DOWN","SINGULAR","BLIND","DUO","VALID","COUPLE","LA","MUTE","AMPERE","GRADE 4","TWIN","PAIR","RIGHT","DEAF","TRUE"],"g":[["Sets of 2",["TWIN","COUPLE","PAIR","DUO"],["PAIR","GRADE","HH II NN TT"]],["Words that can replace \"correct\"",["RIGHT","TRUE","ACCURATE","VALID"],["VALID","TWIN","YES"]],["Disabilities",["BLIND","DEAF","MUTE","DOWN"],["MUTE","TRUE","Cannot"]],["What the letter A might represents",["SINGULAR","AMPERE","GRADE 4","LA"],["AREA","DOWN","@"]]]},{"t":"#7","h":0,"l":5,"d":4,"k":5,"w":["BUSINESS","SWIFT","FIRST","MINTAGE","SPEEDY","MASTERCARD","MANGOLD","PREMIUM","SALE","NIMBLE","COFFEEPOT","GET 1 FREE","LEMONFISH","ECONOMY","BRISK","BEVERAGES"],"g":[["What you might see on a sign while shopping",["SALE","GET 1 FREE","MASTERCARD","BEVERAGES"],["SALE","COFFEEPOT","Aisle"]],["Synonym for fast",["BRISK","SWIFT","NIMBLE","SPEEDY"],["NIMBLE","PREMIUM","The Flash"]],["Airplane classes",["ECONOMY","PREMIUM","BUSINESS","FIRST"],["FIRST","GET 1 FREE","Above clouds"]],["Starting with an ice-cream flavor",["LEMONFISH","MINTAGE","MANGOLD","COFFEEPOT"],["MINTAGE","BRISK","Cone"]]]},{"t":"#8","h":0,"l":5,"d":2,"k":3,"w":["FUND","DYNAMITE","SAFE","MAPS","YOYO","DAWN","HALLS","NOON","TWILIGHT","MUSIC","BANK","CAMERA","PURSE","HEARTBEAT","NIGHT","WEATHER"],"g":[["Places to store your money",["SAFE","PURSE","BANK","FUND"],["FUND","TWILIGHT","Piggy"]],["Time of day",["DAWN","NIGHT","NOON","TWILIGHT"],["DAWN","WEATHER","1440 minutes"]],["Candy brands well-known in Thailand",["YOYO","DYNAMITE","HEARBEAT","HALLS"],["YOYO","PURSE","Diabetes"]],["Default applications on an iPhone",["CAMERA","MAPS","WEATHER","MUSIC"],["CAMERA","DYNAMITE","VS Android"]]]},{"t":"#9","h":0,"l":5,"d":3,"k":4,"w":["DELETE","DORAEMON","DENTAL OFFICE","WAST","VET PRACTICE","TIGGER","CONTROL","HOME","SORTH","NEST","CLINIC","EOUTH","HOSPITAL","ESCAPE","MANEKI-NEKO","TOM"],"g":[["Places for medical care",["HOSPITAL","CLINIC","DENTAL OFFICE","VET PRACTICE"],["CONTROL","CLINIC","Use with a mouse"]],["Keys on a keyboard",["DELETE","CONTROL","HOME","ESCAPE"],["DENTAL OFFICE","NEST","Patient"]],["Identified as cats",["DORAEMON","MANEKI-NEKO","TIGGER","TOM"],["TOM","ESCAPE","Purr…"]],["Cardinal directions with the first letter mixed up",["SORTH","EOUTH","WAST","NEST"],["WAST","TIGGER","That way!"]]]},{"t":"#10","h":1,"l":5,"d":3,"k":3,"w":["PRESUMMABLY","DESERT","APPETIZER","LIKKELY","BROWNIE","SNACK","CAKE","DESSERT","TUNDRA","PERRHAPS","MOUSSE","MAIN COURSE","MARINE","PROBBABLY","FOREST","PIE"],"g":[["Examples of desserts",["CAKE","MOUSSE","PIE","BROWNIE"],["BROWNIE","TUNDRA","Trick or ___"]],["Biomes",["DESERT","FOREST","TUNDRA","MARINE"],["MARINE","LIKKELY","Climates"]],["Courses of a meal served in a restaurant",["APPETIZER","MAIN COURSE","DESSERT","SNACK"],["APPETIZER","MOUSSE","Michelin-star"]],["Synonym of \"maybe\" but a letter is doubled",["PROBBABLY","PERRHAPS","LIKKELY","PRESUMMABLY"],["PERRHAPS","DESSERT","Around 90%"]]]},{"t":"#11","h":1,"l":5,"d":1,"k":5,"w":["SOME","EGG","FOR","LEVEL","MILK","TO","WOOL","ANTI","FLOOR","HONEY","NO","ATE","WON","TIER","EVERY","STORY"],"g":[["Products from animals",["EGG","MILK","WOOL","HONEY"],["EGG","FLOOR","Farm"]],["Layers of a building",["FLOOR","STORY","LEVEL","TIER"],["LEVEL","WOOL","Pretty high"]],["___body",["SOME","EVERY","NO","ANTI"],["NO","WON","\"one\" almost works"]],["Homophones of certain numbers",["WON","TO","FOR","ATE"],["FOR","SOME","Know."]]]},{"t":"#12","h":1,"l":5,"d":2,"k":2,"w":["SLEG","POOL","HARM","POND","FAINT","PERIOD","COMA","WHEAD","OCEAN","SLEEP","ELLIPSIS","COMMA","ANESTHESIA","COLON","LAKE","ABACK"],"g":[["Bodies of water",["POOL","LAKE","POND","OCEAN"],["POOL","ELLIPSIS","Splash!"]],["Punctuation marks",["COMMA","PERIOD","COLON","ELLIPSIS"],["PERIOD","SLEEP","Sentences"]],["Being in unconscious state",["COMA","SLEEP","FAINT","ANESTHESIA"],["FAINT","WHEAD","Call help!!!"]],["Parts of the body plus a starting letter",["HARM","WHEAD","SLEG","ABACK"],["ABACK","COLON","Yourself"]]]},{"t":"#13","h":1,"l":5,"d":3,"k":5,"w":["ADMIT","DIOR","INDONESIAN FLAG","DOCS","FRACTION","MEDICINES","PLAY","GLADE","SHEETS","EQUAL SIGN","REFER","CLASSROOM","CHANEL","CERTIFICATES","FEBREZE","SANDGLASS"],"g":[["Well-known fragrance brands",["GLADE","DIOR","CHANEL","FEBREZE"],["CHANEL","HOURGLASS","Good for nose"]],["Google products",["DOCS","SHEETS","PLAY","CLASSROOM"],["SHEETS","GLADE","\"MEET\" counts"]],["What doctors might assign for patients",["ADMIT","REFER","MEDICINES","CERTIFICATES"],["ADMIT","PLAY","Feeling well now?"]],["Has upper and lower halves",["FRACTION","SANDGLASS","EQUAL SIGN","INDONESIAN FLAG"],["EQUAL SIGN","MEDICINES","Sky & Sea"]]]},{"t":"#14","h":1,"l":5,"d":3,"k":3,"w":["TRUCK","PIANO","FORWARD","CANCELLED","TOUCHDOWN","ELEVATOR","READ","BICYCLE","DELAYED","SEWING MACHINE","LADDER","AIRBORNE","SCAFFOLDING","SEND","ESCALATOR","COPY"],"g":[["Use to travel vertically",["ELEVATOR","ESCALATOR","LADDER","SCAFFOLDING"],["ELEVATOR","PIANO","Super high"]],["What you can do to text messsages",["SEND","COPY","READ","FORWARD"],["SEND","TOUCHDOWN","Call or ___ me"]],["Flight status",["DELAYED","CANCELLED","AIRBORNE","TOUCHDOWN"],["CANCELLED","FORWARD","Super high"]],["Have pedals",["TRUCK","BICYCLE","PIANO","SEWING MACHINE"],["TRUCK","SCAFFOLDING","Foot press"]]]},{"t":"#15","h":1,"l":5,"d":4,"k":3,"w":["BTS","SGD","STU","THB","MOL","BRT","OHM","BUS","JPY","GHI","MRT","ABC","NOP","TON","USD","ATM"],"g":[["Abbreviations for currencies",["USD","THB","JPY","SGD"],["USD","ATM","Who pays?"]],["Public transportations in Thailand",["BTS","MRT","BRT","BUS"],["MRT","SGD","Commute"]],["Units of measure",["ATM","MOL","OHM","TON"],["TON","STU",""]],["Consecutive English letters",["ABC","GHI","NOP","STU"],["NOP","BRT",""]]]},{"t":"#16","h":1,"l":5,"d":3,"k":3,"w":["NEARBY","OCCASIONALLY","INTER","EVER","FRESHLY","CONFINED","JUST","OFTEN","SHUT","LATELY","RARELY","INSEPARABLE","FOR","NEVER","DIG","RECENTLY"],"g":[["Adverbs of frequency",["NEVER","OFTEN","RARELY","OCCASIONALLY"],["NEVER","JUST","Every time"]],["Not long ago",["RECENTLY","JUST","LATELY","FRESHLY"],["LATELY","RARELY","Yesterday"]],["Synonyms for \"close\"",["NEARBY","CONFINED","SHUT","INSEPARABLE"],["SHUT","EVER","Not opened"]],["Adding -est gives a different meaning",["EVER","FOR","INTER","DIG"],["INTER","NEAR","Superlative"]]]},{"t":"#17","h":1,"l":5,"d":2,"k":3,"w":["SPIDER","BRAIN","PORCUPINE","INFLATE","SWELL","BEAR TRAP","LEECH","MOSQUITO","RAZOR","VAMPIRE","SUPER","CANINE","DILATE","WONDERWO","EXPAND","ANT"],"g":[["To grow",["EXPAND","DILATE","INFLATE","SWELL"],["DILATE","SUPER","Balloon"]],["Requires blood to live",["MOSQUITO","LEECH","VAMPIRE","BRAIN"],["MOSQUITO","PORCUPINE","Heart-related"]],["Has a sharp body",["BEAR TRAP","RAZOR","PORCUPINE","CANINE"],["RAZOR","VAMPIRE","Poke poke"]],["Superheroes named ___man",["SPIDER","ANT","SUPER","WONDERWO"],["SPIDER","INFLATE","Save the world"]]]},{"t":"#18","h":1,"l":5,"d":4,"k":3,"w":["ESCALATE","SPECTACLED","SUBQUOTIENT","WINGS","BEAK","SKYROCKET","CROWN","GRIZZLY","SURGE","AMERICAN BLACK","TAIL","BYPRODUCT","INDIFFERENCE","ARTERIOSUM","POLAR","SPIKE"],"g":[["Increase sharply",["ESCALATE","SPIKE","SURGE","SKYROCKET"],["SURGE","CROWN","Positive slope"]],["Parts of a bird",["BEAK","WINGS","TAIL","CROWN"],["WINGS","SPIKE","Flying nature"]],["Types of bears",["POLAR","GRIZZLY","AMERICAN BLACK","SPECTACLED"],["GRIZZLY","ARTERIOSUM","Growls"]],["Ending with math operation results",["ARTERIOSUM","INDIFFERENCE","BYPRODUCT","SUBQUOTIENT"],["BYPRODUCT","SPECTACLED","10^100"]]]},{"t":"#19","h":1,"l":5,"d":2,"k":3,"w":["INDEX","WEB","MORSE","ALL","INVESTIGATOR","IMAGES","DETECTIVE","BRAILLE","THUMB","SECURITY","UNICODE","RING","SHOPPING","BINARY","PINKY","PATROL"],"g":[["Fingers",["THUMB","INDEX","RING","PINKY"],["THUMB","MORSE","5 in 1"]],["Law enforcements",["INVESTIGATOR","DETECTIVE","SECURITY","PATROL"],["DETECTIVE","WEB","Arrest"]],["Systems used as codes",["MORSE","BRAILLE","BINARY","UNICODE"],["BRAILLE","RING","Eng replacement"]],["Google search tabs",["ALL","IMAGES","WEB","SHOPPING"],["SHOPPING","SECURITY","10^100"]]]},{"t":"#20","h":1,"l":5,"d":2,"k":4,"w":["TAKE NOTES","STITCH","BARCODE","PAY ATTENTION","PIANO KEYS","UNKNOWN","LUNCH","SADNESS","OLAF","ANSWER","TEN","CROSSWALK","TIMES","PRISON UNIFORM","WRONG","LIONHEART"],"g":[["Have zebra stripes",["CROSSWALK","BARCODE","PRISON UNIFORM","PIANO KEYS"],["CROSSWALK","PAY ATTENTION","Yin-Yang"]],["What you typically do at school",["PAY ATTENTION","TAKE NOTES","ANSWER","LUNCH"],["TAKE NOTES","WRONG","Any questions?"]],["Disney characters",["OLAF","STITCH","LIONHEART","SADNESS"],["LIONHEART","PIANO KEYS","Not that knee"]],["What X might mean",["TIMES","WRONG","UNKNOWN","TEN"],["UNKNOWN","SADNESS","Ray for plain film"]]]},{"t":"#21","h":1,"l":5,"d":1,"k":1,"w":["NEWSPAPER","COUNTDOWN","PRICE","MONEY","FRIEND","MEDAL","AUTHOR","PRIZE","TITLE","SHUTTER","CHEESE","EDITION","SOCIAL MEDIA","CERTIFICATE","TELEVISION","NEXT"],"g":[["Labels on a book cover",["TITLE","EDITION","PRICE","AUTHOR"],["TITLE","CERTIFICATE","Lots of text"]],["Possible rewards for winning a competition",["PRIZE","MONEY","MEDAL","CERTIFICATE"],["MONEY","PRICE","Lots of places"]],["\"Where did you heard the news from?\"",["NEWSPAPER","SOCIAL MEDIA","TELEVISION","FRIEND"],["NEWSPAPER","SHUTTER","Lots of fake ones"]],["What you might hear during a photoshoot",["CHEESE","COUNTDOWN","SHUTTER","NEXT"],["COUNTDOWN","FRIEND","Lots of makeup"]]]},{"t":"BONUS #1","h":0,"l":5,"d":5,"k":2,"w":["HERRINGBONE","SCORCH","UP","LEAF","CHEVRON","WONDERS","TILES","BARK","ELEVEN","CHECKERBOARD","SINGE","BRANCH","DWARFS","BURN","ROOT","BLAZE"],"g":[["Parts of a tree",["BARK","LEAF","ROOT","BRANCH"],["BRANCH","SINGE","Grow"]],["To light up in flame",["SCORCH","SINGE","BLAZE","BURN"],["BLAZE","TILES","Sweating"]],["Floor patterns",["TILES","CHECKERBOARD","HERRINGBONE","CHEVRON"],["CHEVRON","ELEVEN","Walk…or run"]],["Seven ___",["UP","ELEVEN","DWARFS","WONDERS"],["UP","ROOT","Rainbow"]]]},{"t":"BONUS #2","h":1,"l":5,"d":5,"k":4,"w":["KARATE","LIGHTERY","FIREFIGHTER","KENDO","NINJA","UJI","MATCHA","OXYGENE","NISHIO","SUMO","SURGEON","LOGO","DIVER","YAME","JUDO","SHIZUOKA"],"g":[["Japanese martial arts",["KARATE","SUMO","JUDO","KENDO"],["KENDO","NISHIO","Combat"]],["Famous matcha-producing regions in Japan",["UJI","NISHIO","SHIZUOKA","YAME"],["UJI","JUDO","T but green"]],["Wear masks",["NINJA","DIVER","SURGEON","FIREFIGHTER"],["DIVER","OXYGENE","Low Oxygen"]],["Things used to start a fire plus a letter",["MATCHA","LIGHTERY","LOGO","OXYGENE"],["LOGO","NINJA","1000°C"]]]},{"t":"BONUS #3","h":1,"l":5,"d":5,"k":5,"w":["NORI","LIST","DNA","PRISONER","BOARD","DNOMAID","REPPOC","LOLLIPOP","HAHAUSEN","HOUSE","ANODE","NING","SKULLFISH","SIGNAL","DLOG","ROFLUMILAST"],"g":[["Ores but letters are reversed",["NORI","DLOG","DNOMAID","REPPOC"],["DLOG","NING","Precious"]],["Starting with a reaction to funny texts",["LOLLIPOP","HAHAUSEN","ROFLUMILAST","SKULLFISH"],["SKULLFISH","SIGNAL","lmfao"]],["White___",["BOARD","LIST","HOUSE","NING"],["BOARD","LOLLIPOP","Clean & bright"]],["What a cell might have",["DNA","PRISONER","ANODE","SIGNAL"],["ANODE","NORI","Smallest of you"]]]},{"t":"MED #1","h":0,"l":5,"d":3,"k":4,"w":["ARM","TROCHLEA","PEDICLE","PELVIS","LUMBAR VERTEBRA","DEEP NECK","FOOT","CRIBRIFORM PLATE","DIAPHRAGM","RAMUS","PITUITARY GLAND","DESCENDING HELIX","XIPHOID PROCESS","TRANSVERSE SINUS","STAPES","AORTA"],"g":[["Bony landmarks",["PEDICLE","TROCHLEA","RAMUS","XIPHOID PROCESS"],["RAMUS","CRIBRIFORM PLATE","S in \"MS\""]],["Located inside the skull",["PITUITARY GLAND","CRIBRIFORM PLATE","TRANSVERSE SINUS","STAPES"],["TRANSVERSE SINUS","AORTA","Protects the brain"]],["Have arch",["AORTA","PELVIS","FOOT","LUMBAR VERTEBRA"],["FOOT","ARM","Bridge"]],["Regions innervated by cervical nerve roots",["DIAPHRAGM","DEEP NECK","ARM","DESCENDING HELIX"],["DIAPHRAGM","XIPHOID PROCESS","1-8"]]]},{"t":"MED #2","h":0,"l":5,"d":3,"k":3,"w":["HYPOPERFUSION","CYANOBACTERIA","VIRAL RNA","ISCHEMIA","MYOGLOBIN","PH 8 URINALYSIS","ST SEGMENT","BILE","HYPOXIA","LDH1","HYPOVOLEMIA","CRP","TROPONIN","BODY TEMPERATURE","CREATINE KINASE","CITRATE NEGATIVE"],"g":[["Reduced blood circulation",["HYPOXIA","HYPOPERFUSION","ISCHEMIA","HYPOVOLEMIA"],["HYPOXIA","TROPONIN","Low SV"]],["Biomarkers for myocardial infarction",["TROPONIN","MYOGLOBIN","CREATINE KINASE","LDH1"],["CREATINE KINASE","CRP","Acute coronary"]],["Elevated level might indicate viral infection",["ST SEGMENT","BODY TEMPERATURE","CRP","VIRAL RNA"],["BODY TEMPERATURE","PH 8 URINALYSIS","Serology test"]],["Green",["CITRATE NEGATIVE","CYANOBACTERIA","PH 8 URINALYSIS","BILE"],["CYANOBACTERIA","HYPOXIA","Like chlorophyll"]]]},{"t":"MED #3","h":1,"l":5,"d":1,"k":1,"w":["JUST","BLAST","CHRONIC","POLY","GEST","OSIS","OO","AUTO","BLOODY","NON","HYPER","AMNI","OSMOTIC","STEATORRHEA","BEN","RRHEA"],"g":[["Excessive",["HYPER","POLY","OSIS","RRHEA"],["POLY","BLAST","ilyvm"]],["Types of diarrhea",["OSMOTIC","CHRONIC","BLOODY","STEATORRHEA"],["OSMOTIC","OSIS","Usually liquid"]],["Embryologic prefixes",["GEST","AMNI","BLAST","OO"],["AMNI","AUTO","Prenatal"]],["Starting of principles of medical ethics",["AUTO","BEN","NON","JUST"],["JUST","CHRONIC","Do what's right"]]]},{"t":"MED #4","h":1,"l":5,"d":2,"k":5,"w":["URIA","TUBULE","ATAXIA","EXTENSION","EPISTAXIS","PIVOT","PHONE","VILLI","CIRCULATION","OXYLIN","WINE","EMBER","OCHEZIA","DERMATITIS","EMESIS","CHEMOTAXIS"],"g":[["Movement patterns",["CHEMOTAXIS","PIVOT","ATAXIA","EXTENSION"],["ATAXIA","WINE","Sensory & ___"]],["Can cause red stain on the skin",["EPISTAXIS","DERMATITIS","WINE","EMBER"],["EPISTAXIS","CIRCULATION","Last color of rainbow"]],["Hemat___",["EMESIS","URIA","OCHEZIA","OXYLIN"],["OXYLIN","PIVOT","A concerning color"]],["Micro___",["VILLI","TUBULE","PHONE","CIRCULATION"],["VILLI","URIA","Not even glasses help"]]]}];
+const WA_COLORS=['เหลือง','เขียว','น้ำเงิน','ม่วง'];
+const WA_EMO=['🟨','🟩','🟦','🟪'];
+const WA_KINDS=[['all','ทั้งหมด'],['main','ชุดหลัก'],['bonus','BONUS'],['med','MED']];
+S.wa=Object.assign({view:'home',pid:null,kind:'all'},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;
+const waSave=()=>{const {view,pid,kind}=S.wa;LS.set('wa',{view,pid,kind})};
+let WAG=LS.get('waG',{});const waGSave=()=>LS.set('waG',WAG);
+const WAS={at:0,list:null,busy:false,err:'',try:0};
+(function(){const c=LS.get('waSheet',null);if(c&&Array.isArray(c.list)&&c.list.length){WAS.at=+c.at||0;WAS.list=c.list}})();
+const waUp=s=>String(s==null?'':s).trim().replace(/\s+/g,' ').toUpperCase();
+function waLev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let p=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function waHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
+/* one sheet tab → a playable puzzle (fixes small sheet slips and lists them for โหมดพี่) */
+function waNorm(r){
+  const t=String(r.t||'').trim();const iss=[];
+  const kind=/^bonus/i.test(t)?'bonus':/^med/i.test(t)?'med':'main';
+  const board=(r.w||[]).map(waUp);
+  if(board.length!==16||board.some(x=>!x)||new Set(board).size!==16)return {t,skip:'กระดานยังมีคำไม่ครบ 16 คำ หรือมีคำซ้ำ'};
+  const used=new Set();const groups=[];
+  for(let i=0;i<4;i++){const g=(r.g||[])[i]||[];const ws=(g[1]||[]).map(waUp);
+    if(ws.length!==4||ws.some(x=>!x))return {t,skip:`เฉลยกลุ่ม${WA_COLORS[i]}ยังมีคำไม่ครบ 4 คำ`};
+    const out=[];
+    for(const w of ws){
+      if(board.includes(w)&&!used.has(w)){used.add(w);out.push(w);continue}
+      let best=null,bd=9;for(const b of board){if(used.has(b))continue;const d=waLev(w,b);if(d<bd){bd=d;best=b}}
+      if(best&&bd<=2){used.add(best);out.push(best);iss.push(`เฉลยกลุ่ม${WA_COLORS[i]}เขียน ${w} แต่บนกระดานเป็น ${best} · เว็บนับเป็นคำเดียวกันให้`)}
+      else return {t,skip:`คำเฉลย ${w} (กลุ่ม${WA_COLORS[i]}) ไม่อยู่บนกระดาน`};
+    }
+    const h=g[2]||[];groups.push({name:String(g[0]||'').trim(),words:out,hint:{in:String(h[0]||'').trim(),out:String(h[1]||'').trim(),cat:String(h[2]||'').trim()}});
+  }
+  const own=x=>groups.findIndex(g=>g.words.includes(waUp(x)));
+  const hs=groups.map(g=>g.hint);const want=hs.map(h=>own(h.in));
+  if(want.every(x=>x>=0)&&new Set(want).size===4&&want.some((x,i)=>x!==i)){want.forEach((j,i)=>{groups[j].hint=hs[i]});iss.push('แถวคำใบ้บางแถวอยู่ผิดสี · เว็บย้ายไปกลุ่มที่มีคำใน Hint 1 ให้')}
+  groups.forEach((g,i)=>{const n=WA_COLORS[i];
+    if(!g.name)iss.push(`กลุ่ม${n}ยังไม่มีชื่อหมวด`);
+    if(!g.hint.in)iss.push(`กลุ่ม${n}ยังไม่มี Hint 1`);else if(own(g.hint.in)!==i)iss.push(`Hint 1 ของกลุ่ม${n} คือ ${g.hint.in} ${own(g.hint.in)<0?'ซึ่งไม่อยู่บนกระดาน':'ซึ่งอยู่ในกลุ่มอื่น'}`);
+    if(!g.hint.out)iss.push(`กลุ่ม${n}ยังไม่มี Hint 2`);else if(own(g.hint.out)<0)iss.push(`Hint 2 ของกลุ่ม${n} คือ ${g.hint.out} ซึ่งไม่ตรงกับคำบนกระดาน`);else if(own(g.hint.out)===i)iss.push(`Hint 2 ของกลุ่ม${n} คือ ${g.hint.out} ซึ่งอยู่ในกลุ่มนี้เอง`);
+    if(!g.hint.cat)iss.push(`กลุ่ม${n}ยังไม่มี Hint 3`)});
+  const sig=t+'|'+groups.map(g=>g.name+':'+g.words.join(',')).join('|');
+  return {id:waHash(sig),t,kind,hidden:!!r.h,lives:Math.min(9,Math.max(1,+r.l||5)),diff:+r.d||0,trick:+r.k||0,board,groups,issues:iss};
+}
+let waMemo={src:null,all:[]};
+function waAll(){const src=WAS.list||WA_SNAP;if(waMemo.src!==src)waMemo={src,all:src.map(waNorm)};return waMemo.all}
+const waPlayable=()=>waAll().filter(p=>!p.skip&&(S.bro||!p.hidden));
+const waFind=t=>waPlayable().find(p=>p.t===t);
+
+/* ---------- live sync (read-only export of the sheet; needs "Anyone with the link: Viewer") ---------- */
+let waXL=null;
+function waXLSX(){if(window.XLSX)return Promise.resolve(window.XLSX);if(waXL)return waXL;
+  waXL=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';sc.onload=()=>window.XLSX?ok(window.XLSX):no(new Error('xlsx'));sc.onerror=()=>{waXL=null;no(new Error('xlsx'))};document.head.appendChild(sc)});return waXL}
+async function waFetch(){
+  const r=await fetch(`https://docs.google.com/spreadsheets/d/${WA_SHEET}/export?format=xlsx&t=${Date.now()}`,{cache:'no-store'});
+  if(!r.ok)throw new Error('http '+r.status);const buf=await r.arrayBuffer();const XL=await waXLSX();const wb=XL.read(buf,{type:'array'});
+  const meta=(wb.Workbook&&wb.Workbook.Sheets)||[];const list=[];
+  wb.SheetNames.forEach(n=>{if(/^template$/i.test(String(n).trim()))return;const ws=wb.Sheets[n];if(!ws||!ws['!ref'])return;
+    const rg=XL.utils.decode_range(ws['!ref']);rg.s.r=0;rg.s.c=0;ws['!ref']=XL.utils.encode_range(rg);
+    const R=XL.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:true});
+    const c=(r,k)=>String(((R[r]||[])[k])==null?'':R[r][k]).trim();
+    const m=meta.find(x=>x.name===n);
+    list.push({t:n,h:m&&m.Hidden?1:0,l:[2,3,4,5,6,7,8].filter(k=>/^(true|false)$/i.test(c(1,k))).length||5,
+      d:(c(24,2).match(/🌟/g)||[]).length,k:(c(25,2).match(/🌟/g)||[]).length,
+      w:[3,4,5,6].flatMap(r=>[9,10,11,12].map(k=>c(r,k))),
+      g:[9,11,13,15].map((r,i)=>[c(r,9),[9,10,11,12].map(k=>c(r+1,k)),[c(19+i,9),c(19+i,10),c(19+i,11)]])})});
+  if(!list.length)throw new Error('empty');return list}
+async function waSync(force){const now=Date.now();if(WAS.busy)return;
+  if(!force&&now-WAS.at<30000)return;if(!force&&WAS.err&&now-WAS.try<60000)return;
+  WAS.busy=true;WAS.try=now;if(force)render();
+  try{const list=await waFetch();WAS.list=list;WAS.at=Date.now();WAS.err='';LS.set('waSheet',{at:WAS.at,list});if(force)toast('ดึงโจทย์จากชีตแล้ว')}
+  catch(e){WAS.err='ดึงไม่ได้';if(force)toast('ดึงจากชีตไม่ได้ ใช้โจทย์ชุดที่มีอยู่ในเว็บ')}
+  WAS.busy=false;if(S.tab==='words'&&!(S.wa.view==='conn'&&S.wa.pid&&!force))render()}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.tab==='words'&&!(S.wa.view==='conn'&&S.wa.pid))waSync(false)});
+const waWhen=t=>{try{return new Date(t).toLocaleString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})}catch(e){return ''}};
+function waSyncLine(){
+  const st=WAS.busy?'กำลังดึงโจทย์จากชีต…':WAS.list&&!WAS.err?`ซิงก์กับ Google Sheet Connections · ล่าสุด ${waWhen(WAS.at)}`
+    :WAS.list?`ใช้โจทย์ที่ดึงไว้ ${waWhen(WAS.at)} · ครั้งล่าสุดดึงไม่ได้`:`ใช้โจทย์ชุดที่ฝังในเว็บ (${waWhen(WA_SNAP_AT)})${WAS.err?' · ยังดึงสดจากชีตไม่ได้':''}`;
+  const tip=S.bro&&WAS.err&&!WAS.list?'<p class="wa-tip">อยากให้โจทย์อัปเดตเองทันทีที่แก้ชีต: เปิดแชร์ชีต Connections เป็น Anyone with the link · Viewer แล้วกด ดึงใหม่ (ระหว่างนี้เว็บใช้ชุดที่ฝังไว้ เล่นได้ปกติ)</p>':'';
+  return `<div class="wa-sync"><span class="dot ${WAS.list&&!WAS.err?'on':''}"></span><span>${st}</span><button class="wa-link" data-act="waSync" ${WAS.busy?'disabled':''}>ดึงใหม่</button></div>${tip}`}
+
+/* ---------- game state (per device; resets by itself if the puzzle is edited in the sheet) ---------- */
+function waNew(p){return {order:shuffle(p.board),sel:[],solved:[],how:{},cat:[0,0,0,0],hint:[[0,0,0],[0,0,0],[0,0,0],[0,0,0]],miss:0,tries:[],over:'',at:Date.now()}}
+const waG=p=>WAG[p.id]||null;
+function waGet(p){if(!WAG[p.id]){WAG[p.id]=waNew(p);waGSave()}return WAG[p.id]}
+const waOwn=(p,w)=>p.groups.findIndex(g=>g.words.includes(w));
+const waLeft=(p,g)=>g.order.filter(w=>!g.solved.includes(waOwn(p,w)));
+const waStarted=g=>!!(g&&(g.tries.length||g.solved.length||g.cat.some(Boolean)||g.hint.some(h=>h.some(Boolean))));
+function waStatus(p){const g=waG(p);if(!g||!waStarted(g))return ['','ยังไม่เล่น'];
+  if(g.over==='win')return ['win',g.miss?`ผ่าน · พลาด ${g.miss}`:'ผ่าน ไม่พลาดเลย'];
+  if(g.over==='lose')return ['lose','ไม่ผ่าน'];if(g.over==='quit')return ['lose','ยอมแพ้'];return ['go','เล่นค้างอยู่']}
+function waStars(n){n=Math.max(0,Math.min(5,n|0));return '★'.repeat(n)+`<s>${'★'.repeat(5-n)}</s>`}
+const waStarBox=p=>`<div class="wa-stars"><span>ความยาก <em>${waStars(p.diff)}</em></span><span>ความหลอก <em>${waStars(p.trick)}</em></span></div>`;
+const waHintsUsed=g=>g.over&&g.used!=null?g.used:g.hint.reduce((a,h)=>a+h.filter(Boolean).length,0)+g.cat.filter((c,i)=>c&&g.how[i]!=='g').length;
+function waEnd(p,g,kind){g.used=waHintsUsed(g);p.groups.forEach((x,i)=>{if(!g.solved.includes(i)){g.solved.push(i);g.how[i]='e'}g.cat[i]=1});g.sel=[];g.over=kind}
+
+/* ---------- views ---------- */
+function vWords(){
+  const w=S.wa;
+  if(w.view==='conn'&&w.pid){const p=waFind(w.pid);if(p)return waPlayView(p);w.pid=null}
+  if(w.view==='conn')return waListView();
+  if(w.view==='cross')return waCrossView();
+  const all=waPlayable();const won=all.filter(p=>(waG(p)||{}).over==='win').length;
+  return `<section class="sec">
+    <div class="sec-head"><div><h2>Word Arcade</h2><p>เกมคำภาษาอังกฤษสไตล์ NYT Games ทุกคำพี่แต่งเอง</p></div></div>
+    <div class="wa-games">
+      <button class="wa-game" data-act="waView" data-id="conn"><div class="wa-mini">${[0,1,2,3].map(i=>[0,1,2,3].map(()=>`<i class="wa-g${i}"></i>`).join('')).join('')}</div>
+        <b>Connections</b><span>หา 4 กลุ่ม กลุ่มละ 4 คำที่มีอะไรเหมือนกัน พลาดได้ 5 ครั้ง มีคำใบ้ 3 ระดับ</span>
+        <span>${all.length} โจทย์ · ผ่านแล้ว ${won}</span></button>
+      <button class="wa-game" data-act="waView" data-id="cross"><div class="wa-xmini">${'0110110001010101000101101'.split('').map(c=>`<i class="${c==='1'?'k':''}"></i>`).join('')}</div>
+        <b>Crossword</b><span>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</span><span>ยังไม่มีโจทย์</span></button>
+    </div>
+    ${waSyncLine()}
+  </section>`;
+}
+function waListView(){
+  const w=S.wa;const all=waPlayable();const list=all.filter(p=>w.kind==='all'||p.kind===w.kind);
+  const skipped=S.bro?waAll().filter(p=>p.skip):[];
+  const cnt=k=>all.filter(p=>k==='all'||p.kind===k).length;
+  return `<section class="sec">
+    <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Connections</h2><p>เลือกโจทย์ แล้วจับคำ 4 คำที่เข้ากลุ่มเดียวกัน</p></div></div>
+    <div class="chips">${WA_KINDS.filter(([k])=>cnt(k)).map(([k,n])=>`<button class="chip" data-act="waKind" data-id="${k}" aria-pressed="${w.kind===k}">${n}<span class="n">${cnt(k)}</span></button>`).join('')}</div>
+    ${list.length?`<div class="wa-list">${list.map(p=>{const [c,s]=waStatus(p);return `<button class="wa-card ${p.hidden?'hid':''}" data-act="waOpen" data-id="${esc(p.t)}">
+      <div class="top"><b>${esc(p.t)}</b><span class="wa-st ${c}">${esc(s)}</span></div>${waStarBox(p)}
+      ${p.hidden||(S.bro&&p.issues.length)?`<div class="chips">${p.hidden?'<span class="tag ex">ซ่อนในชีต · น้องยังไม่เห็น</span>':''}${S.bro&&p.issues.length?`<span class="tag">ชีตมี ${p.issues.length} จุดให้เช็ก</span>`:''}</div>`:''}
+    </button>`}).join('')}</div>`:'<div class="empty"><b>ยังไม่มีโจทย์</b><p>โจทย์ใหม่จะขึ้นที่นี่เมื่อพี่เพิ่มในชีต</p></div>'}
+    ${skipped.length?`<div class="wa-issues"><b>ชีตที่ยังเล่นไม่ได้ (โหมดพี่เห็นคนเดียว)</b><ul>${skipped.map(p=>`<li>${esc(p.t)}: ${esc(p.skip)}</li>`).join('')}</ul></div>`:''}
+    ${waSyncLine()}
+  </section>`;
+}
+function waCrossView(){
+  return `<section class="sec">
+    <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Crossword</h2><p>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</p></div></div>
+    <div class="empty"><b>ยังไม่มีโจทย์ Crossword</b><p>พี่กำลังทำโจทย์อยู่ เร็ว ๆ นี้จะมาให้เล่นกัน</p></div>
+  </section>`;
+}
+function waBars(p,g){
+  return g.solved.map(i=>{const x=p.groups[i];const fx=S.wa.fx&&S.wa.fx.type==='pop'&&S.wa.fx.gi===i?'pop':'';
+    return `<div class="wa-bar wa-g${i} ${fx}" data-bar="${i}">${g.cat[i]?`<b>${esc(x.name||'(ยังไม่มีชื่อหมวด)')}</b>`:`<span class="lock">ชื่อหมวดยังปิดอยู่</span>`}<span>${x.words.map(esc).join(', ')}</span>${g.how[i]==='r'&&!g.over?'<span class="rv">เปิดเฉลย</span>':''}</div>`}).join('')}
+function waHelp(p,g){
+  const cell=(i,k,label,val)=>{const on=g.hint[i][k];const key=`h${i}${k}`;const arm=S.wa.arm===key;
+    return on?`<span class="wa-hb on"><small>${label}</small><span class="v">${esc(val||'—')}</span></span>`
+      :`<button class="wa-hb ${arm?'arm':''}" data-act="waHint" data-id="${i}" data-k="${k}">${arm?'แตะอีกครั้งเพื่อเปิด':label}</button>`};
+  const rev=(i,what,label)=>{const key=`${what}${i}`;const arm=S.wa.arm===key;return `<button class="wa-hb ${arm?'arm':''}" data-act="waReveal" data-id="${i}" data-k="${what}">${arm?'แตะอีกครั้งเพื่อเปิด':label}</button>`};
+  return `<div class="wa-help"><h3>คำใบ้ &amp; เฉลย</h3>
+    ${p.groups.map((x,i)=>{const done=g.solved.includes(i);
+      return `<div class="wa-hrow"><i class="wa-g${i}" aria-hidden="true"></i><div class="in">
+        <div class="wa-hbtns">${cell(i,0,'Hint 1 · มีคำนี้',x.hint.in)}${cell(i,1,'Hint 2 · ไม่มีคำนี้',x.hint.out)}${cell(i,2,'Hint 3 · หมวด',x.hint.cat)}</div>
+        <div class="wa-hbtns">${g.cat[i]?`<span class="wa-hb on"><small>ชื่อหมวด</small><span class="v">${esc(x.name||'—')}</span></span>`:rev(i,'cat','ดูชื่อหมวด')}
+          ${done?'':rev(i,'words','ดูคำในกลุ่ม')}${done||g.cat[i]?'':rev(i,'all','ดูทั้งกลุ่ม')}</div></div></div>`}).join('')}
+  </div>`;
+}
+function waDoneView(p,g){
+  const emo=g.tries.map(t=>t.g.map(i=>WA_EMO[i]||'⬜').join('')).join('<br>');
+  const hu=waHintsUsed(g);const rv=Object.values(g.how).filter(h=>h==='r').length;
+  const all=waPlayable();const ix=all.findIndex(x=>x.id===p.id);const nx=all.slice(ix+1).find(x=>(waG(x)||{}).over!=='win');
+  const head=g.over==='win'?(g.miss===0&&!hu&&!rv?'เพอร์เฟกต์!':'ผ่านแล้ว!'):g.over==='quit'?'ยอมแพ้':'หมดชีวิต';
+  return `<div class="wa-done"><h3>${head}</h3>
+    <p class="muted">พลาด ${g.miss}/${p.lives} · ใช้คำใบ้ ${hu} · ${g.over==='win'?(rv?`เปิดเฉลย ${rv} กลุ่ม`:'ไม่เปิดเฉลยเลย'):'เฉลยอยู่ด้านบน'}</p>
+    ${emo?`<div class="wa-emo">${emo}</div>`:''}
+    <div class="btns" style="justify-content:center">${emo?'<button class="btn" data-act="waCopy">คัดลอกผล</button>':''}<button class="btn" data-act="waReset">เล่นใหม่</button>${nx?`<button class="btn primary" data-act="waOpen" data-id="${esc(nx.t)}">โจทย์ถัดไป: ${esc(nx.t)}</button>`:''}</div></div>`}
+function waPlayView(p){
+  const g=waGet(p);const left=waLeft(p,g);const lives=p.lives-g.miss;
+  const shake=S.wa.fx&&S.wa.fx.type==='shake'?S.wa.fx.w:[];
+  return `<section class="sec"><div class="wa-play">
+    <div class="wa-head"><div><button class="back" data-act="waView" data-id="conn">← โจทย์ทั้งหมด</button><h2>Connections ${esc(p.t)}</h2></div>${waStarBox(p)}</div>
+    ${p.hidden?'<p class="wa-tip">โจทย์นี้ซ่อนอยู่ในชีต น้อง ๆ ยังไม่เห็น (unhide ในชีตเมื่อไรก็ขึ้นเว็บเอง)</p>':''}
+    ${g.over?'':'<p class="wa-lead">จับ 4 คำที่อยู่กลุ่มเดียวกัน</p>'}
+    <div class="wa-board">${waBars(p,g)}${left.map(w=>`<button class="wa-tile ${shake.includes(w)?'shake':''}" data-act="waTile" data-id="${esc(w)}" aria-pressed="${g.sel.includes(w)}" ${g.over?'disabled':''}><span>${esc(w)}</span></button>`).join('')}</div>
+    ${g.over?waDoneView(p,g):`
+    <div class="wa-lives">พลาดได้อีก ${Array.from({length:p.lives},(_,i)=>`<i class="${i<lives?'':'x'}"></i>`).join('')}</div>
+    <div class="wa-ctrl"><button class="btn" data-act="waShuffle">สลับ</button><button class="btn" data-act="waDesel" ${g.sel.length?'':'disabled'}>ล้างที่เลือก</button><button class="btn primary" data-act="waSubmit" ${g.sel.length===4?'':'disabled'}>ส่งคำตอบ</button></div>
+    ${waHelp(p,g)}`}
+    ${S.bro&&p.issues.length?`<div class="wa-issues"><b>จุดที่ควรเช็กในชีต (โหมดพี่เห็นคนเดียว)</b><ul>${p.issues.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+    ${g.over?'':'<p class="muted small" style="text-align:center">Enter = ส่งคำตอบ · ⌘/Ctrl + Enter = ยอมแพ้ เปิดเฉลยทั้งหมด</p>'}
+  </div></section>`;
+}
+/* fit long words into their tiles, then clear one-shot animations */
+function waAfter(){
+  document.querySelectorAll('.wa-tile span').forEach(sp=>{const t=sp.parentElement;sp.style.fontSize='';let fs=parseFloat(getComputedStyle(sp).fontSize)||16;let n=0;
+    while((sp.scrollWidth>t.clientWidth-6||sp.scrollHeight>t.clientHeight-6)&&fs>9&&n++<30){fs-=.5;sp.style.fontSize=fs+'px'}});
+  if(S.wa.fx){S.wa.fx=null}
+  if(S.wa.view!=='cross'&&!(S.wa.view==='conn'&&S.wa.pid))waSync(false);
+}
+
+/* ---------- actions ---------- */
+const waCur=()=>S.wa.view==='conn'&&S.wa.pid?waFind(S.wa.pid):null;
+ACT.waView=t=>{S.wa.view=t.dataset.id;S.wa.pid=null;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waKind=t=>{S.wa.kind=t.dataset.id;waSave();render()};
+ACT.waOpen=t=>{S.wa.view='conn';S.wa.pid=t.dataset.id;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waSync=()=>waSync(true);
+ACT.waTile=t=>{const p=waCur();if(!p)return;const g=waGet(p);if(g.over)return;const w=t.dataset.id;S.wa.arm=null;
+  const i=g.sel.indexOf(w);if(i>=0)g.sel.splice(i,1);else{if(g.sel.length>=4)return;g.sel.push(w)}waGSave();render()};
+ACT.waDesel=()=>{const p=waCur();if(!p)return;const g=waGet(p);g.sel=[];S.wa.arm=null;waGSave();render()};
+ACT.waShuffle=()=>{const p=waCur();if(!p)return;const g=waGet(p);g.order=shuffle(g.order);S.wa.arm=null;waGSave();render()};
+function waSubmit(){const p=waCur();if(!p)return;const g=waGet(p);if(g.over||g.sel.length!==4)return;S.wa.arm=null;
+  const key=g.sel.slice().sort().join('|');if(g.tries.some(x=>x.k===key)){toast('ทายชุดนี้ไปแล้ว');return}
+  const gs=g.sel.map(w=>waOwn(p,w));g.tries.push({k:key,g:gs});
+  const hit=p.groups.findIndex((x,i)=>!g.solved.includes(i)&&g.sel.every(w=>x.words.includes(w)));
+  if(hit>=0){g.solved.push(hit);g.how[hit]='g';g.cat[hit]=1;g.sel=[];S.wa.fx={type:'pop',gi:hit};
+    if(g.solved.length===4){g.used=waHintsUsed(g);g.over='win';toast(g.miss?'ผ่านแล้ว!':'ผ่านแบบไม่พลาดเลย!')}}
+  else{g.miss++;const best=Math.max(...[0,1,2,3].map(i=>gs.filter(x=>x===i).length));S.wa.fx={type:'shake',w:g.sel.slice()};
+    if(g.miss>=p.lives){waEnd(p,g,'lose');toast('หมดชีวิตแล้ว ดูเฉลยด้านบน')}else toast(best===3?'One away… ขาดอีกคำเดียว':'ยังไม่ใช่')}
+  waGSave();render()}
+ACT.waSubmit=waSubmit;
+ACT.waHint=t=>{const p=waCur();if(!p)return;const g=waGet(p);const i=+t.dataset.id,k=+t.dataset.k;const key=`h${i}${k}`;
+  if(S.wa.arm!==key){S.wa.arm=key;render();return}S.wa.arm=null;g.hint[i][k]=1;waGSave();render()};
+ACT.waReveal=t=>{const p=waCur();if(!p)return;const g=waGet(p);if(g.over)return;const i=+t.dataset.id,what=t.dataset.k;const key=what+i;
+  if(S.wa.arm!==key){S.wa.arm=key;render();return}S.wa.arm=null;
+  if(what==='cat'||what==='all')g.cat[i]=1;
+  if((what==='words'||what==='all')&&!g.solved.includes(i)){g.solved.push(i);g.how[i]='r';g.sel=g.sel.filter(w=>!p.groups[i].words.includes(w));S.wa.fx={type:'pop',gi:i};
+    if(g.solved.length===4){g.used=waHintsUsed(g);g.over='win';p.groups.forEach((x,j)=>{g.cat[j]=1})}}
+  waGSave();render()};
+ACT.waReset=()=>{const p=waCur();if(!p)return;openSheet('เล่นโจทย์นี้ใหม่?',`<p>Connections ${esc(p.t)} จะเริ่มใหม่หมด ผลเดิมในเครื่องนี้จะหายไป</p>`,
+  '<button class="btn primary big" data-act="waResetGo" data-enter>เล่นใหม่</button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
+ACT.waResetGo=()=>{const p=waCur();closeSheet();if(!p)return;WAG[p.id]=waNew(p);waGSave();render()};
+ACT.waCopy=()=>{const p=waCur();if(!p)return;const g=waGet(p);
+  const txt=`Word Arcade · Connections ${p.t}\n`+g.tries.map(x=>x.g.map(i=>WA_EMO[i]||'⬜').join('')).join('\n');
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('คัดลอกผลแล้ว')).catch(()=>toast('คัดลอกไม่ได้'))};
+function waEndInfo(){const p=waCur();if(!p)return null;const g=waG(p);if(!g||g.over||!waStarted(g))return null;
+  return {name:'Connections '+p.t,note:'เปิดเฉลยที่เหลือทั้งหมด นับว่ายอมแพ้',go:()=>{const q=waCur();if(!q)return;waEnd(q,waGet(q),'quit');waGSave();render()}}}
+/* Enter = send the 4 selected words */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.metaKey||e.ctrlKey||e.altKey||e.shiftKey||e.isComposing||!$('#sheet').hidden||S.tab!=='words')return;
+  const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+  const p=waCur();if(!p)return;const g=waG(p);if(!g||g.over||g.sel.length!==4)return;e.preventDefault();waSubmit()});
+
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-28T05:13:00+07:00';
+const SITE_UPDATED='2026-10-28T18:40:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
