@@ -744,6 +744,46 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .wa-award{display:flex;gap:8px 16px;flex-wrap:wrap;justify-content:center}
 .wa-award span{display:inline-flex;align-items:center;gap:6px}
 .wa-award b{font:600 .95rem var(--f-head);font-variant-numeric:tabular-nums}
+/* ---------- Word Arcade: Crossword ---------- */
+:root{--cw-cell:#FFFFFF;--cw-ink:#14191F;--cw-line:#2A333D;--cw-word:#CFE0F7;--cw-cur:#F6D96B;--cw-rev:#2F5BD3;--cw-bad:#BE3A2A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cw-cell:#E9EEF2;--cw-word:#9EC0EE;--cw-cur:#F4CF4A;--cw-rev:#2F5BD3;--cw-bad:#D2402D}}
+:root[data-theme="dark"]{--cw-cell:#E9EEF2;--cw-word:#9EC0EE;--cw-cur:#F4CF4A;--cw-rev:#2F5BD3;--cw-bad:#D2402D}
+.cw-play{max-width:760px;grid-template-columns:minmax(0,1fr)}
+.cw-play>*{min-width:0}
+.cw-timer{font:600 1.05rem/1 var(--f-head);font-variant-numeric:tabular-nums;padding:8px 12px;border-radius:999px;background:var(--sunk);align-self:flex-start}
+.cw-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;text-align:left;width:100%;padding:12px 14px;border-radius:12px;border:0;background:var(--cw-word);color:var(--cw-ink);cursor:pointer;min-height:54px}
+.cw-bar b{font:600 .85rem/1.2 var(--f-head);white-space:nowrap}
+.cw-bar span{font:400 1.02rem/1.35 var(--f-body)}
+.cw-board{position:relative}
+.cw-scroll{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding:2px 2px 6px}
+.cw-grid{display:grid;grid-template-columns:repeat(var(--c),var(--s));grid-auto-rows:var(--s);width:max-content;margin:0 auto}
+.cw-grid>i{display:block}
+.cw-cell{position:relative;appearance:none;border:0;margin:0;padding:0;background:var(--cw-cell);color:var(--cw-ink);box-shadow:0 0 0 1px var(--cw-line);cursor:pointer;display:grid;place-items:center;font:600 calc(var(--s) * .55)/1 var(--f-body);text-transform:uppercase;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.cw-cell small{position:absolute;top:1px;left:2px;font:500 calc(var(--s) * .27)/1 var(--f-body);color:var(--cw-ink);opacity:.8}
+.cw-cell.word{background:var(--cw-word)}
+.cw-cell.cur{background:var(--cw-cur)}
+.cw-cell.bad span{color:var(--cw-bad)}
+.cw-cell.bad::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 47%,var(--cw-bad) 48% 52%,transparent 53%);opacity:.55;pointer-events:none}
+.cw-cell.rev::before{content:"";position:absolute;top:0;right:0;border-style:solid;border-width:0 calc(var(--s) * .3) calc(var(--s) * .3) 0;border-color:transparent var(--cw-rev) transparent transparent}
+.cw-cell.rev span{color:var(--cw-rev)}
+.cw-tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.cw-kb{position:sticky;bottom:0;z-index:4;display:grid;gap:6px;padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:1px solid var(--line)}
+.cw-kb>div{display:flex;gap:5px;justify-content:center}
+.cw-kb button{flex:1 1 0;max-width:44px;min-height:46px;border-radius:7px;border:0;background:var(--wa-tile);color:var(--wa-tile-ink);font:600 1.05rem/1 var(--f-body);cursor:pointer;touch-action:manipulation;padding:0}
+.cw-kb button:active{background:var(--wa-sel);color:var(--wa-sel-ink)}
+.cw-kb button.wide{flex:1.6 1 0;max-width:68px}
+@media (hover:hover) and (pointer:fine){.cw-kb{display:none}}
+@media (hover:none){.cw-keys{display:none}}
+.cw-clues{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:620px){.cw-clues{grid-template-columns:1fr}}
+.cw-clues h3{font-size:1rem;margin-bottom:6px}
+.cw-clues ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.cw-clue{display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:6px;width:100%;text-align:left;padding:7px 10px;border-radius:9px;border:0;border-left:4px solid transparent;background:none;color:var(--ink);cursor:pointer;font:400 .95rem/1.4 var(--f-body)}
+.cw-clue b{font:600 .9rem/1.4 var(--f-head);font-variant-numeric:tabular-nums}
+.cw-clue.on{background:var(--sunk);border-left-color:var(--ink)}
+.cw-clue.x{border-left-color:var(--line)}
+.cw-clue.done span{color:var(--muted)}
+.cw-board .wa-msg{top:-6px}
 @media (max-width:420px){.wa-board{gap:6px}.wa-tile{border-radius:8px}.wa-tile span{font-size:.92rem}}
 </style>
 </head>
@@ -3299,7 +3339,7 @@ document.addEventListener('keydown',e=>{const t=e.target;if(e.key!=='Enter'||e.i
 /* ---------- ทุกเกม: ⌘/Ctrl + Enter = จบเกม (ถามยืนยันก่อน) ---------- */
 function endInfo(){
   if(S.bro&&EXT.end){const x=EXT.end();if(x)return x}
-  if(S.tab==='words')return waEndInfo();
+  if(S.tab==='words')return waEndInfo()||cwEndInfo();
   if(S.tab!=='tools'||!S.tool)return null;
   switch(S.tool){
     case 'bsgs':{const s=S.bs;if(!s||s.phase==='setup'||s.phase==='end')return null;return {name:'Baan Suay Game Show',note:'ไปหน้าสรุปคะแนนเลย ช่องที่ยังไม่เปิดจะไม่ได้เล่น',go:()=>ACT.bsEndNow()}}
@@ -3324,7 +3364,7 @@ ACT.endGo=t=>{const g=S.endGo;S.endGo=null;closeSheet();if(!g)return;const c=(g.
 window.addEventListener('keydown',e=>{
   if(e.key!=='Enter'||!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.isComposing)return;
   if(!$('#sheet').hidden){const b=$('#sheetCard [data-endgo]');if(b){e.preventDefault();e.stopImmediatePropagation();b.click()}return}
-  if((S.tab!=='tools'||!S.tool)&&!(S.tab==='words'&&waEndInfo())&&!(S.bro&&EXT.end&&EXT.end()))return;
+  if((S.tab!=='tools'||!S.tool)&&!(S.tab==='words'&&(waEndInfo()||cwEndInfo()))&&!(S.bro&&EXT.end&&EXT.end()))return;
   e.preventDefault();e.stopImmediatePropagation();askEndGame();
 },true);
 /* Enter confirms the main button of a small confirm popup */
@@ -3398,7 +3438,7 @@ const WA_COLORS=['เหลือง','เขียว','น้ำเงิน',
 const WA_EMO=['🟨','🟩','🟦','🟪'];
 const WA_KINDS=[['all','ทั้งหมด'],['main','ชุดหลัก'],['bonus','BONUS'],['med','MED']];
 S.wa=Object.assign({view:'home',pid:null,kind:'all',who:[]},LS.get('wa',{}));S.wa.arm=null;S.wa.fx=null;S.wa.busy=false;S.wa.msg=null;
-const waSave=()=>{const {view,pid,kind,who}=S.wa;LS.set('wa',{view,pid,kind,who})};
+const waSave=()=>{const {view,pid,cid,kind,who}=S.wa;LS.set('wa',{view,pid,cid,kind,who})};
 const waTeam=()=>(S.wa.who||[]).filter(id=>kidById(id)).sort();
 const waKey=p=>p.id+'@'+waTeam().join(',');
 const waGame=p=>'Connections '+p.t;
@@ -3501,7 +3541,7 @@ function vWords(){
   const w=S.wa;
   if(w.view==='conn'&&w.pid){const p=waFind(w.pid);if(p)return waPlayView(p);w.pid=null}
   if(w.view==='conn')return waListView();
-  if(w.view==='cross')return waCrossView();
+  if(w.view==='cross'){if(w.cid){const p=cwFind(w.cid);if(p)return cwPlayView(p);w.cid=null}return cwListView()}
   const all=waPlayable();const won=all.filter(p=>(waG(p)||{}).over==='win').length;
   return `<section class="sec">
     <div class="sec-head"><div><h2>Word Arcade</h2><p>เกมคำภาษาอังกฤษสไตล์ NYT Games ทุกคำพี่แต่งเอง</p></div></div>
@@ -3510,7 +3550,7 @@ function vWords(){
         <b>Connections</b><span>หา 4 กลุ่ม กลุ่มละ 4 คำที่มีอะไรเหมือนกัน พลาดได้ 5 ครั้ง มีคำใบ้ 3 ระดับ</span>
         <span>${all.length} โจทย์ · ผ่านแล้ว ${won}</span></button>
       <button class="wa-game" data-act="waView" data-id="cross"><div class="wa-xmini">${'0110110001010101000101101'.split('').map(c=>`<i class="${c==='1'?'k':''}"></i>`).join('')}</div>
-        <b>Crossword</b><span>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</span><span>ยังไม่มีโจทย์</span></button>
+        <b>Crossword</b><span>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</span><span>${CW_PUZ.length} โจทย์ · เสร็จแล้ว ${CW_PUZ.filter(p=>(cwG(p)||{}).over==='win').length}</span></button>
     </div>
     ${waSyncLine()}
   </section>`;
@@ -3521,8 +3561,7 @@ function waListView(){
   const cnt=k=>all.filter(p=>k==='all'||p.kind===k).length;
   return `<section class="sec">
     <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Connections</h2><p>เลือกโจทย์ แล้วจับคำ 4 คำที่เข้ากลุ่มเดียวกัน</p></div></div>
-    ${kids().length?`<div class="panel wa-who"><div><h3>ใครเล่น</h3><p class="muted small">เลือกได้หลายคน ช่วยกันทายบนจอนี้ ผ่านแล้วทุกคนที่เลือกได้แต้มบ้านเท่ากับชีวิตที่เหลือ (นับครั้งแรกที่ผ่านโจทย์นั้น)</p></div>
-      <div class="pawns">${kids().map(k=>pawnBtn(k,'waWho',waTeam().includes(k.id))).join('')}</div></div>`:''}
+    ${waWhoPanel('ผ่านแล้วทุกคนที่เลือกได้แต้มบ้านเท่ากับชีวิตที่เหลือ (นับครั้งแรกที่ผ่านโจทย์นั้น)')}
     <div class="chips">${WA_KINDS.filter(([k])=>cnt(k)).map(([k,n])=>`<button class="chip" data-act="waKind" data-id="${k}" aria-pressed="${w.kind===k}">${n}<span class="n">${cnt(k)}</span></button>`).join('')}</div>
     ${list.length?`<div class="wa-list">${list.map(p=>{const [c,s]=waStatus(p);return `<button class="wa-card ${p.hidden?'hid':''}" data-act="waOpen" data-id="${esc(p.t)}">
       <div class="top"><b>${esc(p.t)}</b><span class="wa-st ${c}">${esc(s)}</span></div>${waStarBox(p)}
@@ -3530,12 +3569,6 @@ function waListView(){
     </button>`}).join('')}</div>`:'<div class="empty"><b>ยังไม่มีโจทย์</b><p>โจทย์ใหม่จะขึ้นที่นี่เมื่อพี่เพิ่มในชีต</p></div>'}
     ${skipped.length?`<div class="wa-issues"><b>ชีตที่ยังเล่นไม่ได้ (โหมดพี่เห็นคนเดียว)</b><ul>${skipped.map(p=>`<li>${esc(p.t)}: ${esc(p.skip)}</li>`).join('')}</ul></div>`:''}
     ${waSyncLine()}
-  </section>`;
-}
-function waCrossView(){
-  return `<section class="sec">
-    <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Crossword</h2><p>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</p></div></div>
-    <div class="empty"><b>ยังไม่มีโจทย์ Crossword</b><p>พี่กำลังทำโจทย์อยู่ เร็ว ๆ นี้จะมาให้เล่นกัน</p></div>
   </section>`;
 }
 function waBars(p,g){
@@ -3568,7 +3601,9 @@ function waDoneView(p,g){
     ${emo?`<div class="wa-emo">${emo}</div>`:''}
     ${waAwardLine(g)}
     <div class="btns" style="justify-content:center">${emo?'<button class="btn" data-act="waCopy">คัดลอกผล</button>':''}<button class="btn" data-act="waReset">เล่นใหม่</button>${nx?`<button class="btn primary" data-act="waOpen" data-id="${esc(nx.t)}">โจทย์ถัดไป: ${esc(nx.t)}</button>`:''}</div></div>`}
-function waTeamLine(){const t=waTeam();return t.length?`<div class="wa-team"><span class="stack">${t.map(id=>pawn(kidById(id),'sm')).join('')}</span><span>${t.length>1?'เล่นด้วยกัน':'กำลังเล่น'} · ผ่านแล้วได้แต้มเท่าชีวิตที่เหลือ</span></div>`:'<div class="wa-team"><span class="tag ex">เล่นแบบไม่บันทึกแต้ม</span></div>'}
+function waWhoPanel(note){return kids().length?`<div class="panel wa-who"><div><h3>ใครเล่น</h3><p class="muted small">เลือกได้หลายคน ช่วยกันเล่นบนจอนี้ · ${note}</p></div>
+      <div class="pawns">${kids().map(k=>pawnBtn(k,'waWho',waTeam().includes(k.id))).join('')}</div></div>`:''}
+function waTeamLine(note){const t=waTeam();return t.length?`<div class="wa-team"><span class="stack">${t.map(id=>pawn(kidById(id),'sm')).join('')}</span><span>${t.length>1?'เล่นด้วยกัน':'กำลังเล่น'} · ${note||'ผ่านแล้วได้แต้มเท่าชีวิตที่เหลือ'}</span></div>`:'<div class="wa-team"><span class="tag ex">เล่นแบบไม่บันทึกแต้ม</span></div>'}
 function waPlayView(p){
   const g=waGet(p);const left=waLeft(p,g);const lives=p.lives-g.miss;
   const shake=S.wa.fx&&S.wa.fx.type==='shake'?S.wa.fx.w:[];
@@ -3592,7 +3627,8 @@ function waAfter(){
     while((sp.scrollWidth>t.clientWidth-6||sp.scrollHeight>t.clientHeight-6)&&fs>9&&n++<30){fs-=.5;sp.style.fontSize=fs+'px'}});
   if(S.wa.fx){S.wa.fx=null}
   {const p=waCur();const g=p&&waG(p);if(g&&g.over&&!g.saved)waRecord(p,g)}
-  if(S.wa.msg){const b=document.querySelector('.wa-board');if(b){const m=document.createElement('div');m.className='wa-msg';m.setAttribute('role','status');m.textContent=S.wa.msg;b.appendChild(m);setTimeout(()=>m.remove(),2000)}S.wa.msg=null}
+  cwAfter();{const q=cwCur();const h=q&&cwG(q);if(h&&h.over&&!h.saved)cwRecord(q,h)}
+  if(S.wa.msg){const b=document.querySelector('.wa-board,.cw-board');if(b){const m=document.createElement('div');m.className='wa-msg';m.setAttribute('role','status');m.textContent=S.wa.msg;b.appendChild(m);setTimeout(()=>m.remove(),2000)}S.wa.msg=null}
   if(S.wa.view!=='cross'&&!(S.wa.view==='conn'&&S.wa.pid))waSync(false);
 }
 
@@ -3600,7 +3636,7 @@ function waAfter(){
 let waArmT=0;
 function waArm(key){S.wa.arm=key;render();clearTimeout(waArmT);waArmT=setTimeout(function back(){if(S.wa.arm!==key)return;if(S.wa.busy){waArmT=setTimeout(back,400);return}S.wa.arm=null;if(S.tab==='words')render()},3000)}
 const waCur=()=>S.wa.view==='conn'&&S.wa.pid?waFind(S.wa.pid):null;
-ACT.waView=t=>{S.wa.view=t.dataset.id;S.wa.busy=false;S.wa.pid=null;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
+ACT.waView=t=>{S.wa.view=t.dataset.id;S.wa.busy=false;S.wa.pid=null;S.wa.cid=null;S.wa.arm=null;waSave();render();window.scrollTo({top:0})};
 ACT.waKind=t=>{S.wa.kind=t.dataset.id;waSave();render()};
 ACT.waOpen=t=>{const id=t.dataset.id;
   if(kids().length&&!waTeam().length&&S.wa.view==='conn'&&!S.wa.pid){S.wa.pend=id;openSheet('ยังไม่ได้เลือกคนเล่น','<p>เลือกน้องที่จะเล่นก่อน ผ่านแล้วจะได้แต้มบ้าน หรือจะลองเล่นโดยไม่บันทึกก็ได้</p>',
@@ -3671,8 +3707,154 @@ document.addEventListener('keydown',e=>{
   const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
   const p=waCur();if(!p)return;const g=waG(p);if(!g||g.over||g.sel.length!==4)return;e.preventDefault();waSubmit()});
 
+/* ---------- Word Arcade: Crossword (โจทย์จากไฟล์ของพี่ ฝังในเว็บ) ----------
+   แตะช่องเพื่อเลือก แตะซ้ำเพื่อสลับแนวนอน/แนวตั้ง · พิมพ์ด้วยคีย์บอร์ดในเว็บหรือคีย์บอร์ดจริง
+   ตรวจ/เฉลย ได้ทีละช่อง ทีละคำ หรือทั้งกระดาน · เลือกคนเล่นร่วมกับ Connections */
+const CW_PUZ=[{"id":"banky-1","t":"Banky #1","g":["..............M.......","...........THEATER.B..",".......Y......Z....O..",".......O....K.E..J.X..","..C..N.Y..B.AUSTRALIA.","WHATDOYOUMEAN....P.N..","A.T..T.S..F.G..P.A.G..","S....H....O.A.DOWN....",".....I....R.R..L.E....","...HINTS..E.O.SIXSEVEN",".....G......O..C.E....","..........NESTLE......"],"a":{"2":"Movie place","10":"Continent that happens to be a country","11":"“I don’t understand what you’re trying to say”","13":"Up ___ Left Right","14":"Clues","15":"Popular saying among kids, involving 2 consecutive numbers","16":"Very popular water brand with red people holding hands in its logo"},"d":{"1":"You might get lost inside them","3":"Sport related to 5-Down","4":"Kids toys with strings that spin","5":"National animals of 10-Across","6":"Adjective for the flag with a central red dot and a white background","7":"Goes meow","8":"“I have ___ to hide!”","9":"In comparison with “after”, as in makeup photos","11":"Past tense of “is”","12":"One could arrest you"}},{"id":"banky-2","t":"Banky #2","g":["......W............","......ANGLE........","......T............",".....SCHOOL........","......H..V......B..",".......D.A......A..",".F.MULTIPLICATION..",".A.....V.S.R.I..K..",".T.....I...O.M.B...",".T.....S...S.E.I...",".E...C.I.MASKS.K...","ESCALATOR..W.T.E...",".T...N.N...O.WORDLE",".....O.....R.O.S...",".....N..GOLD......."],"a":{"2":"Measurement of space between two intersecting lines","3":"Kids typically do not like this place (some do, though)","8":"Repeated addition","13":"Wearable covers mostly seen in hospitals or cosplays","14":"What you might look for if the elevator is in maintenance","15":"Popular 5-letter word guessing game","16":"Shiny ore found in Minecraft nether"},"d":{"1":"Time-teller, or if used with “out,” can be a warning","4":"Imperfect circles","5":"Trustworthy money keeper, hopefully","6":"Counterpart of 8-Across","7":"Opposite of thinnest","9":"This game","10":"Doubles","11":"Non-electric two-wheel vehicle operators","12":"Camera brand, or famous detective with vowels switched"}},{"id":"banky-3","t":"Banky #3","g":["..............F..","........SONGKRAN.","....I...C.....K..","....C...A.P...E..","...YESTERDAY..D..","....C.A.E.N......","....R.K.C.D......","....E.E.ROADS....","....A.O.O........","MANDM.F.WEIGH....",".N....F.....E....",".D.......MAMA....","........J...R....",".......PARROT....","........N...SANDP"],"a":{"2":"Thai New Year days","5":"Just before today","7":"Trains = rails; Cars = ___","8":"Colorful chocolate brand with the same letter on both ends","10":"Homophone of “w” from “btw”","12":"Word some use to call a member of the family that, if written down, may confuse with noodles","14":"Flying copycat","15":"Restaurant that also sells baked products in Thailand"},"d":{"1":"Pretended","2":"Creepy figure you might find in a field","3":"Frozen + Thick = Cold (Liquid)","4":"16th & 1st (& Cute!)","6":"After taxi","9":"Logic gate featured in 3 different answers from this puzzle","11":"Icons for showing love","13":"Month before Feb"}}];
+const CWS={pid:null,r:0,c:0,dir:'a',sl:null};
+let CWG=LS.get('cwG',{});const cwGSave=()=>LS.set('cwG',CWG);
+const cwMemo={};
+function cwBuild(p){if(cwMemo[p.id])return cwMemo[p.id];
+  const g=p.g,R=g.length,C=g[0].length,f=(r,c)=>r>=0&&r<R&&c>=0&&c<C&&g[r][c]!=='.';
+  const num={},words=[],of={};let n=0;
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++){if(!f(r,c))continue;
+    const sa=!f(r,c-1)&&f(r,c+1),sd=!f(r-1,c)&&f(r+1,c);if(sa||sd)num[r+'_'+c]=++n;
+    if(sa){const cells=[];for(let x=c;f(r,x);x++)cells.push([r,x]);words.push({dir:'a',n,cells,clue:(p.a||{})[n]||''})}
+    if(sd){const cells=[];for(let y=r;f(y,c);y++)cells.push([y,c]);words.push({dir:'d',n,cells,clue:(p.d||{})[n]||''})}}
+  words.sort((x,y)=>x.dir===y.dir?x.n-y.n:(x.dir==='a'?-1:1));
+  words.forEach((w,i)=>w.cells.forEach(([r,c])=>{const k=r+'_'+c;(of[k]=of[k]||{})[w.dir]=i}));
+  const cells=Object.keys(of);
+  return cwMemo[p.id]={R,C,f,num,words,of,cells,ans:k=>{const [r,c]=k.split('_').map(Number);return g[r][c]}}}
+const cwKey=p=>p.id+'@'+waTeam().join(',');
+const cwG=p=>CWG[cwKey(p)]||null;
+function cwGet(p){const k=cwKey(p);if(!CWG[k]){CWG[k]={fill:{},bad:{},rev:{},sec:0,over:'',who:waTeam(),at:Date.now()};cwGSave()}return CWG[k]}
+const cwGame=p=>'Crossword '+p.t;
+const cwFind=id=>CW_PUZ.find(p=>p.id===id);
+const cwTime=s=>{s=Math.max(0,s|0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const cwStarted=g=>!!(g&&(Object.keys(g.fill).length||g.over));
+function cwStatus(p){const g=cwG(p);if(!g||!cwStarted(g))return ['','ยังไม่เล่น'];
+  if(g.over==='win')return ['win',`เสร็จ · ${cwTime(g.sec)}${Object.keys(g.rev).length?' · มีเปิดเฉลย':''}`];if(g.over==='quit')return ['lose','ยอมแพ้'];return ['go','เล่นค้างอยู่']}
+/* current word */
+function cwWordIx(b){const o=b.of[CWS.r+'_'+CWS.c];if(!o)return -1;if(o[CWS.dir]==null)CWS.dir=CWS.dir==='a'?'d':'a';return o[CWS.dir]}
+function cwStart(p,b,g){if(b.of[CWS.r+'_'+CWS.c]&&CWS.pid===p.id)return;CWS.pid=p.id;const w=b.words[0];
+  const e=w.cells.find(([r,c])=>!g.fill[r+'_'+c])||w.cells[0];CWS.r=e[0];CWS.c=e[1];CWS.dir=w.dir;CWS.sl=null}
+
+function cwListView(){
+  return `<section class="sec">
+    <div class="sec-head"><div><button class="back" data-act="waView" data-id="home">← Word Arcade</button><h2>Crossword</h2><p>ปริศนาอักษรไขว้ เติมคำแนวนอนและแนวตั้งจากคำใบ้</p></div></div>
+    ${waWhoPanel('ผ่านแล้วบันทึกผลเข้าบ้าน')}
+    <div class="wa-list">${CW_PUZ.map(p=>{const [c,s]=cwStatus(p);const b=cwBuild(p);return `<button class="wa-card" data-act="cwOpen" data-id="${esc(p.id)}">
+      <div class="top"><b>${esc(p.t)}</b><span class="wa-st ${c}">${esc(s)}</span></div>
+      <span class="muted small">${b.words.filter(w=>w.dir==='a').length} แนวนอน · ${b.words.filter(w=>w.dir==='d').length} แนวตั้ง · ${b.cells.length} ช่อง</span></button>`}).join('')}</div>
+  </section>`;
+}
+function cwPlayView(p){
+  const b=cwBuild(p);const g=cwGet(p);cwStart(p,b,g);const wi=cwWordIx(b);const w=b.words[wi];
+  const inW=new Set(w?w.cells.map(([r,c])=>r+'_'+c):[]);const cur=CWS.r+'_'+CWS.c;
+  const vw=Math.min(window.innerWidth||400,760)-34;const s=Math.max(26,Math.min(40,Math.floor(vw/b.C)));
+  const cells=[];for(let r=0;r<b.R;r++)for(let c=0;c<b.C;c++){const k=r+'_'+c;
+    if(!b.f(r,c)){cells.push('<i></i>');continue}
+    const v=g.fill[k]||'';const n=b.num[k];
+    cells.push(`<button class="cw-cell${k===cur&&!g.over?' cur':''}${inW.has(k)&&!g.over?' word':''}${g.bad[k]?' bad':''}${g.rev[k]?' rev':''}" data-act="cwCell" data-id="${k}" aria-label="${n?n+' ':''}${v||'ว่าง'}">${n?`<small>${n}</small>`:''}<span>${esc(v)}</span></button>`)}
+  const done=(dir,x)=>x.cells.every(([r,c])=>g.fill[r+'_'+c]);
+  const cross=w&&b.of[cur]?b.of[cur][w.dir==='a'?'d':'a']:null;
+  const list=dir=>b.words.map((x,i)=>x.dir!==dir?'':`<li><button class="cw-clue${i===wi?' on':''}${i===cross?' x':''}${done(dir,x)?' done':''}" data-act="cwClue" data-id="${i}"><b>${x.n}</b><span>${esc(x.clue||'—')}</span></button></li>`).join('');
+  const kb=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+  return `<section class="sec"><div class="wa-play cw-play">
+    <div class="wa-head"><div><button class="back" data-act="waView" data-id="cross">← โจทย์ทั้งหมด</button><h2>${esc(p.t)}</h2>${waTeamLine('ผ่านแล้วบันทึกผลเข้าบ้าน')}</div>
+      <div class="cw-timer" aria-label="เวลา"><span id="cwTime">${cwTime(g.sec)}</span></div></div>
+    ${g.over?cwDoneView(p,b,g):`<button class="cw-bar" data-act="cwFlip" aria-label="สลับแนว"><b>${w?w.n+(w.dir==='a'?' แนวนอน':' แนวตั้ง'):''}</b><span>${esc(w?w.clue:'')}</span></button>`}
+    <div class="cw-board"><div class="cw-scroll" id="cwScroll"><div class="cw-grid" style="--c:${b.C};--s:${s}px">${cells.join('')}</div></div></div>
+    ${g.over?'':`<div class="cw-tools"><button class="btn sm" data-act="cwStep" data-id="-1" aria-label="คำก่อน">‹ คำก่อน</button><button class="btn sm" data-act="cwStep" data-id="1">คำถัดไป ›</button>
+      <button class="btn sm" data-act="cwMenu" data-id="check">ตรวจ</button><button class="btn sm" data-act="cwMenu" data-id="reveal">เฉลย</button></div>
+    <div class="cw-kb" aria-label="แป้นพิมพ์">${kb.map((row,i)=>`<div>${row.split('').map(k=>`<button data-act="cwKey" data-id="${k}">${k}</button>`).join('')}${i===2?'<button class="wide" data-act="cwKey" data-id="BS" aria-label="ลบ">⌫</button>':''}</div>`).join('')}</div>`}
+    <div class="cw-clues"><div><h3>แนวนอน</h3><ol>${list('a')}</ol></div><div><h3>แนวตั้ง</h3><ol>${list('d')}</ol></div></div>
+    ${!g.over&&cwStarted(g)?'<div class="btns" style="justify-content:center"><button class="btn sm ghost" data-act="cwReset">เริ่มโจทย์นี้ใหม่</button></div>':''}
+    ${g.over?'':'<p class="muted small cw-keys" style="text-align:center">พิมพ์ได้เลย · Space หรือแตะช่องเดิม = สลับแนว · Tab / Enter = คำถัดไป · ⌘/Ctrl + Enter = ยอมแพ้ เปิดเฉลยทั้งหมด</p>'}
+  </div></section>`;
+}
+function cwDoneView(p,b,g){const nr=Object.keys(g.rev).length;
+  return `<div class="wa-done"><h3>${g.over==='win'?(nr?'เสร็จแล้ว!':'เพอร์เฟกต์!'):'ยอมแพ้'}</h3>
+    <p class="muted">เวลา ${cwTime(g.sec)}${g.over==='win'?(nr?` · เปิดเฉลย ${nr} ช่อง`:' · ไม่เปิดเฉลยเลย'):' · เฉลยอยู่บนกระดาน'}</p>
+    ${waAwardLine(g)}
+    <div class="btns" style="justify-content:center"><button class="btn" data-act="cwReset">เล่นใหม่</button>${(()=>{const i=CW_PUZ.findIndex(x=>x.id===p.id);const nx=CW_PUZ.slice(i+1).find(x=>(cwG(x)||{}).over!=='win');return nx?`<button class="btn primary" data-act="cwOpen" data-id="${esc(nx.id)}">โจทย์ถัดไป: ${esc(nx.t)}</button>`:''})()}</div></div>`}
+
+/* after each render: keep the grid's horizontal scroll, keep the current square in view, run the clock */
+let cwTick=0;
+function cwAfter(){const sc=document.getElementById('cwScroll');
+  if(sc){if(CWS.sl!=null)sc.scrollLeft=CWS.sl;const el=sc.querySelector('.cw-cell.cur');
+    if(el){const a=el.offsetLeft,z=a+el.offsetWidth;if(a<sc.scrollLeft+8)sc.scrollLeft=a-40;else if(z>sc.scrollLeft+sc.clientWidth-8)sc.scrollLeft=z-sc.clientWidth+40}
+    CWS.sl=sc.scrollLeft;sc.onscroll=()=>{CWS.sl=sc.scrollLeft}}
+  if(cwTick)return;
+  cwTick=setInterval(()=>{const q=S.tab==='words'&&cwCur();const h=q&&cwG(q);if(!h||h.over){clearInterval(cwTick);cwTick=0;return}if(document.hidden)return;
+    h.sec++;const t=document.getElementById('cwTime');if(t)t.textContent=cwTime(h.sec);if(h.sec%5===0)cwGSave()},1000)}
+function cwRecord(p,g){if(g.saved)return;g.saved=1;const who=(g.who||[]).filter(id=>kidById(id));g.award={};
+  if(!who.length){cwGSave();return}
+  const win=g.over==='win';who.forEach(id=>{g.award[id]=0});cwGSave();
+  saveGameSession({game:cwGame(p),players:who.map(id=>({id})),coop:true,win,pts:{}}).then(()=>toast('บันทึกผลเข้าบ้านแล้ว')).catch(()=>toast('บันทึกผลเข้าบ้านไม่ได้'))}
+
+/* ---------- actions ---------- */
+const cwCur=()=>S.wa.view==='cross'&&S.wa.cid?cwFind(S.wa.cid):null;
+function cwRender(){const sc=document.getElementById('cwScroll');if(sc)CWS.sl=sc.scrollLeft;render()}
+ACT.cwOpen=t=>{const id=t.dataset.id;
+  if(kids().length&&!waTeam().length&&!S.wa.cid){S.wa.pend=id;openSheet('ยังไม่ได้เลือกคนเล่น','<p>เลือกน้องที่จะเล่นก่อน ผลจะบันทึกเข้าบ้าน หรือจะลองเล่นโดยไม่บันทึกก็ได้</p>',
+    '<button class="btn primary big" data-act="closeSheet" data-enter>เลือกคนเล่น</button><button class="btn ghost big" data-act="cwOpenGo">เล่นโดยไม่บันทึก</button>');return}
+  S.wa.view='cross';S.wa.cid=id;CWS.pid=null;waSave();render();window.scrollTo({top:0})};
+ACT.cwOpenGo=()=>{const id=S.wa.pend;closeSheet();if(!id)return;S.wa.pend=null;S.wa.view='cross';S.wa.cid=id;CWS.pid=null;waSave();render();window.scrollTo({top:0})};
+function cwMove(p,b,g,dr,dc){let r=CWS.r,c=CWS.c;for(;;){r+=dr;c+=dc;if(r<0||c<0||r>=b.R||c>=b.C)return;if(b.f(r,c)){CWS.r=r;CWS.c=c;return}}}
+function cwGoWord(b,g,i){const w=b.words[(i+b.words.length)%b.words.length];const e=w.cells.find(([r,c])=>!g.fill[r+'_'+c])||w.cells[0];CWS.r=e[0];CWS.c=e[1];CWS.dir=w.dir}
+function cwCheckDone(p,b,g){if(g.over)return;if(!b.cells.every(k=>g.fill[k]))return;
+  if(b.cells.every(k=>g.fill[k]===b.ans(k))){g.over='win';S.wa.msg=Object.keys(g.rev).length?'เสร็จแล้ว!':'เพอร์เฟกต์!'}else S.wa.msg='กระดานเต็มแล้ว แต่ยังมีบางช่องไม่ถูก'}
+function cwType(ch){const p=cwCur();if(!p)return;const b=cwBuild(p);const g=cwGet(p);if(g.over)return;const k=CWS.r+'_'+CWS.c;if(!b.of[k])return;
+  if(!g.rev[k]){g.fill[k]=ch;delete g.bad[k]}
+  const wi=cwWordIx(b);const w=b.words[wi];const pos=w.cells.findIndex(([r,c])=>r===CWS.r&&c===CWS.c);
+  const rest=w.cells.slice(pos+1).find(([r,c])=>!g.fill[r+'_'+c]);
+  if(rest){CWS.r=rest[0];CWS.c=rest[1]}else if(pos<w.cells.length-1){CWS.r=w.cells[pos+1][0];CWS.c=w.cells[pos+1][1]}
+  else if(!b.cells.every(x=>g.fill[x])){for(let j=1;j<=b.words.length;j++){const x=b.words[(wi+j)%b.words.length];if(x.cells.some(([r,c])=>!g.fill[r+'_'+c])){cwGoWord(b,g,(wi+j)%b.words.length);break}}}
+  cwCheckDone(p,b,g);cwGSave();cwRender()}
+function cwBack(){const p=cwCur();if(!p)return;const b=cwBuild(p);const g=cwGet(p);if(g.over)return;const k=CWS.r+'_'+CWS.c;
+  if(g.fill[k]&&!g.rev[k]){delete g.fill[k];delete g.bad[k]}
+  else{const w=b.words[cwWordIx(b)];const pos=w.cells.findIndex(([r,c])=>r===CWS.r&&c===CWS.c);
+    if(pos>0){CWS.r=w.cells[pos-1][0];CWS.c=w.cells[pos-1][1];const j=CWS.r+'_'+CWS.c;if(!g.rev[j]){delete g.fill[j];delete g.bad[j]}}}
+  cwGSave();cwRender()}
+ACT.cwCell=t=>{const p=cwCur();if(!p)return;const [r,c]=t.dataset.id.split('_').map(Number);const b=cwBuild(p);
+  if(r===CWS.r&&c===CWS.c){const o=b.of[r+'_'+c];const nd=CWS.dir==='a'?'d':'a';if(o&&o[nd]!=null)CWS.dir=nd}else{CWS.r=r;CWS.c=c}cwRender()};
+ACT.cwFlip=()=>{const p=cwCur();if(!p)return;const b=cwBuild(p);const o=b.of[CWS.r+'_'+CWS.c];const nd=CWS.dir==='a'?'d':'a';if(o&&o[nd]!=null){CWS.dir=nd;cwRender()}};
+ACT.cwClue=t=>{const p=cwCur();if(!p)return;const b=cwBuild(p);const g=cwGet(p);cwGoWord(b,g,+t.dataset.id);cwRender();
+  const bd=document.querySelector('.cw-bar')||document.querySelector('.cw-board');if(bd)bd.scrollIntoView({block:'nearest',behavior:'smooth'})};
+ACT.cwStep=t=>{const p=cwCur();if(!p)return;const b=cwBuild(p);const g=cwGet(p);cwGoWord(b,g,cwWordIx(b)+(+t.dataset.id));cwRender()};
+ACT.cwKey=t=>{const k=t.dataset.id;if(k==='BS')cwBack();else cwType(k)};
+ACT.cwMenu=t=>{const p=cwCur();if(!p)return;const rev=t.dataset.id==='reveal';
+  openSheet(rev?'เฉลย':'ตรวจคำตอบ',rev?'<p class="muted">ช่องที่เปิดเฉลยจะมีมุมสีน้ำเงิน</p>':'<p class="muted">ช่องที่ผิดจะขึ้นสีแดง แก้แล้วสีหายเอง</p>',
+    ['square','word','all'].map((x,i)=>`<button class="btn ${i?'':'primary'} big" data-act="cwDo" data-id="${rev?'r':'c'}${x}">${{square:'ช่องนี้',word:'คำนี้',all:'ทั้งกระดาน'}[x]}</button>`).join('')+'<button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
+ACT.cwDo=t=>{const p=cwCur();closeSheet();if(!p)return;const b=cwBuild(p);const g=cwGet(p);const how=t.dataset.id[0],scope=t.dataset.id.slice(1);
+  if(how==='r'&&scope==='all'){openSheet('เปิดเฉลยทั้งกระดาน?','<p>ทุกช่องจะเติมคำตอบให้ นับว่ายอมแพ้</p>','<button class="btn dangerfill big" data-act="cwQuit" data-enter>เปิดเฉลยทั้งหมด</button><button class="btn ghost big" data-act="closeSheet">เล่นต่อ</button>');return}
+  const ks=scope==='square'?[CWS.r+'_'+CWS.c]:scope==='word'?b.words[cwWordIx(b)].cells.map(([r,c])=>r+'_'+c):b.cells;
+  let bad=0;ks.forEach(k=>{if(how==='r'){if(g.fill[k]!==b.ans(k)){g.fill[k]=b.ans(k);g.rev[k]=1}delete g.bad[k]}else if(g.fill[k]&&g.fill[k]!==b.ans(k)){g.bad[k]=1;bad++}});
+  if(how==='c')S.wa.msg=bad?`ผิด ${bad} ช่อง`:'ที่เติมไว้ถูกหมด';
+  cwCheckDone(p,b,g);cwGSave();cwRender()};
+function cwQuitNow(){const p=cwCur();closeSheet();if(!p)return;const b=cwBuild(p);const g=cwGet(p);if(g.over)return;
+  b.cells.forEach(k=>{if(g.fill[k]!==b.ans(k)){g.fill[k]=b.ans(k);g.rev[k]=1}delete g.bad[k]});g.over='quit';cwGSave();cwRender()}
+ACT.cwQuit=cwQuitNow;
+ACT.cwReset=()=>{const p=cwCur();if(!p)return;openSheet('เล่นโจทย์นี้ใหม่?',`<p>${esc(p.t)} จะล้างกระดานและเวลาใหม่หมด</p>`,
+  '<button class="btn primary big" data-act="cwResetGo" data-enter>เล่นใหม่</button><button class="btn ghost big" data-act="closeSheet">ยกเลิก</button>')};
+ACT.cwResetGo=()=>{const p=cwCur();closeSheet();if(!p)return;delete CWG[cwKey(p)];cwGSave();CWS.pid=null;render()};
+function cwEndInfo(){const p=cwCur();if(!p)return null;const g=cwG(p);if(!g||g.over||!cwStarted(g))return null;
+  return {name:'Crossword '+p.t,note:'เปิดเฉลยทั้งกระดาน นับว่ายอมแพ้',go:cwQuitNow}}
+document.addEventListener('keydown',e=>{
+  if(S.tab!=='words'||!cwCur()||!$('#sheet').hidden||e.metaKey||e.ctrlKey||e.altKey||e.isComposing)return;
+  const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+  const p=cwCur();const b=cwBuild(p);const g=cwGet(p);if(g.over)return;const k=e.key;
+  if(/^[a-zA-Z]$/.test(k)){e.preventDefault();cwType(k.toUpperCase());return}
+  if(k==='Backspace'||k==='Delete'){e.preventDefault();cwBack();return}
+  const mv={ArrowLeft:[0,-1,'a'],ArrowRight:[0,1,'a'],ArrowUp:[-1,0,'d'],ArrowDown:[1,0,'d']}[k];
+  if(mv){e.preventDefault();if(CWS.dir!==mv[2]&&b.of[CWS.r+'_'+CWS.c]&&b.of[CWS.r+'_'+CWS.c][mv[2]]!=null)CWS.dir=mv[2];else cwMove(p,b,g,mv[0],mv[1]);cwRender();return}
+  if(k===' '){e.preventDefault();ACT.cwFlip();return}
+  if(k==='Tab'||k==='Enter'){e.preventDefault();cwGoWord(b,g,cwWordIx(b)+(e.shiftKey?-1:1));cwRender()}
+});
+
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-10-28T20:11:00+07:00';
+const SITE_UPDATED='2026-10-28T20:22:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
