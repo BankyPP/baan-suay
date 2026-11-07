@@ -520,6 +520,8 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-rows{display:grid;gap:10px}
 .f7-row{--c:#6B7785;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);min-width:0}
 .f7-row{cursor:pointer}.f7-row input{cursor:text}
+.f7-row .f7-key{position:relative}.f7-kb{display:none;position:absolute;top:2px;right:3px;font:600 .58rem/1 var(--f-head);opacity:.6;pointer-events:none}
+@media (hover:hover){.f7-row.on .f7-kb{display:block}}
 .f7-row.on,.f7-row:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
 .f7-who{background:none;border:0;padding:0;cursor:pointer;border-radius:50%;line-height:0}
 .f7-name{display:grid;gap:6px;min-width:0}
@@ -2920,24 +2922,24 @@ function f7PlayView(f){
           <input type="text" id="f7In_${i}" data-f7="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="เช่น 3 7 12 แล้วกด Enter" value="${esc(f.draft[k]||'')}" aria-label="ใส่แต้มของ ${esc(playerName(p))} หลายเลขเว้นวรรคได้">
           <button type="button" class="btn sm primary f7-go" data-act="f7AddPts" data-id="${i}">บวกแต้ม</button>
           <button type="button" class="btn sm ghost f7-go" data-act="f7Edit" data-id="${i}" ${es.length?'':'disabled'}>แก้</button>
-          <div class="f7-pad" role="group" aria-label="กดเลขแทนการพิมพ์">${Array.from({length:13},(_,n)=>V?n+1:n).map(n=>`<button type="button" class="btn sm f7-key" data-act="f7Num" data-id="${i}" data-n="${n}">${n}</button>`).join('')}<button type="button" class="btn sm f7-key ghost" data-act="f7Num" data-id="${i}" data-n="del" aria-label="ลบเลขตัวท้าย">⌫</button></div>
+          <div class="f7-pad" role="group" aria-label="กดเลขแทนการพิมพ์">${Array.from({length:13},(_,n)=>V?n+1:n).map(n=>`<button type="button" class="btn sm f7-key" data-act="f7Num" data-id="${i}" data-n="${n}">${n}${n>=10?'<span class="f7-kb" aria-hidden="true">'+'QWER'[n-10]+'</span>':''}</button>`).join('')}<button type="button" class="btn sm f7-key ghost" data-act="f7Num" data-id="${i}" data-n="del" aria-label="ลบเลขตัวท้าย">⌫</button></div>
           ${V?`<div class="f7-pad f7-special f7-v" role="group" aria-label="การ์ดพิเศษ Vengeance">
-            <button type="button" class="btn sm f7-key f7-x2" data-act="f7Zero" data-id="${i}" aria-pressed="${zero}" title="The Zero: แต้มรอบนี้เป็น 0 ถ้าไม่ได้ Flip 7">Zero</button>
+            <button type="button" class="btn sm f7-key f7-x2" data-act="f7Zero" data-id="${i}" aria-pressed="${zero}" title="The Zero: แต้มรอบนี้เป็น 0 ถ้าไม่ได้ Flip 7">Zero<span class="f7-kb" aria-hidden="true">Z</span></button>
             <button type="button" class="btn sm f7-key f7-lbl" data-act="f7Num" data-id="${i}" data-n="7" title="Unlucky 7: ทิ้งเลขกับการ์ดลบที่มีทั้งหมด เหลือแค่ 7 ใบนี้">7<small>Unlucky</small></button>
-            <button type="button" class="btn sm f7-key f7-lbl" data-act="f7Num" data-id="${i}" data-n="13" title="Lucky 13: ถือ 13 ได้ 2 ใบไม่แตก">13<small>Lucky</small></button>
-            <button type="button" class="btn sm f7-key f7-x2" data-act="f7Half" data-id="${i}" aria-pressed="${half}" aria-label="การ์ด ÷2 หารครึ่งผลรวมเลข ปัดลง">÷2</button>
-            ${F7V_MODS.map(m=>`<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${mods.includes(m)}" aria-label="การ์ด ${m}">−${-m}</button>`).join('')}
-            <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15</button>
-            ${f.brutal?`<button type="button" class="btn sm f7-key f7-hit f7-wide" data-act="f7Hit" data-id="${i}" aria-pressed="${hit}" title="Brutal: คนอื่น Flip 7 แล้วเลือกหักคนนี้ 15">−15 โดน</button>`:''}
+            <button type="button" class="btn sm f7-key f7-lbl" data-act="f7Num" data-id="${i}" data-n="13" title="Lucky 13: ถือ 13 ได้ 2 ใบไม่แตก">13<small>Lucky</small><span class="f7-kb" aria-hidden="true">R</span></button>
+            <button type="button" class="btn sm f7-key f7-x2" data-act="f7Half" data-id="${i}" aria-pressed="${half}" aria-label="การ์ด ÷2 หารครึ่งผลรวมเลข ปัดลง">÷2<span class="f7-kb" aria-hidden="true">X</span></button>
+            ${F7V_MODS.map(m=>`<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${mods.includes(m)}" aria-label="การ์ด ${m}">−${-m}<span class="f7-kb" aria-hidden="true">${'ASDFG'[F7V_MODS.indexOf(m)]}</span></button>`).join('')}
+            <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15<span class="f7-kb" aria-hidden="true">B</span></button>
+            ${f.brutal?`<button type="button" class="btn sm f7-key f7-hit f7-wide" data-act="f7Hit" data-id="${i}" aria-pressed="${hit}" title="Brutal: คนอื่น Flip 7 แล้วเลือกหักคนนี้ 15">−15 โดน<span class="f7-kb" aria-hidden="true">H</span></button>`:''}
           </div>`:`<div class="f7-pad f7-special" role="group" aria-label="การ์ดพิเศษ">
-            <button type="button" class="btn sm f7-key f7-x2" data-act="f7X2" data-id="${i}" aria-pressed="${x2}" aria-label="การ์ด ×2 คูณเฉพาะเลข">×2</button>
-            ${F7_MODS.map(m=>{const c=mods.filter(v=>v===m).length;return `<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${c>0}" aria-label="การ์ด +${m}">+${m}</button>`}).join('')}
-            <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15</button>
+            <button type="button" class="btn sm f7-key f7-x2" data-act="f7X2" data-id="${i}" aria-pressed="${x2}" aria-label="การ์ด ×2 คูณเฉพาะเลข">×2<span class="f7-kb" aria-hidden="true">X</span></button>
+            ${F7_MODS.map(m=>{const c=mods.filter(v=>v===m).length;return `<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${c>0}" aria-label="การ์ด +${m}">+${m}<span class="f7-kb" aria-hidden="true">${'ASDFG'[F7_MODS.indexOf(m)]}</span></button>`}).join('')}
+            <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15<span class="f7-kb" aria-hidden="true">B</span></button>
           </div>`}
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys">${f.ver==='v'?'<span>คลิกกล่องของใครแล้วพิมพ์แต้มได้เลย</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span>คลิกกล่องของใครแล้วพิมพ์แต้มได้เลย</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys">${f.ver==='v'?'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>1</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> = 10 11 12 13 · <kbd>Z</kbd> หรือ <kbd>0</kbd> Zero · <kbd>X</kbd> ÷2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = −2 ถึง −10 · <kbd>B</kbd> +15'+(f.brutal?' · <kbd>H</kbd> −15 โดน':'')+' · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Esc</kbd> เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>0</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> = 10 11 12 · <kbd>X</kbd> ×2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = +2 ถึง +10 · <kbd>B</kbd> +15 · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Esc</kbd> เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
@@ -2949,7 +2951,7 @@ function f7EndView(f){
     ${f.saved?'<p class="muted">บันทึกผลเข้าบ้านแล้ว</p>':`<label class="check"><input type="checkbox" id="f7Award" checked> ให้แต้มบ้านกับผู้ชนะ</label><label class="field" style="max-width:180px"><span>กี่แต้ม</span><input type="number" id="f7AwardN" value="${esc(f.award)}" min="0" max="50"></label><button class="btn primary big" data-act="f7Save">บันทึกผลเข้าบ้าน</button>`}
     <div class="btns" style="justify-content:center"><button class="btn" data-act="f7Again">เล่นอีกเกม คนเดิม</button><button class="btn" data-act="f7Back">กลับไปเล่นต่อ</button><button class="btn ghost" data-act="f7New">ตั้งค่าใหม่</button></div></div>`;
 }
-function f7Paint(focusIdx){render();if(focusIdx==null)return;const el=document.getElementById('f7In_'+focusIdx);if(el){try{el.focus({preventScroll:true});const l=el.value.length;el.setSelectionRange(l,l)}catch(e){}}}
+function f7Paint(focusIdx){render();if(focusIdx==null||(S.flip&&S.flip.sel!=null))return;const el=document.getElementById('f7In_'+focusIdx);if(el){try{el.focus({preventScroll:true});const l=el.value.length;el.setSelectionRange(l,l)}catch(e){}}}
 function f7AddFor(i){
   const f=f7();const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);
   const raw=el?el.value:(f.draft[k]||'');const e=f7Draft(f,p,raw);const r=e.r;const {x2,b15,mods,half,zero,hit}=e;
@@ -3073,24 +3075,35 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.f7Undo();return}
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==='Escape'&&S.flip.sel!=null){f7Select(null);return}
-  const si=S.flip.sel;const sel=si!=null&&document.getElementById('f7In_'+si);
-  if(sel&&e.key!=='Enter'){
-    let ch=dig?dig[2]:/^[\s\-−+x×*\/÷]$/.test(e.key)?e.key:null;
-    if(ch!=null||e.key==='Backspace'){e.preventDefault();f7Focus(sel);
-      if(ch!=null)f7Insert(sel,ch);else{const v=sel.value;sel.value=v.slice(0,-1);sel.dispatchEvent(new Event('input',{bubbles:true}))}}
+  const si=S.flip.sel;const row=si!=null&&document.querySelector('.f7-row[data-row="'+si+'"]');
+  if(row&&e.key!=='Enter'){
+    const V=S.flip.ver==='v';const c=e.code||'';const N=n=>'[data-act="f7Num"][data-n="'+n+'"]';const mods=V?F7V_MODS:F7_MODS;
+    let q=null;
+    if(dig){const n=+dig[2];q=V&&n===0?'[data-act="f7Zero"]':N(n)}
+    else if(e.key==='Backspace')q=N('del');
+    else{const L=/^Key([A-Z])$/.exec(c);const ch=L?L[1]:(c==='Slash'||c==='NumpadDivide'?'/':c==='NumpadMultiply'?'*':'');
+      const m='ASDFG'.indexOf(ch);
+      if('QWER'.includes(ch)&&ch)q=N(10+'QWER'.indexOf(ch));
+      else if(m>=0)q='[data-act="f7Mod"][data-n="'+mods[m]+'"]';
+      else if(ch==='X'||(V&&ch==='/')||(!V&&ch==='*'))q=V?'[data-act="f7Half"]':'[data-act="f7X2"]';
+      else if(ch==='B')q='[data-act="f7B15"]';
+      else if(V&&ch==='Z')q='[data-act="f7Zero"]';
+      else if(V&&ch==='H')q='[data-act="f7Hit"]'}
+    const btn=q&&row.querySelector(q);
+    if(btn){e.preventDefault();if(!e.repeat)btn.click()}
     return}
   if(e.key==='Enter'){const r=a&&a.closest&&a.closest('[data-row]');const i=r?+r.dataset.row:(S.flip.sel!=null?S.flip.sel:S.flip.lastRow);const p=S.flip.players[i];
     if(p&&(r||S.flip.sel===i||f7Has(f7(),f7key(p)))){e.preventDefault();f7AddFor(i)}return}
 });
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.f7-key'))e.preventDefault()});
-/* คลิกกล่องของใครก็ได้ → เลือกกล่องนั้น แล้วพิมพ์แต้มด้วยคีย์บอร์ดได้เลย */
+/* คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น (ส่วนอื่น) = เลือกกล่องนั้น แล้วคีย์บอร์ดกดปุ่มในกล่องแทน (ปุ่มลัดเขียนมุมปุ่ม) */
 function f7Focus(el){try{el.focus({preventScroll:true});const l=el.value.length;el.setSelectionRange(l,l)}catch(e){}}
 function f7Mark(i){const f=S.flip;if(!f)return;f.sel=i;LS.set('flip',f);document.querySelectorAll('.f7-row[data-row]').forEach(r=>r.classList.toggle('on',+r.dataset.row===i))}
-function f7Select(i){f7Mark(i);if(i==null){const a=document.activeElement;if(a&&a.dataset&&a.dataset.f7!=null)a.blur();return}const el=document.getElementById('f7In_'+i);if(el)f7Focus(el)}
+function f7Select(i){f7Mark(i);const a=document.activeElement;if(a&&a.dataset&&a.dataset.f7!=null)a.blur()}
 document.addEventListener('click',e=>{if(!f7On())return;const t=e.target;if(!t.closest)return;const r=t.closest('.f7-row[data-row]');
   if(!r){if(S.flip.sel!=null&&t.closest('#app,main,body')&&!t.closest('#sheet'))f7Mark(null);return}
-  const i=+r.dataset.row;if(t.closest('button,input,a,label,select,textarea')){if(S.flip.sel!==i)f7Mark(i);return}f7Select(i)});
-document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.f7!=null&&S.flip&&S.flip.sel!==+t.dataset.f7)f7Mark(+t.dataset.f7)});
+  const i=+r.dataset.row;if(t.closest('button,input,a,label,select,textarea')){if(S.flip.sel!=null&&S.flip.sel!==i)f7Mark(null);return}f7Select(i)});
+document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.f7!=null&&S.flip&&S.flip.sel!=null)f7Mark(null)});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
   f.draft[f7key(p)]=t.value;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+t.dataset.f7);if(pv)pv.innerHTML=f7PrevHTML(f,p)});
 /* Poker (No-Limit Texas Hold'em): only chips and betting. Cards are dealt for real on the table */
