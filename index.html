@@ -1061,6 +1061,7 @@ small.over{color:var(--bad)!important;font-weight:700}
 .ct-sbar u{position:absolute;left:0;right:0;height:2px;background:var(--bad)}
 .ct-log{margin:0;padding-left:1.6em;display:grid;gap:4px;font-size:.92rem}
 .ct.stack .ct-bank{display:flex;flex-wrap:wrap}
+.ct-palh{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
 </style>
 </head>
 <body>
@@ -4475,7 +4476,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-07T13:58:00+07:00';
+const SITE_UPDATED='2026-11-07T14:01:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
@@ -4832,12 +4833,12 @@ function ctBoardView(C){
   const H=C.hex;const chk=ctBoardCheck(C);const used={},nused={};H.forEach(h=>{if(h.t)used[h.t]=(used[h.t]||0)+1;if(h.n)nused[h.n]=(nused[h.n]||0)+1});
   const sel=C.view.sel,sh=H[sel]||{};const ph=CT_TMP_PHOTO||ctPhoto();const ed=C.view.ed;
   const numsU=[2,3,4,5,6,8,9,10,11,12];
-  const pal=ed==='hex'?`<div class="ct-pal"><div class="label">ช่องที่ ${sel+1} · แตะช่องบนกระดานเพื่อเลือกช่องอื่น</div>
+  const pal=ed==='hex'?`<div class="ct-pal"><div class="ct-palh"><div class="label">ช่องที่ ${sel+1}${sh.t?' · '+CT_T[sh.t].n+(sh.n?' '+sh.n:''):' · ว่าง'} · แตะช่องบนกระดานเพื่อเลือกช่องอื่น</div>${sh.t||sh.n?`<button type="button" class="chip" data-act="ctClearHex">🧽 ล้างช่องนี้</button>`:''}</div>
       <div class="ct-tgrid">${CT_TK.map(t=>{const left=CT_TCOUNT[t]-(used[t]||0);return `<button type="button" class="ct-tb" style="--c:${CT_T[t].c}" data-act="ctSetT" data-id="${t}" aria-pressed="${sh.t===t}"><b>${CT_T[t].r?CT_RE[CT_T[t].r]:'🏜️'} ${CT_T[t].n}</b><small class="${left<0?'over':''}">เหลือ ${left}</small></button>`}).join('')}</div>
       <div class="ct-ngrid">${numsU.map(n=>{const left=(n===2||n===12?1:2)-(nused[n]||0);return `<button type="button" class="ct-nb${n===6||n===8?' red':''}" data-act="ctSetN" data-id="${n}" aria-pressed="${sh.n===n}" ${sh.t==='D'?'disabled':''}><b>${n}</b><small class="${left<0?'over':''}">${left}</small></button>`}).join('')}<button type="button" class="ct-nb" data-act="ctSetN" data-id="0" aria-pressed="${!sh.n}"><b>–</b><small>ไม่มี</small></button></div>
-      <p class="muted small" style="margin:0">เลือกพื้นที่ แล้วเลือกเลข จอจะเลื่อนไปช่องถัดไปเอง (ทะเลทรายเลื่อนเลย)</p></div>`
+      <p class="muted small" style="margin:0">เลือกพื้นที่ แล้วเลือกเลข จอจะเลื่อนไปช่องถัดไปเอง (ทะเลทรายเลื่อนเลย) · แก้ช่องไหนก็แตะช่องนั้นแล้วกดใหม่ทับได้ · เอาเลขออกกด – ไม่มี · ล้างทั้งช่องกด 🧽</p></div>`
     :`<div class="ct-pal"><div class="label">${C.view.psel!=null?'ท่าเรือที่เลือก: เลือกชนิด':'แตะวงกลมรอบเกาะเพื่อเลือกตำแหน่งท่าเรือ'}</div>
-      ${C.view.psel!=null?`<div class="chips">${CT_PORTK.map(k=>`<button type="button" class="chip" data-act="ctSetP" data-id="${k}" aria-pressed="${C.ports[C.view.psel]===k}">${k==='3'?'? 3:1':CT_RE[k]+' '+CT_RN[k]+' 2:1'}</button>`).join('')}<button type="button" class="chip" data-act="ctSetP" data-id="x">ไม่มีท่าเรือ</button></div>`:''}
+      ${C.view.psel!=null?`<div class="chips">${CT_PORTK.map(k=>`<button type="button" class="chip" data-act="ctSetP" data-id="${k}" aria-pressed="${C.ports[C.view.psel]===k}">${k==='3'?'? 3:1':CT_RE[k]+' '+CT_RN[k]+' 2:1'}</button>`).join('')}<button type="button" class="chip" data-act="ctSetP" data-id="x" ${C.ports[C.view.psel]?'':'disabled'}>🧽 ลบท่าเรือนี้</button></div>`:''}
       <p class="muted small" style="margin:0">มีท่าเรือ ${Object.keys(C.ports).length} ที่ (กล่องปกติมี 9: 3:1 สี่ที่ และ 2:1 อย่างละที่)</p></div>`;
   return `<div class="ct-bed">
     <div class="ct-bwrap">${ctSVG(C,'edit')}</div>
@@ -5116,6 +5117,7 @@ Object.assign(ACT,{
   ctRot(){const C=ct();C.view.rot=((C.view.rot||0)+1)%6;ctGo()},
   ctRand(){const C=ct();C.hex=ctRandBoard();const tys=shuffle(Object.values(C.ports));Object.keys(C.ports).forEach((e,k)=>C.ports[e]=tys[k]);C.view.aiNote='';toast('สุ่มกระดานใหม่แล้ว (เลขแดงไม่ติดกัน ท่าเรือสลับชนิด)');ctGo()},
   ctBeginBoard(){const C=ct();C.hex=ctParseHexes(CT_BEGIN);C.ports=CT_STD_PORTS();C.view.aiNote='';ctGo()},
+  ctClearHex(){const C=ct();const h=C.hex[C.view.sel];if(!h)return;h.t=null;h.n=null;ctGo()},
   ctClearBoard(){const C=ct();C.hex=ctEmptyHex();C.view.sel=0;ctGo()},
   ctCodeUse(){const C=ct();const r=ctParseCode(val('ctCodeIn'));if(!r){toast('อ่านรหัสไม่ได้ ต้องมี 19 ช่อง เช่น W5 P6 … ');return}C.hex=r.hex;if(r.ports)C.ports=r.ports;toast('ตั้งกระดานจากรหัสแล้ว');ctGo()},
   ctCodeCopy(){const s=ctCode(ct());(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('คัดลอกรหัสแล้ว'),()=>{const el=document.getElementById('ctCodeIn');if(el){el.value=s;el.select()}toast('เลือกข้อความไว้แล้ว กดคัดลอกเอง')})},
