@@ -519,7 +519,8 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-goal b{font-family:var(--f-head);font-weight:600}
 .f7-rows{display:grid;gap:10px}
 .f7-row{--c:#6B7785;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);min-width:0}
-.f7-row.on{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
+.f7-row{cursor:pointer}.f7-row input{cursor:text}
+.f7-row.on,.f7-row:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
 .f7-who{background:none;border:0;padding:0;cursor:pointer;border-radius:50%;line-height:0}
 .f7-name{display:grid;gap:6px;min-width:0}
 .f7-name b{font:600 1.08rem/1.2 var(--f-head);overflow-wrap:anywhere}
@@ -2909,7 +2910,7 @@ function f7PlayView(f){
     ${hit.length?`<div class="f7-goal" role="status"><b>${esc(hit.map(playerName).join(', '))} ถึง ${f.target} แล้ว</b> · เล่นให้จบรอบนี้ แล้วกดจบเกม ตอนนี้ ${esc(lead.map(playerName).join(' & '))} นำอยู่ที่ ${top}</div>`:''}
     <div class="f7-rows">${f.players.map((p,i)=>i).sort((a,b)=>tots[b]-tots[a]||a-b).map(i=>{const p=f.players[i];const t=tots[i];const k=f7key(p);const es=p.entries;const x2=!!f.x2[k];const b15=!!f.b15[k];const mods=f.mods[k]||[];const rk=1+tots.filter(v=>v>t).length;
       const V=f.ver==='v';const half=!!f.half[k];const zero=!!f.zero[k];const hit=!!f.hit[k];
-      return `<div class="f7-row" data-row="${i}" style="--c:${f7Color(p)}">
+      return `<div class="f7-row ${f.sel===i?'on':''}" data-row="${i}" style="--c:${f7Color(p)}">
         <button type="button" class="f7-who" data-act="f7SetTurn" data-id="${i}" aria-label="ให้เป็นตาของ ${esc(playerName(p))}">${playerPawn(p)}</button>
         <div class="f7-name"><b><span class="f7-rk ${rk===1&&t>0?'top':''}" aria-label="อันดับ ${rk}">${rk}</span>${esc(playerName(p))}${t>=f.target?'<span class="f7-tag hit">ถึงเป้า</span>':''}</b>
           <div class="f7-bar" role="img" aria-label="${t} จาก ${f.target}"><i style="width:${Math.max(0,Math.min(100,t/f.target*100)).toFixed(1)}%"></i></div>
@@ -2936,7 +2937,7 @@ function f7PlayView(f){
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys">${f.ver==='v'?'<span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys">${f.ver==='v'?'<span>คลิกกล่องของใครแล้วพิมพ์แต้มได้เลย</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span>คลิกกล่องของใครแล้วพิมพ์แต้มได้เลย</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
@@ -2956,7 +2957,7 @@ function f7AddFor(i){
   const n=f7Calc(f,e);const before=f7Tot(p);
   f7Snap(f,f7Fmt(n)+' ให้ '+playerName(p));
   p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(F7_HALF,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,half,zero,hit,n,at:Date.now()});
-  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.half[k]=false;f.zero[k]=false;f.hit[k]=false;f.lastRow=null;persist();
+  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.half[k]=false;f.zero[k]=false;f.hit[k]=false;f.lastRow=null;f.sel=null;persist();
   const a=document.activeElement;if(a&&a.blur)a.blur();render();
   const t=f7Tot(p);toast(before<f.target&&t>=f.target?`${playerName(p)} ถึง ${f.target} แล้ว! เล่นให้จบรอบนี้`:`${playerName(p)} ${f7Fmt(n)} รวม ${t}`);
 }
@@ -3010,7 +3011,7 @@ Object.assign(ACT,{
   f7Hit(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
     f.hit[k]=!f.hit[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7Turn(t){f7Step(+t.dataset.id)},
-  f7SetTurn(t){const f=f7();f.cur=+t.dataset.id;persist();render()},
+  f7SetTurn(t){f7Select(+t.dataset.id)},
   f7X2(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
     f.x2[k]=!f.x2[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7B15(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
@@ -3071,10 +3072,25 @@ document.addEventListener('keydown',e=>{
   }
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.f7Undo();return}
   if(e.ctrlKey||e.metaKey||e.altKey)return;
-  if(e.key==='Enter'){const r=a&&a.closest&&a.closest('[data-row]');const i=r?+r.dataset.row:S.flip.lastRow;const p=S.flip.players[i];
-    if(p&&(r||f7Has(f7(),f7key(p)))){e.preventDefault();f7AddFor(i)}return}
+  if(e.key==='Escape'&&S.flip.sel!=null){f7Select(null);return}
+  const si=S.flip.sel;const sel=si!=null&&document.getElementById('f7In_'+si);
+  if(sel&&e.key!=='Enter'){
+    let ch=dig?dig[2]:/^[\s\-−+x×*\/÷]$/.test(e.key)?e.key:null;
+    if(ch!=null||e.key==='Backspace'){e.preventDefault();f7Focus(sel);
+      if(ch!=null)f7Insert(sel,ch);else{const v=sel.value;sel.value=v.slice(0,-1);sel.dispatchEvent(new Event('input',{bubbles:true}))}}
+    return}
+  if(e.key==='Enter'){const r=a&&a.closest&&a.closest('[data-row]');const i=r?+r.dataset.row:(S.flip.sel!=null?S.flip.sel:S.flip.lastRow);const p=S.flip.players[i];
+    if(p&&(r||S.flip.sel===i||f7Has(f7(),f7key(p)))){e.preventDefault();f7AddFor(i)}return}
 });
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.f7-key'))e.preventDefault()});
+/* คลิกกล่องของใครก็ได้ → เลือกกล่องนั้น แล้วพิมพ์แต้มด้วยคีย์บอร์ดได้เลย */
+function f7Focus(el){try{el.focus({preventScroll:true});const l=el.value.length;el.setSelectionRange(l,l)}catch(e){}}
+function f7Mark(i){const f=S.flip;if(!f)return;f.sel=i;LS.set('flip',f);document.querySelectorAll('.f7-row[data-row]').forEach(r=>r.classList.toggle('on',+r.dataset.row===i))}
+function f7Select(i){f7Mark(i);if(i==null){const a=document.activeElement;if(a&&a.dataset&&a.dataset.f7!=null)a.blur();return}const el=document.getElementById('f7In_'+i);if(el)f7Focus(el)}
+document.addEventListener('click',e=>{if(!f7On())return;const t=e.target;if(!t.closest)return;const r=t.closest('.f7-row[data-row]');
+  if(!r){if(S.flip.sel!=null&&t.closest('#app,main,body')&&!t.closest('#sheet'))f7Mark(null);return}
+  const i=+r.dataset.row;if(t.closest('button,input,a,label,select,textarea')){if(S.flip.sel!==i)f7Mark(i);return}f7Select(i)});
+document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.f7!=null&&S.flip&&S.flip.sel!==+t.dataset.f7)f7Mark(+t.dataset.f7)});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
   f.draft[f7key(p)]=t.value;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+t.dataset.f7);if(pv)pv.innerHTML=f7PrevHTML(f,p)});
 /* Poker (No-Limit Texas Hold'em): only chips and betting. Cards are dealt for real on the table */
