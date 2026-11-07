@@ -265,6 +265,8 @@ textarea.grow{min-height:46px;resize:vertical;overflow:hidden}
 textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
 /* story reader */
 .sxlock body{overflow:hidden}
+.parkrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0}.parkrow>span{flex:1;min-width:10em}
+.clockset .pick{margin-bottom:6px}
 .storyx{position:fixed;inset:0;z-index:30;background:var(--paper);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;
   padding:max(10px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .sx-bar{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
@@ -1475,6 +1477,7 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!typing()){
 const TABS=[['home','หน้าบ้าน'],['points','แต้มบ้าน'],['learn','ห้องเรียน'],['games','ห้องเกม'],['words','Word Arcade'],['tools','ตัวช่วยเล่น'],['wall','กำแพงบ้าน'],['stickers','สติกเกอร์'],['admin','จัดการบ้าน',1]];
 function render(){
   Store.checkAdmin();
+  if(S.quiz&&!S.quiz.done&&S.tab!=='learn'){quizPark()}
   if(S.tab==='admin'&&!S.bro)S.tab='home';
   $('#houseName').textContent=houseName();
   const mb=$('#modeBtn');mb.setAttribute('aria-pressed',S.bro?'true':'false');$('.mlabel',mb).textContent=S.bro?'โหมดพี่ เปิดอยู่':'โหมดพี่';
@@ -1660,6 +1663,24 @@ function vLearn(){
 
 /* MCQ + MEQ and "new questions only" are the defaults every time the page opens; only the timer choice is remembered */
 const QSET_DEF={mode:'both',pick:'new',timer:'none',qSec:60,setSec:900};
+/* quiz clock is set by the brother per lesson (every subject): kind none | timer (count down) | watch (stopwatch, no limit);
+   per set | q (each question) | story (story lessons: one clock across a story's Reading Comprehension + Vocabularies) */
+const CLOCK_DEF={kind:'none',per:'set',sec:900};
+function lessonClock(l){const c=Object.assign({},CLOCK_DEF,(l&&l.clock)||{});if(!['none','timer','watch'].includes(c.kind))c.kind='none';
+  if(!['set','q','story'].includes(c.per))c.per='set';if(c.per==='story'&&!isStory(l))c.per='set';c.sec=Math.max(15,Math.round(+c.sec||900));return c}
+/* the clock a quiz set actually runs with; Vocab Checkpoints (several stories) fall back from per-story to the whole set */
+function clockOf(l,sc){const c=lessonClock(l);const per=c.per==='story'&&isCk(sc)?'set':c.per;
+  return {kind:c.kind,per,sec:c.sec,timer:c.kind==='timer'?(per==='q'?'q':'set'):'none',watch:c.kind==='watch',story:per==='story'?sxScopeTid(sc):null}}
+/* per-story clock memory on this device: {left (timer) | spent (stopwatch), done:[sets finished since this clock started]} */
+const storyClk=(kid,lid,tid)=>(LS.get('sclk',{})[kid+'|'+lid+'|'+tid])||null;
+function storyClkSet(kid,lid,tid,v){const m=LS.get('sclk',{});if(v)m[kid+'|'+lid+'|'+tid]=v;else delete m[kid+'|'+lid+'|'+tid];LS.set('sclk',m)}
+function clockLabel(c){if(c.kind==='none')return 'ไม่จับเวลา';const per=c.per==='q'?'ทีละข้อ':c.per==='story'?'ทั้งเรื่อง':'ทั้งชุด';
+  return c.kind==='watch'?'จับเวลาเดินหน้า '+per:'นับถอยหลัง '+fmtDur(c.sec)+' '+per}
+/* paused quizzes are kept on this device so they can be continued later, even after closing the app */
+const parkKey=q=>q.kid+'|'+q.lessonId+'|'+q.scope;
+const parked=()=>LS.get('parkQ',{});
+function parkSave(q){const m=parked();m[parkKey(q)]=q;LS.set('parkQ',m)}
+function parkDrop(key){const m=parked();delete m[key];LS.set('parkQ',m)}
 function qset(){const saved=Object.assign({},LS.get('qset',{}));delete saved.mode;delete saved.pick;S.learn.qs=Object.assign({},QSET_DEF,saved,S.learn.qs||{});return S.learn.qs}
 const Q_PRESETS=[[30,'30 วิ'],[60,'1 นาที'],[120,'2 นาที'],[300,'5 นาที'],[600,'10 นาที']];
 const SET_PRESETS=[[300,'5 นาที'],[600,'10 นาที'],[900,'15 นาที'],[1800,'30 นาที'],[3600,'60 นาที']];
@@ -1674,7 +1695,11 @@ function vLesson(l){
   const st=qset();const sc=curScope(l);
   const P=quizPlan(l,sc,sel);const nm=P.nm,ne=P.ne,mode=P.mode,pick=P.pick;
   const n=P.order.length;const allQ=openQCount(l,'mcq')+openQCount(l,'meq');const mt=midTids(l);const prac=isPractice(sc);
-  const setHint=(prac?'ตอบแล้วกดตรวจ เฉลยขึ้นทันทีทีละข้อ · ':'ทำทั้งชุดแล้วส่งทีเดียว เฉลยตอนส่ง · ')+(st.timer==='q'?`จับเวลาข้อละ ${fmtDur(st.qSec)}${prac?' หมดเวลาแล้วขึ้นเฉลยข้อนั้น':' หมดเวลาแล้วข้ามไปข้อถัดไป'}`:st.timer==='set'?`ทั้งชุด ${n} ข้อ ภายใน ${fmtDur(st.setSec)}${prac?' เวลาหยุดเดินตอนอ่านเฉลย':''} หมดเวลาแล้วข้อที่เหลือนับเป็น 0`:'ไม่มีนับถอยหลัง หน้าสรุปจะบอกเวลาที่ใช้');
+  const C=clockOf(l,sc);const skc=C.story&&sel?storyClk(sel,l.id,C.story):null;const setK=isCk(sc)?sc:String(sc).endsWith(VS)?'v':'r';const carryOk=skc&&!(skc.done||[]).includes(setK);
+  const setHint=(prac?'ตอบแล้วกดตรวจ เฉลยขึ้นทันทีทีละข้อ · ':'ทำทั้งชุดแล้วส่งทีเดียว เฉลยตอนส่ง · ')+(C.watch?`จับเวลาเดินหน้า${C.per==='q'?'ทีละข้อ':C.per==='story'?' รวมทั้งเรื่อง ('+SX_R+' ต่อด้วย '+SX_V+')':'ทั้งชุด'} ไม่มีหมดเวลา${carryOk?' · ใช้ไปแล้ว '+fmtDur(skc.spent||0):''}`
+    :C.timer==='q'?`จับเวลาข้อละ ${fmtDur(C.sec)}${prac?' หมดเวลาแล้วขึ้นเฉลยข้อนั้น':' หมดเวลาแล้วข้ามไปข้อถัดไป'}`
+    :C.timer==='set'?(C.story?`ทั้งเรื่อง ${fmtDur(C.sec)} ใช้ร่วมกันทั้ง ${SX_R} และ ${SX_V}${carryOk&&skc.left>0?' · เหลือ '+fmtDur(skc.left):''}`:`ทั้งชุด ${n} ข้อ ภายใน ${fmtDur(C.sec)}`)+`${prac?' เวลาหยุดเดินตอนอ่านเฉลย':''} หมดเวลาแล้วข้อที่เหลือนับเป็น 0`
+    :'ไม่มีนับถอยหลัง หน้าสรุปจะบอกเวลาที่ใช้')+' · กดพักหรือออกได้ เวลาจะหยุดจนกว่าจะกลับมาทำต่อ';
   const segN=(m,tot)=>pick==='all'?`${tot} ข้อ`:`${pickName(pick)} ${P.per(m)} ข้อ`;
   const doneIn=s=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id&&(e.scope||'final')===s).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
   const story=isStory(l);
@@ -1738,13 +1763,12 @@ function vLesson(l){
       <button type="button" data-act="qsMode" data-id="both" aria-pressed="${mode==='both'}" ${nm&&ne?'':'disabled'}><b>MCQ + MEQ</b><span>ทั้งสองแบบ · ${segN('both',nm+ne)}</span></button>
       <button type="button" data-act="qsMode" data-id="mcq" aria-pressed="${mode==='mcq'}" ${nm?'':'disabled'}><b>MCQ</b><span>ตัวเลือก · ${segN('mcq',nm)}</span></button>
       <button type="button" data-act="qsMode" data-id="meq" aria-pressed="${mode==='meq'}" ${ne?'':'disabled'}><b>MEQ</b><span>เขียนตอบ · ${segN('meq',ne)}</span></button></div></div>
-    <div class="qgroup"><span class="label">จับเวลา</span><div class="chips">
-      <button class="chip" data-act="qsTimer" data-id="none" aria-pressed="${st.timer==='none'}">ไม่จับเวลา</button>
-      <button class="chip" data-act="qsTimer" data-id="q" aria-pressed="${st.timer==='q'}">จับทีละข้อ</button>
-      <button class="chip" data-act="qsTimer" data-id="set" aria-pressed="${st.timer==='set'}">จับทั้งชุด</button></div>
-      ${st.timer!=='none'?timeChips(st.timer,st.timer==='q'?st.qSec:st.setSec):''}
-      <p class="muted small">${setHint}</p></div>
-    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&n?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+modeName(mode)+(pick!=='all'&&P.cnt.old?' · '+pickName(pick):'')+' '+n+' ข้อ ของ '+esc(kidById(sel).code)}</button></div>`
+    ${(()=>{const pk=Object.entries(parked()).filter(([,q])=>q.lessonId===l.id&&kidById(q.kid));if(!pk.length)return '';
+      return `<div class="qgroup"><span class="label">ควิซที่พักไว้</span>${pk.map(([key,q])=>{const v=clockNow(q);const dn=q.order.filter((_,p)=>isAnswered(q,p)).length;
+        return `<div class="parkrow">${pawn(kidById(q.kid))}<span><b>${esc(scopeName(l,q.scope))}</b><small class="muted"> · ตอบแล้ว ${dn}/${q.order.length}${q.timer!=='none'||q.watch?' · '+(q.watch?'ใช้ไป ':'เหลือ ')+clockText(q,v):''}</small></span>
+          <button type="button" class="btn sm primary" data-act="qParkGo" data-id="${esc(key)}">ทำต่อ</button><button type="button" class="btn sm ghost" data-act="qParkDrop" data-id="${esc(key)}">${S.confirm==='pdrop:'+key?'แตะอีกครั้งเพื่อทิ้ง':'ทิ้ง'}</button></div>`}).join('')}</div>`})()}
+    <div class="qgroup"><span class="label">เวลา (พี่ตั้งไว้)</span><p class="muted small">${setHint}</p></div>
+    <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&(n||parked()[sel+'|'+l.id+'|'+sc])?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':parked()[sel+'|'+l.id+'|'+sc]?'ทำต่อ '+esc(scopeName(l,sc))+' ที่พักไว้ ของ '+esc(kidById(sel).code):!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+modeName(mode)+(pick!=='all'&&P.cnt.old?' · '+pickName(pick):'')+' '+n+' ข้อ ของ '+esc(kidById(sel).code)}</button></div>`
     :`<p class="muted">${(l.questions||[]).length&&!S.bro?'ยังไม่มีควิซที่เปิดให้ทำ รอพี่เปิดชุดข้อสอบก่อน':'บทนี้ยังไม่มีโจทย์'+(S.bro?' กดแก้ไขควิซเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่ชุดไหน':'')}</p>`}
   </div></section>${story&&S.story&&S.story.lid===l.id?vStory(l):''}`;
 }
@@ -1830,20 +1854,45 @@ function sxOpenTab(i,force){const tb=document.querySelector(`.storyx .sx-tab[dat
 /* quiz engine: exam style — move freely between questions, change answers, submit once; MEQ is graded after submitting */
 function quizNow(){return Date.now()}
 function startQuizFor(lessonId,kid,again){
-  const l=Store.d.lessons[lessonId];const st=qset();const sc=curScope(l);if(!sc)return;
+  const l=Store.d.lessons[lessonId];const sc=curScope(l);if(!sc)return;
+  if(!again){const pk=parked()[kid+'|'+lessonId+'|'+sc];if(pk){quizResume(kid+'|'+lessonId+'|'+sc);return}}
+  const C=clockOf(l,sc);
   const P=quizPlan(l,sc,kid);const order=again?again.order.filter(i=>(l.questions||[])[i]):P.order;if(!order.length)return;
-  const now=quizNow();
-  S.quiz={lessonId,kid,scope:sc,mode:again?again.mode:P.mode,pick:again?again.pick:P.pick,practice:isPractice(sc),timer:st.timer,qSec:st.qSec,setSec:st.setSec,order,i:0,phase:'answer',
-    ans:order.map(()=>({pick:null,text:'',locked:false,revealed:false,timeout:false,left:st.qSec})),scores:{},gi:0,gList:[],confirm:false,res:[],
-    startAt:now,paused:0,pauseAt:null,qEnd:st.timer==='q'?now+st.qSec*1000:null,setEnd:st.timer==='set'?now+st.setSec*1000:null,done:false};
+  const now=quizNow();const set=isCk(sc)?sc:String(sc).endsWith(VS)?'v':'r';
+  /* per-story clock: carry on from the other set of the same story, start fresh when this set was already done on this clock */
+  let setSec=C.sec,carry=0;const sk=C.story?storyClk(kid,lessonId,C.story):null;
+  if(C.story&&sk&&!(sk.done||[]).includes(set)){if(C.timer==='set'&&sk.left>0)setSec=sk.left;if(C.watch)carry=+sk.spent||0}
+  else if(C.story)storyClkSet(kid,lessonId,C.story,null);
+  S.quiz={lessonId,kid,scope:sc,mode:again?again.mode:P.mode,pick:again?again.pick:P.pick,practice:isPractice(sc),timer:C.timer,qSec:C.sec,setSec,fullSec:C.sec,
+    watch:C.watch,wper:C.per,story:C.story,storySet:set,carry,order,i:0,phase:'answer',
+    ans:order.map(()=>({pick:null,text:'',locked:false,revealed:false,timeout:false,left:C.sec,spent:0})),scores:{},gi:0,gList:[],confirm:false,res:[],
+    startAt:now,paused:0,pauseAt:null,holdAt:null,qStart:C.watch&&C.per==='q'?now:null,qEnd:C.timer==='q'?now+C.sec*1000:null,setEnd:C.timer==='set'?now+setSec*1000:null,done:false};
   quizLoop();render();window.scrollTo({top:0});
 }
+/* what the clock shows right now: seconds left (timer) or seconds used (stopwatch) */
+function quizRef(q){return q.holdAt!=null?(q.pauseAt!=null?Math.min(q.pauseAt,q.holdAt):q.holdAt):q.pauseAt!=null?q.pauseAt:quizNow()}
+function clockNow(q){if(!q)return null;const ref=quizRef(q);
+  if(q.watch){if(q.wper==='q'){const a=q.ans[q.i];if(!a)return 0;return (a.spent||0)+(q.qStart!=null?(ref-q.qStart)/1000:0)}
+    return (q.carry||0)+Math.max(0,(ref-q.startAt-(q.paused||0))/1000)}
+  const end=q.timer==='q'?(q.ans[q.i]&&q.ans[q.i].locked?null:q.qEnd):q.timer==='set'?q.setEnd:null;return end?(end-ref)/1000:null}
+const clockText=(q,v)=>v==null?'—':q.watch?fmtTime(Math.floor(v)):fmtTime(v);
+/* pause (button, leaving the quiz, closing the app): every clock stops; answering is hidden until they continue */
+function quizHold(q){if(!q||q.holdAt!=null||q.done)return;if(q.phase==='answer'){quizLeave()}q.holdAt=quizNow();clearInterval(qTick)}
+function quizUnhold(q){if(!q||q.holdAt==null)return;const now=quizNow();const d=now-q.holdAt;q.holdAt=null;
+  if(q.pauseAt==null){q.paused=(q.paused||0)+d;if(q.setEnd)q.setEnd+=d}
+  if(q.phase==='answer'){const a=q.ans[q.i];if(a&&!a.locked){if(q.timer==='q')q.qEnd=now+a.left*1000;if(q.watch&&q.wper==='q')q.qStart=now}}
+  quizLoop()}
+function quizPark(){const q=S.quiz;if(!q||q.done)return false;quizHold(q);parkSave(q);S.story=null;S.quiz=null;return true}
+function quizResume(key){const q=parked()[key];if(!q)return;const l=Store.d.lessons[q.lessonId];
+  if(!l||q.order.some(i=>!(l.questions||[])[i])){parkDrop(key);toast('ควิซที่พักไว้ใช้ต่อไม่ได้แล้ว เพราะพี่แก้โจทย์ชุดนี้ เริ่มใหม่ได้เลย');render();return}
+  parkDrop(key);S.quiz=q;S.tab='learn';S.learn.open=q.lessonId;quizUnhold(q);render();window.scrollTo({top:0})}
 /* practice (topic) sets: while the answer of the current question is showing, the whole-set clock stops */
 function quizPause(q){if(!q)return;const now=quizNow();const r=q.practice&&q.phase==='answer'&&!q.done&&q.ans[q.i]&&q.ans[q.i].revealed;
   if(r&&q.pauseAt==null)q.pauseAt=now;
   else if(!r&&q.pauseAt!=null){const d=now-q.pauseAt;q.paused+=d;if(q.setEnd)q.setEnd+=d;q.pauseAt=null}}
 function quizReveal(q,pos){const a=q.ans[pos];if(!a||a.revealed)return;
-  if(pos===q.i){const b=document.getElementById('meqAns');if(b)a.text=b.value;if(q.timer==='q'&&q.qEnd&&!a.locked)a.left=Math.max(0,(q.qEnd-quizNow())/1000);q.qEnd=null}
+  if(pos===q.i){const b=document.getElementById('meqAns');if(b)a.text=b.value;if(q.timer==='q'&&q.qEnd&&!a.locked)a.left=Math.max(0,(q.qEnd-quizNow())/1000);q.qEnd=null;
+    if(q.qStart!=null){a.spent=(a.spent||0)+(quizNow()-q.qStart)/1000;q.qStart=null}}
   a.locked=true;a.revealed=true;quizPause(q)}
 const nextOpen=q=>{const n=q.order.length;for(let k=1;k<=n;k++){const p=(q.i+k)%n;if(!q.ans[p].revealed)return p}return -1};
 const usedSecs=q=>Math.max(0,((q.endAt||quizNow())-q.startAt-(q.paused||0))/1000);
@@ -1851,9 +1900,10 @@ const qItem=(q,pos)=>{const l=Store.d.lessons[q.lessonId];return l&&(l.questions
 function curQ(){const q=S.quiz;return qItem(q,q.i)}
 const isAnswered=(q,pos)=>{const it=qItem(q,pos)||{};const a=q.ans[pos];return isMEQ(it)?!!(a.text||'').trim():a.pick!=null};
 function meqPositions(q){return q.order.map((ix,pos)=>pos).filter(pos=>isMEQ(qItem(q,pos)||{}))}
-function quizLeave(){const q=S.quiz;if(q.timer==='q'&&q.qEnd&&!q.ans[q.i].locked){q.ans[q.i].left=Math.max(0,(q.qEnd-quizNow())/1000)}q.qEnd=null;const b=document.getElementById('meqAns');if(b&&!q.ans[q.i].locked)q.ans[q.i].text=b.value}
+function quizLeave(){const q=S.quiz;if(q.timer==='q'&&q.qEnd&&!q.ans[q.i].locked){q.ans[q.i].left=Math.max(0,(q.qEnd-quizNow())/1000)}q.qEnd=null;
+  if(q.qStart!=null&&q.ans[q.i]){q.ans[q.i].spent=(q.ans[q.i].spent||0)+(quizNow()-q.qStart)/1000;q.qStart=null}const b=document.getElementById('meqAns');if(b&&!q.ans[q.i].locked)q.ans[q.i].text=b.value}
 function quizGo(pos){const q=S.quiz;if(pos<0||pos>=q.order.length)return;quizLeave();q.i=pos;q.confirm=false;
-  if(q.timer==='q'&&!q.ans[pos].locked)q.qEnd=quizNow()+q.ans[pos].left*1000;quizPause(q);render();window.scrollTo({top:0})}
+  if(q.timer==='q'&&!q.ans[pos].locked)q.qEnd=quizNow()+q.ans[pos].left*1000;if(q.watch&&q.wper==='q'&&!q.ans[pos].locked)q.qStart=quizNow();quizPause(q);render();window.scrollTo({top:0})}
 function vQuiz(){
   const q=S.quiz;const l=Store.d.lessons[q.lessonId];if(!l){S.quiz=null;return vLearn()}
   const k=kidById(q.kid);const n=q.order.length;
@@ -1875,8 +1925,11 @@ function vQuiz(){
       body+=`<div class="explain" role="status"><b>แนวคำตอบ</b>${it.key||it.answer?`<div class="prose">${md(it.key||it.answer||'')}</div>`:'<div class="muted">ยังไม่ได้ใส่แนวคำตอบ</div>'}${it.explain?`<div class="prose">${md(it.explain)}</div>`:''}</div>
       <div class="qgroup"><span class="label">ให้คะแนนข้อนี้ (เต็ม ${mx}) · เทียบกับแนวคำตอบ</span><div class="chips">${Array.from({length:mx+1},(_,s)=>`<button class="chip" data-act="pScore" data-id="${s}" aria-pressed="${sc===s}">${s}</button>`).join('')}</div></div>`}
   }
-  const cEnd=q.timer==='q'?(lock?null:q.qEnd):q.timer==='set'?q.setEnd:null;const ref=q.pauseAt!=null?q.pauseAt:quizNow();
-  const clock=q.timer==='none'?'':`<span class="clock ${cEnd&&cEnd-ref<=10000?'warn':''}" id="qClock" aria-label="เวลาที่เหลือ">${cEnd?fmtTime((cEnd-ref)/1000):'—'}</span>`;
+  const cv=clockNow(q);
+  const clock=q.timer==='none'&&!q.watch?'':`<span class="clock ${!q.watch&&cv!=null&&cv<=10?'warn':''}" id="qClock" aria-label="${q.watch?'เวลาที่ใช้':'เวลาที่เหลือ'}">${clockText(q,cv)}</span>`;
+  if(q.holdAt!=null)return `<section class="quiz"><div class="panel result">${pawn(k,'lg')}<span class="label">${esc(l.title)} · ${esc(scopeName(l,q.scope))}</span>
+    <div class="score">พักอยู่</div><p class="muted">${q.watch?'เวลาที่ใช้':'เวลาที่เหลือ'} ${clockText(q,cv)} · ตอบแล้ว ${done}/${n} ข้อ · เวลาหยุดเดินจนกว่าจะกดทำต่อ</p>
+    <div class="btns"><button class="btn primary big" data-act="qResume">ทำต่อ</button><button class="btn ghost" data-act="endQuiz">ออก (เก็บไว้ทำต่อทีหลัง)</button></div></div></section>`;
   const left=n-done;const prog=prac?nRev:done;
   const mark=p=>{if(!prac||!q.ans[p].revealed)return '';const x=qItem(q,p)||{};if(isMEQ(x)){const s=q.scores[p];return s==null?'':s>=qMax(x)?'ok':s>0?'part':'no'}return q.ans[p].pick===x.answer?'ok':'no'};
   const nx=prac?nextOpen(q):-1;const needScore=isE&&rev&&q.scores[q.i]==null;
@@ -1887,7 +1940,7 @@ function vQuiz(){
   const sub=prac&&nRev===n?'':`<div class="qsubmit">${q.confirm?`<div class="banner">ยังไม่ได้ตอบ ${left} ข้อ ${prac?'จบเลยไหม':'ส่งเลยไหม'} ข้อที่ไม่ได้ตอบจะนับเป็น 0</div><div class="btns"><button class="btn primary" data-act="qSubmit">ยืนยัน${endWord}</button><button class="btn ghost" data-act="qSubmitCancel">กลับไปทำต่อ</button></div>`
       :`<button class="btn ${!prac&&q.i+1===n?'primary big':''}" data-act="qSubmitAsk">${endWord}${prac?' ดูผล':''}</button><span class="muted small">${left?'ยังไม่ได้ตอบ '+left+' ข้อ':'ตอบครบทุกข้อแล้ว'}</span>`}</div>`;
   return `<section class="quiz">
-    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}${isStory(l)?'<button class="btn sm" data-act="sxQuizOpen" style="white-space:nowrap">อ่านเรื่อง</button>':''}<button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
+    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}${isStory(l)?'<button class="btn sm" data-act="sxQuizOpen" style="white-space:nowrap">อ่านเรื่อง</button>':''}<button class="btn sm" data-act="qHold">พัก</button><button class="btn sm ghost" data-act="endQuiz" title="เก็บไว้ทำต่อทีหลัง">ออก</button></div>
     <nav class="qmap" aria-label="เลือกข้อ">${q.order.map((_,p)=>`<button type="button" class="${p===q.i?'cur':''} ${isAnswered(q,p)?'done':''} ${q.ans[p].locked?'lock':''} ${mark(p)}" data-act="qGo" data-id="${p}" aria-label="ข้อ ${p+1}${isAnswered(q,p)?' ตอบแล้ว':''}" ${p===q.i?'aria-current="true"':''}>${p+1}</button>`).join('')}</nav>
     <div class="chips"><span class="tag">ข้อ ${q.i+1}/${n}</span>${isE?`<span class="tag">MEQ · เต็ม ${qMax(it)} คะแนน</span>`:`<span class="tag">MCQ · 1 คะแนน</span>`}${lock?`<span class="tag">${a.timeout?'หมดเวลาข้อนี้':rev?'ตรวจแล้ว':'ล็อกแล้ว'}</span>`:''}${rev&&q.timer==='set'&&nx>=0?'<span class="tag">เวลาหยุดระหว่างอ่านเฉลย</span>':''}</div>
     <div class="qtext">${md(it.q)}</div>${body}
@@ -1915,6 +1968,9 @@ function quizSubmit(){
   const q=S.quiz;if(!q||q.phase!=='answer')return;quizLeave();
   if(q.pauseAt!=null){q.paused+=quizNow()-q.pauseAt;q.pauseAt=null}
   q.endAt=quizNow();q.confirm=false;clearInterval(qTick);
+  if(q.story){const sk=storyClk(q.kid,q.lessonId,q.story)||{done:[]};const done=[...new Set([...(sk.done||[]),q.storySet])];
+    if(q.watch)storyClkSet(q.kid,q.lessonId,q.story,{spent:(q.carry||0)+usedSecs(q),done});
+    else storyClkSet(q.kid,q.lessonId,q.story,{left:Math.max(0,(q.setEnd-q.endAt)/1000),done})}
   /* MEQ already scored right after its answer (topic sets) is not graded again */
   q.gList=meqPositions(q).filter(p=>q.scores[p]==null);
   if(q.gList.length){q.phase='grade';q.gi=0;render();window.scrollTo({top:0})}else{quizBuildRes(q);finishQuiz()}
@@ -1924,7 +1980,7 @@ function vQuizResult(q,l,k){
   const msg=q.pts?`ได้ ${q.pts} แต้มเข้าบ้าน จากข้อที่ทำครั้งแรก ${q.fresh} ข้อ${q.old?` · อีก ${q.old} ข้อเคยทำแล้ว เป็นรอบฝึก`:''}`
     :q.fresh?'ครั้งนี้ยังไม่ได้แต้ม ลองทบทวนหัวข้ออีกรอบ':q.old?'ทุกข้อในรอบนี้เคยทำแล้ว เป็นรอบฝึก ไม่นับแต้มเพิ่ม':'ไม่ได้ตอบข้อไหนเลย ยังไม่ได้แต้ม';
   return `<section class="quiz"><div class="panel result">${pawn(k,'lg')}<span class="label">${esc(l.title)} · ${esc(scopeName(l,q.scope))} · ${modeName(q.mode)}</span><div class="score">${got}/${full}</div>
-    <p class="muted small">ใช้เวลา ${fmtDur(usedSecs(q))}${q.timer==='set'?' จาก '+fmtDur(q.setSec):q.timer==='q'?' · จับเวลาข้อละ '+fmtDur(q.qSec):''}${q.practice&&q.paused>=1000?' · ไม่นับเวลาอ่านเฉลย':''}</p>
+    <p class="muted small">ใช้เวลา ${fmtDur(usedSecs(q))}${q.story&&q.watch?' · รวมทั้งเรื่อง '+fmtDur((q.carry||0)+usedSecs(q)):''}${q.timer==='set'?' จาก '+fmtDur(q.setSec)+(q.story?' · เวลาของเรื่องนี้เหลือ '+fmtDur(Math.max(0,(q.setEnd-q.endAt)/1000)):''):q.timer==='q'?' · จับเวลาข้อละ '+fmtDur(q.qSec):''}${q.practice&&q.paused>=1000?' · ไม่นับเวลาอ่านเฉลย':''}</p>
     <p>${msg}</p>
     ${got===full&&full?'<p><b>เต็มทุกข้อ</b></p>':''}
     <ol class="review">${q.order.map((ix,i)=>{const it=qs[ix]||{};const r=q.res[i]||{};const e=isMEQ(it);const ok=e?(+r.score||0)>=qMax(it):r.ok;
@@ -1934,11 +1990,11 @@ function vQuizResult(q,l,k){
     <div class="btns"><button class="btn" data-act="retryQuiz">ทำชุดเดิมอีกรอบ</button><button class="btn primary" data-act="endQuiz">กลับบทเรียน</button></div></div></section>`;
 }
 let qTick=null;
-function quizLoop(){clearInterval(qTick);if(S.quiz&&S.quiz.timer==='none')return;qTick=setInterval(()=>{
-  const q=S.quiz;if(!q||q.done||q.phase!=='answer'){clearInterval(qTick);return}
-  quizPause(q);const now=quizNow();const ref=q.pauseAt!=null?q.pauseAt:now;const el=document.getElementById('qClock');
+function quizLoop(){clearInterval(qTick);if(S.quiz&&S.quiz.timer==='none'&&!S.quiz.watch)return;qTick=setInterval(()=>{
+  const q=S.quiz;if(!q||q.done||q.phase!=='answer'||q.holdAt!=null){clearInterval(qTick);return}
+  quizPause(q);const now=quizNow();const v=clockNow(q);
+  [document.getElementById('qClock'),document.getElementById('sxClock')].forEach(el=>{if(!el)return;el.textContent=clockText(q,v);el.classList.toggle('warn',!q.watch&&v!=null&&v<=10)});
   const end=q.timer==='q'?(q.ans[q.i].locked?null:q.qEnd):q.timer==='set'?q.setEnd:null;
-  [el,document.getElementById('sxClock')].forEach(el=>{if(!el)return;if(end){const left=(end-ref)/1000;el.textContent=fmtTime(left);el.classList.toggle('warn',left<=10)}else{el.textContent='—';el.classList.remove('warn')}});
   if(end&&q.pauseAt==null&&now>=end)quizTimeout();
 },250)}
 function quizTimeout(){
@@ -2633,7 +2689,7 @@ function lessonForm(id,part,qf){
     midAfter:l?(l.midAfter||''):'',bulkTopic:'',hidden:null,
     questions:l?(l.questions||[]).map(q=>isMEQ(q)?{type:'meq',topic:q.topic||'',q:q.q||'',choices:['','','',''],answer:0,explain:q.explain||'',key:q.key!=null?q.key:(q.answer||''),max:qMax(q),qid:qKey(q),born:+q.born||0}
       :{type:'mcq',topic:q.topic||'',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2,qid:qKey(q),born:+q.born||0}):[],
-    example:l?!!l.example:false};
+    example:l?!!l.example:false,clock:Object.assign({},CLOCK_DEF,(l&&l.clock)||{})};
   /* new quiz sets start hidden from the kids until the brother opens them */
   S.draft.hidden=l?(l.hidden||[]).slice():['mid','final',...S.draft.topics.flatMap(t=>[t.tid,t.tid+VS])];
   S.draft.part=part==='quiz'&&l?'quiz':'lesson';S.draft.qf=qf||'all';
@@ -2647,9 +2703,17 @@ function qfShow(d,q){const f=d.qf||'all';if(f==='all')return true;if(f==='final'
 function qfBar(d){const f=d.qf||'all';const cnt=x=>d.questions.filter(q=>x==='all'||(x==='final'?(!q.topic||q.topic==='final'):q.topic===x)).length;
   const sets=d.story?[['all','ทุกชุด'],...draftSets(d)]:[['all','ทุกชุด'],...d.topics.map((t,i)=>[t.tid,'หัวข้อ '+(i+1)]),['mid','Midterm'],['final','Final']];
   return `<div class="field"><span>ดูทีละชุด</span><div class="chips">${sets.map(([v,n])=>`<button type="button" class="chip" data-act="qfSet" data-id="${esc(v)}" aria-pressed="${f===v}">${n}<span class="n">${cnt(v)}</span></button>`).join('')}</div></div>`}
+function clockField(d){const c=d.clock||Object.assign({},CLOCK_DEF);const per=!d.story&&c.per==='story'?'set':c.per;
+  const opt=(name,v,n,on,ch)=>`<label class="opt"><input type="radio" name="${name}" value="${v}" ${on?'checked':''} ${ch?'data-change="lfClk"':''}><span>${n}</span></label>`;
+  return `<div class="field clockset"><span>เวลาทำควิซ · พี่ตั้ง น้องเปลี่ยนไม่ได้ (ใช้กับทุกชุดในบทนี้)</span>
+    <div class="pick">${[['none','ไม่จับเวลา'],['timer','นับถอยหลัง'],['watch','จับเวลาเดินหน้า']].map(([v,n])=>opt('lfClk',v,n,c.kind===v,1)).join('')}</div>
+    ${c.kind!=='none'?`<div class="pick">${[['set','ทั้งชุด'],['q','ทีละข้อ'],...(d.story?[['story','ทั้งเรื่อง']]:[])].map(([v,n])=>opt('lfClkPer',v,n,per===v,1)).join('')}</div>`:''}
+    ${c.kind==='timer'?`<label class="mini"><span>${per==='q'?'ข้อละ':per==='story'?'เรื่องละ':'ชุดละ'}</span><input type="number" id="lfClkMin" min="0.25" step="0.25" value="${+(c.sec/60).toFixed(2)}" aria-label="เวลาเป็นนาที"><span>นาที</span></label>`:''}
+    <small class="muted">${c.kind==='none'?'ไม่มีนาฬิกาตอนทำ หน้าสรุปบอกเวลาที่ใช้':per==='story'?'ใช้นาฬิกาเดียวต่อกันทั้ง '+SX_R+' และ '+SX_V+' ของเรื่องเดียวกัน · Vocab Checkpoint จับทั้งชุดแทน':per==='q'?'แต่ละข้อมีเวลาของตัวเอง':'นาฬิกาเดียวทั้งชุด'}${c.kind==='watch'?' · เดินหน้าไม่มีหมดเวลา':''} · หยุดเฉพาะตอนกดพัก ออก หรือปิดแอป${c.kind==='timer'||c.kind==='watch'?' (และตอนอ่านเฉลยในชุดฝึก)':''}</small></div>`}
 function paintLessonForm(){
   const d=S.draft;const nm=d.questions.filter(q=>q.type!=='meq').length,ne=d.questions.length-nm;
   openSheet(d.part==='quiz'?'แก้ไขควิซ · '+esc(d.title):d.id?'แก้ไขบทเรียน':'เพิ่มบทเรียน',`${fmtBar()}
+${clockField(d)}
 ${d.part!=='quiz'?`
     <div class="row2"><label class="field"><span>วิชา</span><select id="lfSubj">${SUBJECTS.map(([v,n])=>`<option value="${v}" ${d.subject===v?'selected':''}>${n}</option>`).join('')}</select></label>
     <label class="field"><span>ชื่อบท</span><input type="text" id="lfTitle" value="${esc(d.title)}" placeholder="เช่น เคมีไฟฟ้า"></label></div>
@@ -2704,6 +2768,8 @@ function syncDraft(){
   flag('lfShowMid','mid');flag('lfShowFin','final');d.topics.forEach((t,i)=>{flag('t'+i+'_show',t.tid);flag('t'+i+'_showv',t.tid+VS);flag('t'+i+'_showc',CK+t.tid)});
   if(document.getElementById('t0_ck')){const was=new Set(d.checks||[]);d.checks=d.topics.filter((t,i)=>{const e=document.getElementById('t'+i+'_ck');return e?e.checked:was.has(t.tid)}).map(t=>t.tid);d.checks.forEach(x=>{if(!was.has(x))hs.add(CK+x)})}
   d.hidden=[...hs];const sb=document.getElementById('lfStory');if(sb)d.story=sb.checked;
+  if($('#sheetCard input[name="lfClk"]')){const c=Object.assign({},CLOCK_DEF,d.clock||{});c.kind=radio('lfClk')||c.kind;const pr=radio('lfClkPer');if(pr)c.per=pr;
+    const mn=document.getElementById('lfClkMin');if(mn&&parseFloat(mn.value)>0)c.sec=Math.round(parseFloat(mn.value)*60);d.clock=c}
   d.topics.forEach((t,i)=>{if(!document.getElementById('t'+i+'_name'))return;t.name=val('t'+i+'_name');const s=radio('t'+i+'_star');t.stars=s?+s:0;const g=document.getElementById('t'+i+'_goals');if(g)t.goals=g.value;const sx=document.getElementById('t'+i+'_story');if(sx)t.story=sx.value});
   d.questions.forEach((q,i)=>{if(!document.getElementById('q'+i+'_q'))return;
     const t=document.getElementById('q'+i+'_type');if(t)q.type=t.value;const tp=document.getElementById('q'+i+'_topic');if(tp)q.topic=tp.value;
@@ -2750,7 +2816,8 @@ async function saveLesson(){
   const bad=qs.find(q=>q.type==='mcq'&&(q.choices.length<2||q.answer<0));
   if(bad){toast('มี MCQ ที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
   const id=d.id||uid();const old=d.id&&Store.d.lessons[d.id];
-  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,story:!!d.story,checks,topics,midAfter:topics.some(t=>t.tid===d.midAfter)?d.midAfter:'',hidden:(d.hidden||[]).filter(x=>x==='mid'||x==='final'||tids.includes(x)),content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
+  const ck0=Object.assign({},CLOCK_DEF,d.clock||{});if(ck0.per==='story'&&!d.story)ck0.per='set';
+  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,story:!!d.story,clock:ck0,checks,topics,midAfter:topics.some(t=>t.tid===d.midAfter)?d.midAfter:'',hidden:(d.hidden||[]).filter(x=>x==='mid'||x==='final'||tids.includes(x)),content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
   closeSheet();S.learn.open=id;toast('บันทึกบทเรียนแล้ว');render();
 }
 
@@ -2891,7 +2958,12 @@ const ACT={
   gradePrev(){const q=S.quiz;if(q.gi>0){q.gi--;render();window.scrollTo({top:0})}},
   gradeNext(){const q=S.quiz;const list=q.gList;if(q.scores[list[q.gi]]==null)return;if(q.gi+1<list.length){q.gi++;render();window.scrollTo({top:0})}else{quizBuildRes(q);finishQuiz()}},
   retryQuiz(){const q=S.quiz;S.learn.scope={lid:q.lessonId,sc:q.scope||'final'};Object.assign(qset(),{timer:q.timer,qSec:q.qSec,setSec:q.setSec});startQuizFor(q.lessonId,q.kid,{order:q.order,mode:q.mode,pick:q.pick})},
-  endQuiz(){clearInterval(qTick);const q=S.quiz;S.quiz=null;S.learn.open=q?q.lessonId:null;render()},
+  endQuiz(){clearInterval(qTick);const q=S.quiz;const kept=q&&!q.done&&quizPark();if(!kept)S.quiz=null;S.learn.open=q?q.lessonId:null;if(kept)toast('พักควิซไว้แล้ว กลับมาทำต่อได้ที่บทเรียนนี้');render()},
+  qHold(){const q=S.quiz;if(!q)return;quizHold(q);S.story=null;parkSave(q);render();window.scrollTo({top:0})},
+  qResume(){const q=S.quiz;if(!q)return;parkDrop(parkKey(q));quizUnhold(q);render()},
+  qParkGo(t){quizResume(t.dataset.id)},
+  qParkDrop(t){if(S.confirm!=='pdrop:'+t.dataset.id){S.confirm='pdrop:'+t.dataset.id;render();setTimeout(()=>{if(S.confirm==='pdrop:'+t.dataset.id){S.confirm=null;render()}},3000);return}
+    S.confirm=null;parkDrop(t.dataset.id);toast('ทิ้งควิซที่พักไว้แล้ว');render()},
   lessonForm(t){lessonForm(t.dataset.id||null)},
   async delLesson(t){await Store.del('lessons',t.dataset.id);S.learn.open=null;S.confirm=null;toast('ลบบทเรียนแล้ว');render()},
   tAdd(){syncDraft();const t=blankT();S.draft.topics.push(t);S.draft.hidden=(S.draft.hidden||[]).concat(t.tid,t.tid+VS);paintLessonForm()},
@@ -4224,9 +4296,13 @@ document.addEventListener('selectionchange',()=>fmtTrack(document.activeElement)
 document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-fmt]');if(b)e.preventDefault()},true);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-fmt]');if(b){e.preventDefault();fmtApply(b.dataset.fmt)}});
 document.addEventListener('input',e=>{autoGrow(e.target);if(e.target===FMT.el)fmtTrack(e.target);if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz&&S.quiz.ans&&!S.quiz.ans[S.quiz.i].locked){S.quiz.ans[S.quiz.i].text=e.target.value;const cb=document.getElementById('qCheckBtn');if(cb)cb.disabled=!e.target.value.trim()}});
+/* closing / hiding the app counts as leaving: the quiz pauses and is saved on this device */
+const quizAway=()=>{const q=S.quiz;if(q&&!q.done&&q.holdAt==null){quizHold(q);S.story=null;parkSave(q);render()}};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')quizAway()});
+window.addEventListener('pagehide',quizAway);
 document.addEventListener('change',e=>{
   const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
-  if(c==='qtype'||c==='lfStory'||c==='lfCk'){syncDraft();paintLessonForm()}
+  if(c==='qtype'||c==='lfStory'||c==='lfCk'||c==='lfClk'){syncDraft();paintLessonForm()}
   if(c==='qsCustom'){const v=parseFloat(e.target.value);if(v>0){const st=qset();const sec=Math.round(v*60);if(st.timer==='q')st.qSec=sec;else st.setSec=sec;LS.set('qset',st);render()}}
   if(c==='unoStack'){S.uno.stack=e.target.checked;persist()}
   if(c==='scLow'){S.score.low=e.target.checked;persist()}
@@ -4807,7 +4883,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-08T00:21:00+07:00';
+const SITE_UPDATED='2026-11-08T00:28:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
