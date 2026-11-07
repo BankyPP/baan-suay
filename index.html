@@ -350,6 +350,12 @@ html:has(.unox){overflow:hidden}
 .ukey small{font:600 .9rem/1 var(--f-head)}
 .ukey:disabled{opacity:.35;cursor:default}
 .uk-rev{width:1.5em;height:1.5em}
+.ukey,.ucol,.unox .ubtn{position:relative}
+.ukb{position:absolute;top:5px;right:6px;min-width:1.4em;padding:1px 5px;border-radius:6px;border:1.5px solid currentColor;font:600 .68rem/1.2 var(--f-head);opacity:.7;letter-spacing:0;pointer-events:none}
+.ucol .ukb{color:var(--kc,#fff)}
+.unox .ubtn .ukb{position:static;margin-left:6px;border-width:1px;font-size:.62rem;padding:0 4px;vertical-align:1px}
+.uno-kbl{display:grid;gap:6px;margin-top:6px}
+.uno-kbl kbd,.uno-kbl+* kbd{font:600 .8rem var(--f-head);padding:1px 6px;border-radius:5px;border:1px solid var(--line);background:var(--sunk)}
 .ukey:not(:disabled):active,.ucol:active,.dcard:active{transform:scale(.96)}
 .unox :focus-visible{outline:3px solid var(--fg);outline-offset:3px}
 .unox-wild{height:clamp(64px,16vw,84px);display:grid;place-items:center;border-radius:18px;background:linear-gradient(90deg,#D63A2F,#EDB90F,#2E9B4E,#2B67C9);color:#fff;font:700 clamp(1.3rem,5vw,1.7rem) var(--f-head);letter-spacing:.1em;text-shadow:0 1px 3px rgba(0,0,0,.45);border:4px solid color-mix(in srgb,var(--fg) 85%,transparent)}
@@ -368,7 +374,7 @@ html:has(.unox){overflow:hidden}
 .dos-cs button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 2px var(--bg) inset}
 .dos-ns{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
 .dos-ns .ubtn{padding:0;font:600 1.05rem var(--f-head)}
-@media (hover:none){.unox .kb{display:none}}
+@media (hover:none){.unox .kb,.ukb,.uno-kbl{display:none}}
 @media (prefers-reduced-motion:reduce){.ah svg{animation:none}.ah,.unox{transition:none}}
 .nextup{display:flex;gap:6px;align-items:center;justify-content:center;color:var(--muted);font-size:.9rem}
 .order{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-height:46px;padding:8px;border-radius:12px;background:var(--sunk)}
@@ -2035,6 +2041,24 @@ function unoKeys(u){switch(u.ver){
   case 'dos':return ['dosDel','dosB1','dosB2'];
   default:return ['d2','d4','rev'];
 }}
+/* ปุ่มลัดคีย์บอร์ด (⇧ = Shift) · สีกล่องตรงกลางใช้ A S D (G = กล่องที่ 4) · Enter ล้างเลขจั่ว · H กฎ · Ctrl/⌘+Z ย้อนกลับ */
+const UNO_KB={
+  classic:{d2:'2',d4:'4',rev:'R'},weird:{d2:'2',d4:'4',rev:'R'},
+  nomercy:{d2:'2',d4:'4',d6:'6',d10:'0',rev:'R',rd4:'⇧4'},
+  flip:{d1:'1',d2:'2',d5:'5',dcol:'C',rev:'R',flip:'F'},
+  flex:{d2:'2',d4:'4',rev:'R',frev:'⇧R',all1:'⇧1',all2:'⇧2'},
+  allwild:{d2:'2',d4:'4',rev:'R',tg2:'T',sk2:'K',swap:'W'},
+  teams:{d2:'2',td4:'4',rev:'R',tplay:'T'},
+  liar:{d2:'2',d4:'4',rev:'R',liar:'L'},
+  dos:{dosDel:'⌫',dosB1:'⇧1',dosB2:'⇧2'}
+};
+const UNO_CKB=['A','S','D','G'];
+const unoKb=(u,k)=>(UNO_KB[u.ver]||{})[k]||'';
+function unoKbHit(lab,e){if(!lab)return false;const sh=lab[0]==='⇧';const c=sh?lab.slice(1):lab;if(!!e.shiftKey!==sh)return false;
+  if(c==='⌫')return e.key==='Backspace'||e.key==='Delete';
+  if(/^\d$/.test(c))return e.code==='Digit'+c||e.code==='Numpad'+c;
+  return e.code==='Key'+c}
+const unoKbTag=lab=>lab?`<kbd class="ukb" aria-hidden="true">${esc(lab)}</kbd>`:'';
 function unoPal(u){
   if(u.ver==='allwild'||u.ver==='dos')return [];
   if(u.ver==='flip'&&u.side==='D')return UNO_DARK;
@@ -2090,8 +2114,8 @@ function unoPlayView(u){
   const bg=cur?cur[2]:(u.ver==='flip'&&u.side==='D'?'#1B1424':'#26313D');const fg=unoInk(bg);
   const others=cur?pal.filter(c=>c[0]!==u.color):pal;const cw=dos||u.dir!==-1;
   const keys=unoKeys(u).map(k=>{const d=UK[k];const off=k==='dosDel'&&!(u.dos&&u.dos.sel!=null&&u.dos.row[u.dos.sel]);
-    return `<button type="button" class="ukey${d.w?' w3':''}${d.t?' txt':''}${d.flip?' flip':''}" data-act="uno" data-id="${k}" ${d.aria?`aria-label="${esc(d.aria)}" title="${esc(d.aria)}"`:''} ${off?'disabled':''}>${d.l}</button>`}).join('');
-  const top=pal.length?`<div class="unox-cols${cur?'':' pick4'}">${others.map(([id,nm,c])=>`<button type="button" class="ucol" style="--k:${c}" data-act="unoColor" data-id="${id}" aria-label="เปลี่ยนเป็นสี${esc(nm)}"></button>`).join('')}</div>`
+    return `<button type="button" class="ukey${d.w?' w3':''}${d.t?' txt':''}${d.flip?' flip':''}" data-act="uno" data-id="${k}" ${d.aria?`aria-label="${esc(d.aria)}" title="${esc(d.aria)}"`:''} ${off?'disabled':''}>${d.l}${unoKbTag(unoKb(u,k))}</button>`}).join('');
+  const top=pal.length?`<div class="unox-cols${cur?'':' pick4'}">${others.map(([id,nm,c],i)=>`<button type="button" class="ucol" style="--k:${c};--kc:${unoInk(c)}" data-act="unoColor" data-id="${id}" aria-label="เปลี่ยนเป็นสี${esc(nm)}">${unoKbTag(UNO_CKB[i])}</button>`).join('')}</div>`
     :dos?dosRow(u):'<div class="unox-wild" aria-hidden="true">ALL WILD</div>';
   const hint=pal.length&&!cur?'แตะสีของไพ่ที่หงายอยู่กลางโต๊ะ':dos&&!(u.dos.row||[]).length?'ใส่ไพ่ที่เปิดอยู่กลางโต๊ะ (เริ่ม 2 ใบ)':'';
   const log=u.log||[];
@@ -2101,7 +2125,7 @@ function unoPlayView(u){
     <div class="unox-top">
       <button type="button" class="ubtn" data-act="unoReset">← ออก</button>
       <b class="unox-name"><span>${esc(v.name)}</span>${u.ver==='flip'?`<span class="unox-side">${u.side==='D'?'ด้านมืด':'ด้านสว่าง'}</span>`:''}</b>
-      <span class="unox-tools"><button type="button" class="ubtn" data-act="unoRules">กฎ</button><button type="button" class="ubtn" data-act="uno" data-id="undo" aria-label="ย้อนกลับ" title="ย้อนกลับ (Ctrl+Z)" ${(u.hist||[]).length?'':'disabled'}>↶</button><button type="button" class="ubtn" data-act="unoEnd">${u.order.length?(u.ver==='teams'?'มีทีมชนะ':'มีคนชนะ'):'รอบใหม่'}</button></span>
+      <span class="unox-tools"><button type="button" class="ubtn" data-act="unoRules">กฎ${unoKbTag('H')}</button><button type="button" class="ubtn" data-act="uno" data-id="undo" aria-label="ย้อนกลับ" title="ย้อนกลับ (Ctrl+Z)" ${(u.hist||[]).length?'':'disabled'}>↶</button><button type="button" class="ubtn" data-act="unoEnd">${u.order.length?(u.ver==='teams'?'มีทีมชนะ':'มีคนชนะ'):'รอบใหม่'}</button></span>
     </div>
     <div class="unox-mid">
       ${count}
@@ -2147,8 +2171,15 @@ const UNO_RULES={
 };
 function unoRulesSheet(){const u=S.uno;const v=unoVer(u&&u.ver);
   openSheet('กฎ '+esc(v.name),`<ul class="unor">${(UNO_RULES[v.id]||[]).map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
-    <p class="muted small">จอนี้ไม่บอกว่าตาใคร ใช้ช่วยจำสีกับทิศ · ปุ่มจั่วกดซ้ำได้ เลขรวมกันให้เอง แตะเลขหรือกด Enter เพื่อล้าง</p>`,
+    <p class="muted small">จอนี้ไม่บอกว่าตาใคร ใช้ช่วยจำสีกับทิศ · ปุ่มจั่วกดซ้ำได้ เลขรวมกันให้เอง แตะเลขหรือกด Enter เพื่อล้าง</p>
+    <div class="uno-kbl"><span class="label">ปุ่มลัดคีย์บอร์ด (⇧ = Shift)</span><ul class="unor">${unoKbList(u)}</ul></div>`,
     `<button class="btn primary" data-act="closeSheet" data-enter>เข้าใจแล้ว</button>`)}
+function unoKbList(u){const m=UNO_KB[u.ver]||{};const nm=k=>{const d=UK[k];return d.aria||String(d.l).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()};
+  const rows=Object.keys(m).map(k=>`<li><kbd>${esc(m[k])}</kbd> ${esc(k==='rev'?'กลับทาง':k==='rd4'?'Wild กลับทาง +4':k==='frev'?'Flex กลับทาง + ข้าม':nm(k))}</li>`);
+  if(u.ver==='dos')rows.push('<li><kbd>1</kbd> <kbd>3</kbd>–<kbd>9</kbd> <kbd>0</kbd> (=10) เพิ่มไพ่เลขกลางโต๊ะ · <kbd>#</kbd> Wild # · <kbd>W</kbd> Wild DOS</li>','<li><kbd>R</kbd> <kbd>Y</kbd> <kbd>G</kbd> <kbd>B</kbd> สีของไพ่ที่จะเพิ่ม (แดง เหลือง เขียว น้ำเงิน)</li>','<li><kbd>←</kbd> <kbd>→</kbd> เลือกไพ่กลางโต๊ะ</li>');
+  else if(unoPal(u).length)rows.push('<li><kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> เปลี่ยนสีเป็นกล่องที่ 1 2 3 จากซ้าย (ตอนมี 4 กล่อง <kbd>G</kbd> = กล่องที่ 4)</li>');
+  rows.push('<li><kbd>Enter</kbd> ล้างเลขจั่ว · <kbd>H</kbd> เปิดกฎ · <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Z</kbd> ย้อนกลับ · <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Enter</kbd> จบรอบ</li>');
+  return rows.join('')}
 function unoLiarSheet(){openSheet('จับโกหก!',`<p>คนที่โดนจับเปิดไพ่ใบนั้นให้ดู</p><ul class="unor"><li><b>บอกจริง</b> → คนจับจั่ว 1</li><li><b>โกหก</b> → คนโกหกเอาไพ่คืน แล้วจั่ว 1</li><li><b>แอบเอาไพ่ธรรมดามาคว่ำ</b> → เอาคืน แล้วจั่ว 6</li><li>ถ้าเป็น 7 หรือ 0 สลับมือก่อน แล้วค่อยจั่วไพ่โทษ</li></ul><p class="muted small">ต้องจับก่อนคนถัดไปเริ่มตา</p>`,
   `<button class="btn primary" data-act="closeSheet" data-enter>เข้าใจแล้ว</button>`)}
 function unoAct(a){
@@ -2164,19 +2195,28 @@ function unoAct(a){
   if(d.add){u.draw=(u.draw||0)+d.add;u.log=(u.log||[]).concat(d.add);u.last=d.add}
 }
 function unoZero(){const u=S.uno;if(!u||!u.draw)return;unoSnap(u);Object.assign(u,{draw:0,log:[],last:0,msg:''});persist();render()}
-/* เต็มจอ: Enter ล้างเลขจั่ว · Ctrl/⌘+Z ย้อนกลับ · ปุ่มเลขตรงกับการ์ดจั่ว · R กลับทาง · F พลิก (flip) */
+/* เต็มจอ: ปุ่มลัดตาม UNO_KB ของแต่ละเวอร์ชัน · A S D (G) เปลี่ยนสี · Enter ล้างเลขจั่ว · H กฎ · Ctrl/⌘+Z ย้อนกลับ */
 const unoOn=()=>S.tab==='tools'&&S.tool==='uno'&&S.uno&&S.uno.ver&&S.uno.phase==='play'&&$('#sheet').hidden;
 document.addEventListener('keydown',e=>{
   if(!unoOn()||e.isComposing||e.altKey)return;
   const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
-  if(e.ctrlKey||e.metaKey){if(!e.shiftKey&&e.code==='KeyZ'){e.preventDefault();unoAct('undo');persist();render()}return}
+  const u=S.uno;const go=f=>{e.preventDefault();f();persist();render()};
+  if(e.ctrlKey||e.metaKey){if(!e.shiftKey&&e.code==='KeyZ')go(()=>unoAct('undo'));return}
   if(e.key==='Enter'){e.preventDefault();unoZero();return}
   if(e.repeat)return;
-  const ks=unoKeys(S.uno);let k=null;
-  if(e.code==='KeyR')k=ks.find(x=>UK[x].rev&&!UK[x].add&&!UK[x].msg)||null;
-  else if(e.code==='KeyF')k=ks.find(x=>UK[x].flip)||null;
-  else{const m=/^(?:Digit|Numpad)(\d)$/.exec(e.code||'');if(m){const v=+m[1]||10;k=ks.find(x=>UK[x].add===v&&!UK[x].rev)||null}}
-  if(k){e.preventDefault();unoAct(k);persist();render()}
+  if(e.code==='KeyH'&&!e.shiftKey){e.preventDefault();unoRulesSheet();return}
+  if(u.ver==='dos'){const d=u.dos;
+    const col={KeyR:'red',KeyY:'yellow',KeyG:'green',KeyB:'blue'}[e.code];if(col&&!e.shiftKey)return go(()=>{d.addC=col});
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){const n=d.row.length;if(!n)return;return go(()=>{const c=d.sel==null?(e.key==='ArrowLeft'?n:-1):d.sel;d.sel=((c+(e.key==='ArrowLeft'?-1:1))%n+n)%n})}
+    let card=null;const m=/^(?:Digit|Numpad)(\d)$/.exec(e.code||'');
+    if(e.key==='#'||(e.shiftKey&&e.code==='Digit3'))card={c:d.addC||'red',n:'#'};else if(e.code==='KeyW'&&!e.shiftKey)card={c:'any',n:'DOS'};
+    else if(m&&!e.shiftKey&&m[1]!=='2')card={c:d.addC||'red',n:+m[1]||10};
+    if(card)return go(()=>{unoSnap(u);d.row.push(card);u.msg=''});
+  }
+  const pal=unoPal(u);if(pal.length&&!e.shiftKey){const ci=UNO_CKB.indexOf((/^Key([A-Z])$/.exec(e.code||'')||[])[1]);
+    if(ci>=0){const others=pal.find(c=>c[0]===u.color)?pal.filter(c=>c[0]!==u.color):pal;const c=others[ci];if(c)return go(()=>{unoSnap(u);u.color=c[0];u.msg=''});}}
+  const k=unoKeys(u).find(x=>unoKbHit(unoKb(u,x),e));
+  if(k){if(k==='dosDel'&&!(u.dos&&u.dos.sel!=null))return;if(UK[k].liar){e.preventDefault();unoLiarSheet();return}go(()=>unoAct(k))}
 });
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.unox button'))e.preventDefault()});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.unowc!=null&&S.uno))return;const a=(S.uno.wc||UNO_WEIRD).slice();a[+t.dataset.unowc]=t.value;S.uno.wc=a;persist()});
