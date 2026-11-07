@@ -298,6 +298,14 @@ textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
 .sx-tab.open .m,.storyx.all .sx-tab .m{display:block}
 .sx-tab.left{border-right:4px solid var(--star)}.sx-tab.right{border-left:4px solid var(--star)}
 .sx-tab.top{border-bottom:4px solid var(--star);min-width:128px}.sx-tab.bot{border-top:4px solid var(--star);min-width:128px}
+.topic.exam.ck{border-color:var(--star);background:color-mix(in srgb,var(--star) 9%,var(--surface))}
+.topic.exam.ck .tno{background:var(--star);color:#17212B;font-size:.95rem}
+.ckwords{grid-column:2}.ckwords summary{cursor:pointer;font:500 .9rem/1.3 var(--f-head);color:var(--muted)}
+.ckwords dl{margin:10px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 14px}
+.ckwords dl div{display:flex;gap:8px;align-items:baseline;min-width:0}.ckwords dt{font-weight:700}.ckwords dd{margin:0;color:var(--muted)}
+.ckrm{grid-column:2;display:flex;justify-content:flex-end}
+.ckadd{display:flex;justify-content:center;margin:-4px 0}.ckadd .btn{border-style:dashed;border-color:var(--line);color:var(--muted)}
+.ckgen{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;padding:10px 14px}
 .sx-tab.on{background:color-mix(in srgb,var(--star) 18%,var(--surface));border-color:var(--ink)}
 .sx-tab.on.left{border-right-color:var(--ink)}.sx-tab.on.right{border-left-color:var(--ink)}.sx-tab.on.top{border-bottom-color:var(--ink)}.sx-tab.on.bot{border-top-color:var(--ink)}
 .sx-hint{text-align:center;margin:0}
@@ -1544,13 +1552,21 @@ const VS='~v';
 const SX_R='Reading Comprehension',SX_V='Vocabularies';
 const isStory=l=>!!l&&(l.story===true||(l.story==null&&/^english stories$/i.test(String(l.title||'').trim())));
 const topicSets=(l,t)=>!t.tid?[]:isStory(l)?[t.tid,t.tid+VS]:[t.tid];
-const lessonScopes=l=>[...(l.topics||[]).flatMap(t=>topicSets(l,t)),'mid','final'];
+/* story lessons have no Midterm/Final: a Vocab Checkpoint can sit after any story (l.checks = story tids) and tests the vocabulary of every story up to it */
+const CK='ck:',CK_NAME='Vocab Checkpoint';
+const isCk=sc=>typeof sc==='string'&&sc.startsWith(CK);
+const isExamSet=sc=>sc==='mid'||sc==='final'||isCk(sc);
+const ckList=l=>{const c=l.checks||[];return (l.topics||[]).filter(t=>t.tid&&c.includes(t.tid)).map(t=>CK+t.tid)};
+const ckNo=(l,sc)=>ckList(l).indexOf(sc)+1;
+/* every vocabulary word of the stories from the first one up to the given story */
+function vocabUpTo(topics,tid){const out=[];for(const t of topics||[]){sxParts(t.story).forEach(p=>p.vocab.forEach(v=>out.push(v)));if(t.tid===tid)break}return out}
+const lessonScopes=l=>isStory(l)?(l.topics||[]).flatMap(t=>[...topicSets(l,t),...(t.tid&&(l.checks||[]).includes(t.tid)?[CK+t.tid]:[])]):[...(l.topics||[]).flatMap(t=>topicSets(l,t)),'mid','final'];
 const openQCount=(l,mode)=>{const keep=new Set();lessonScopes(l).forEach(sc=>{if(setOpen(l,sc))qsOf(l,mode,sc).forEach(i=>keep.add(i))});return keep.size};
-function scopeName(l,sc){if(!sc||sc==='final')return 'Final';if(sc==='mid')return 'Midterm';const v=sc.endsWith(VS);const base=v?sc.slice(0,-VS.length):sc;const i=(l.topics||[]).findIndex(t=>t.tid===base);
+function scopeName(l,sc){if(!sc||sc==='final')return 'Final';if(sc==='mid')return 'Midterm';if(isCk(sc))return CK_NAME+' '+(ckNo(l,sc)||'');const v=sc.endsWith(VS);const base=v?sc.slice(0,-VS.length):sc;const i=(l.topics||[]).findIndex(t=>t.tid===base);
   if(isStory(l)&&i>=0){const t=l.topics[i];return (t.name||'Story '+(i+1))+' · '+(v?SX_V:SX_R)}
   return i<0?'หัวข้อ':'หัวข้อ '+(i+1)}
 function curScope(l){const s0=S.learn.scope;let sc=s0&&s0.lid===l.id?s0.sc:null;
-  if(sc&&sc!=='final'&&sc!=='mid'&&!lessonScopes(l).includes(sc))sc=null;
+  if(sc&&!lessonScopes(l).includes(sc))sc=null;
   if(sc&&!setOpen(l,sc))sc=null;
   if(!sc){sc=lessonScopes(l).find(x=>setOpen(l,x)&&scopeCount(l,x))||null}
   return sc}
@@ -1570,7 +1586,7 @@ const PICKS=[['new','ข้อใหม่','ยังไม่เคยทำ']
 const pickName=p=>(PICKS.find(x=>x[0]===p)||PICKS[2])[1];
 function pickFilter(l,order,pick,done){if(pick==='all')return order;const qs=l.questions||[];return order.filter(i=>done.has(qKey(qs[i]))===(pick==='old'))}
 /* topic sets reveal the answer right after each question; Midterm and Final are taken as a whole exam */
-const isPractice=sc=>!!sc&&sc!=='mid'&&sc!=='final';
+const isPractice=sc=>!!sc&&!isExamSet(sc);
 /* what "start" will actually run: the chosen type and new/old pick, falling back when a choice has no questions */
 function quizPlan(l,sc,kid){const st=qset();
   const nm=sc?qsOf(l,'mcq',sc).length:0,ne=sc?qsOf(l,'meq',sc).length:0;
@@ -1640,8 +1656,8 @@ function vLesson(l){
     if(!a&&!b)return S.bro?`<div class="tfoot ${hid?'hid':''}">${L}<span class="muted small">ยังไม่มีโจทย์</span>${eye}${ed}</div>`:L?`<div class="tfoot">${L}<span class="muted small">ยังไม่มีโจทย์</span></div>`:'';
     const dn=doneIn(s);
     if(!S.bro&&hid)return `<div class="tfoot">${L}<span class="muted small">ควิซชุดนี้ยังไม่เปิดให้ทำ</span></div>`;
-    return `<div class="tfoot ${hid?'hid':''}">${L}<span class="muted small">${a?'MCQ '+a:''}${a&&b?' · ':''}${b?'MEQ '+b:''}</span>${dn.length?`<span class="stack">${dn.map(k=>pawn(k,'sm')).join('')}</span>`:''}${eye}${ed}<button class="btn sm" data-act="qsScope" data-id="${esc(s)}">ทำควิซ${lab?'':s==='final'?' Final':s==='mid'?' Midterm':'หัวข้อนี้'}</button></div>`};
-  const examCard=(s,label,sub)=>`<li class="topic exam ${s}"><span class="tno">${s==='mid'?'M':'F'}</span><div class="topic-head"><h3>${label}</h3><span class="muted small">${sub}</span></div>${foot(s)||'<p class="muted small">ยังไม่มีโจทย์ในชุดนี้</p>'}</li>`;
+    return `<div class="tfoot ${hid?'hid':''}">${L}<span class="muted small">${a?'MCQ '+a:''}${a&&b?' · ':''}${b?'MEQ '+b:''}</span>${dn.length?`<span class="stack">${dn.map(k=>pawn(k,'sm')).join('')}</span>`:''}${eye}${ed}<button class="btn sm" data-act="qsScope" data-id="${esc(s)}">ทำควิซ${lab?'':s==='final'?' Final':s==='mid'?' Midterm':isCk(s)?' '+CK_NAME+' '+ckNo(l,s):'หัวข้อนี้'}</button></div>`};
+  const examCard=(s,label,sub,extra)=>`<li class="topic exam ${isCk(s)?'ck':s}"><span class="tno">${s==='mid'?'M':isCk(s)?'V'+ckNo(l,s):'F'}</span><div class="topic-head"><h3>${label}</h3><span class="muted small">${sub}</span></div>${extra||''}${foot(s)||'<p class="muted small">ยังไม่มีโจทย์ในชุดนี้</p>'}</li>`;
   let items='';
   tp.forEach((t,i)=>{const gs=(t.goals||[]).filter(g=>String(g).trim());
     if(story){const ps=sxParts(t.story);const nv=ps.reduce((a,p)=>a+p.vocab.length,0);const has=ps.some(p=>p.text.trim());
@@ -1651,7 +1667,11 @@ function vLesson(l){
       <div class="sx-go">${has?`<button type="button" class="btn primary" data-act="sxOpen" data-id="${esc(t.tid)}"><svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path d="M3 5.5C5.5 4.3 8.7 4.2 12 6c3.3-1.8 6.5-1.7 9-.5V19c-2.5-1.2-5.7-1.1-9 .7-3.3-1.8-6.5-1.9-9-.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 6v13.7" stroke="currentColor" stroke-width="2"/></svg>อ่านเรื่อง</button><span class="muted small">${ps.length>1?ps.length+' parts · ':''}คำศัพท์ ${nv} คำ</span>`
         :S.bro?`<button type="button" class="btn" data-act="lessonForm" data-id="${esc(l.id)}">ใส่เนื้อเรื่อง</button><span class="muted small">ยังไม่มีเนื้อเรื่อง</span>`:'<span class="muted small">ยังไม่มีเนื้อเรื่อง</span>'}</div>
       ${t.tid?foot(t.tid,SX_R)+foot(t.tid+VS,SX_V):''}</li>`;
-      if(mt&&t.tid===l.midAfter)items+=examCard('mid','Midterm',i===0?'ครอบคลุมเรื่อง 1':'ครอบคลุมเรื่อง 1–'+(i+1));
+      if((l.checks||[]).includes(t.tid)){const c=CK+t.tid;const vs=vocabUpTo(tp,t.tid);const nq=scopeCount(l,c);
+        items+=examCard(c,scopeName(l,c),`คำศัพท์ ${i===0?'Story 1':'Story 1–'+(i+1)} · ${vs.length} คำ`,
+          (vs.length?`<details class="ckwords"><summary>ดูคำศัพท์ที่ออก ${vs.length} คำ</summary><dl>${vs.map(v=>`<div><dt>${esc(v.w)}</dt><dd>${esc(v.m)}</dd></div>`).join('')}</dl></details>`:'')
+          +(S.bro&&!nq?`<div class="ckrm"><button type="button" class="btn sm ghost danger" data-act="ckToggle" data-id="${esc(t.tid)}">เอา ${esc(scopeName(l,c))} ออก</button></div>`:''))}
+      else if(S.bro)items+=`<li class="ckadd"><button type="button" class="btn sm ghost" data-act="ckToggle" data-id="${esc(t.tid)}">+ ${CK_NAME} หลัง ${esc(t.name||'Story '+(i+1))}</button></li>`;
       return}
     items+=`<li class="topic"><span class="tno">${i+1}</span>
       <div class="topic-head"><h3>${esc(t.name||'หัวข้อที่ '+(i+1))}</h3>${stars(t.stars)}</div>
@@ -1659,11 +1679,13 @@ function vLesson(l){
       ${t.tid?foot(t.tid):''}</li>`;
     if(mt&&t.tid===l.midAfter)items+=examCard('mid','Midterm',i===0?'ครอบคลุมหัวข้อ 1':'ครอบคลุมหัวข้อ 1–'+(i+1));
   });
-  if(tp.length&&!mt&&scopeCount(l,'mid'))items+=examCard('mid','Midterm','ยังไม่ได้เลือกว่าอยู่หลังหัวข้อไหน');
-  if(tp.length)items+=examCard('final','Final',story?'ครอบคลุมทุกเรื่องในบทนี้':'ครอบคลุมทุกหัวข้อในบทนี้');
+  if(!story&&tp.length&&!mt&&scopeCount(l,'mid'))items+=examCard('mid','Midterm','ยังไม่ได้เลือกว่าอยู่หลังหัวข้อไหน');
+  if(tp.length&&!story)items+=examCard('final','Final','ครอบคลุมทุกหัวข้อในบทนี้');
   const hasMid=scopeCount(l,'mid')>0,hasFin=scopeCount(l,'final')>0;
-  let ordered=[];tp.forEach(t=>{topicSets(l,t).forEach(x=>{if(scopeCount(l,x))ordered.push(x)});if(mt&&t.tid===l.midAfter&&hasMid)ordered.push('mid')});
-  if(hasMid&&!ordered.includes('mid'))ordered.push('mid');if(hasFin)ordered.push('final');
+  let ordered=[];
+  if(story)ordered=lessonScopes(l).filter(x=>scopeCount(l,x));
+  else{tp.forEach(t=>{topicSets(l,t).forEach(x=>{if(scopeCount(l,x))ordered.push(x)});if(mt&&t.tid===l.midAfter&&hasMid)ordered.push('mid')});
+  if(hasMid&&!ordered.includes('mid'))ordered.push('mid');if(hasFin)ordered.push('final');}
   ordered=ordered.filter(x=>setOpen(l,x));
   return `<section class="sec">
     <button class="back" data-act="closeLesson">← กลับห้องเรียน</button>
@@ -1680,7 +1702,7 @@ function vLesson(l){
   <section class="sec" id="quizPanel"><div class="panel qpanel">
     <div><h2>ควิซ</h2><p class="muted small">ข้อที่ทำครั้งแรกได้แต้มเข้าบ้าน MCQ ได้ข้อละ 1 แต้มถ้าถูก MEQ ได้ตามคะแนนที่ได้ ข้อที่เคยทำแล้วทำซ้ำได้เป็นรอบฝึก ไม่นับแต้มเพิ่ม</p></div>
     ${allQ?`
-    <div class="qgroup"><span class="label">ชุดข้อสอบ</span><div class="chips">${ordered.map(s=>`<button class="chip ${s==='mid'||s==='final'?'examchip':''} ${setHidden(l,s)?'hidchip':''}" data-act="qsScope" data-id="${esc(s)}" data-stay="1" aria-pressed="${sc===s}">${esc(scopeName(l,s))}${setHidden(l,s)?' · ซ่อน':''}</button>`).join('')}</div></div>
+    <div class="qgroup"><span class="label">ชุดข้อสอบ</span><div class="chips">${ordered.map(s=>`<button class="chip ${isExamSet(s)?'examchip':''} ${setHidden(l,s)?'hidchip':''}" data-act="qsScope" data-id="${esc(s)}" data-stay="1" aria-pressed="${sc===s}">${esc(scopeName(l,s))}${setHidden(l,s)?' · ซ่อน':''}</button>`).join('')}</div></div>
     <div class="qgroup"><span class="label">ใครทำ</span><div class="pawns">${ks.map(k=>pawnBtn(k,'quizKid',sel===k.id,'lg')).join('')}</div></div>
     ${sel?`<div class="qgroup"><span class="label">ทำข้อไหน</span><div class="seg">${PICKS.map(([v,nmP,sub])=>`<button type="button" data-act="qsPick" data-id="${v}" aria-pressed="${pick===v}" ${P.cnt[v]?'':'disabled'}><b>${nmP}</b><span>${sub} · ${P.cnt[v]} ข้อ</span></button>`).join('')}</div>
       ${P.cnt.all&&!P.cnt.new?`<p class="muted small">${esc(kidById(sel).code)} ทำครบทุกข้อในชุดนี้แล้ว รอบนี้เป็นรอบฝึก ไม่ได้แต้มเพิ่ม</p>`:P.cnt.old?`<p class="muted small">มีข้อใหม่ ${P.cnt.new} ข้อที่ ${esc(kidById(sel).code)} ยังไม่เคยทำ ข้อใหม่ได้แต้มเข้าบ้าน ข้อเดิมเป็นรอบฝึก</p>`:''}</div>`:''}
@@ -2552,15 +2574,26 @@ const rowsOf=s=>Math.min(12,Math.max(1,String(s||'').split('\n').length));
 function autoGrow(el){if(!el||!el.classList||!el.classList.contains('grow'))return;el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
 function blankT(){return {tid:'t'+uid(),name:'',stars:0,goals:'',story:''}}
 /* every quiz set of the draft: [value, short name] — a story lesson has Reading Comprehension and Vocabularies per story */
-const draftSets=d=>d.topics.flatMap((t,i)=>d.story?[[t.tid,(t.name||'Story '+(i+1))+' · '+SX_R],[t.tid+VS,(t.name||'Story '+(i+1))+' · '+SX_V]]:[[t.tid,'หัวข้อ '+(i+1)+(t.name?' · '+t.name:'')]]);
+const draftCk=d=>d.topics.filter(t=>(d.checks||[]).includes(t.tid)).map(t=>t.tid);
+const draftSets=d=>d.topics.flatMap((t,i)=>d.story?[[t.tid,(t.name||'Story '+(i+1))+' · '+SX_R],[t.tid+VS,(t.name||'Story '+(i+1))+' · '+SX_V],...(draftCk(d).includes(t.tid)?[[CK+t.tid,CK_NAME+' '+(draftCk(d).indexOf(t.tid)+1)]]:[])]:[[t.tid,'หัวข้อ '+(i+1)+(t.name?' · '+t.name:'')]]);
+/* vocabulary a set uses: a story's Vocabularies set = that story, a Vocab Checkpoint = every story up to it */
+function draftVocab(d,sc){if(!d.story||!sc)return null;if(isCk(sc))return vocabUpTo(d.topics,sc.slice(CK.length));
+  if(sc.endsWith(VS)){const t=d.topics.find(x=>x.tid+VS===sc);return t?sxParts(t.story).flatMap(p=>p.vocab):null}return null}
+function ckGen(){syncDraft();const d=S.draft;const sc=d.qf;const vs=(draftVocab(d,sc)||[]).filter(v=>v.w&&v.m);if(!vs.length){toast('ยังไม่มีคำศัพท์ที่ใส่ความหมาย');return}
+  const pool=[...new Set(d.topics.flatMap(t=>sxParts(t.story).flatMap(p=>p.vocab.map(v=>v.m))).filter(Boolean))];
+  const have=d.questions.filter(q=>q.topic===sc).map(q=>q.q.toLowerCase());let n=0;
+  vs.forEach(v=>{const w=v.w.toLowerCase();if(have.some(x=>x.includes('“'+w+'”')||x.includes('"'+w+'"')))return;
+    const ch=shuffle([v.m,...shuffle(pool.filter(m=>m!==v.m)).slice(0,3)]);if(ch.length<2)return;
+    const q=blankQ('mcq',sc);q.q='What does “'+v.w+'” mean?';q.choices=ch;q.answer=ch.indexOf(v.m);d.questions.push(q);have.push(q.q.toLowerCase());n++});
+  paintLessonForm();toast(n?'เพิ่มโจทย์คำศัพท์ '+n+' ข้อ':'ทุกคำมีโจทย์ในชุดนี้แล้ว')}
 function topicOpts(d,cur,withMid){
   const fin=!cur||cur==='final';
-  return `${draftSets(d).map(([v,n])=>`<option value="${esc(v)}" ${cur===v?'selected':''}>${esc(n)}</option>`).join('')}<option value="mid" ${cur==='mid'?'selected':''}>Midterm</option><option value="final" ${fin?'selected':''}>Final</option>`;
+  return `${draftSets(d).map(([v,n])=>`<option value="${esc(v)}" ${cur===v?'selected':''}>${esc(n)}</option>`).join('')}${d.story?'':`<option value="mid" ${cur==='mid'?'selected':''}>Midterm</option><option value="final" ${fin?'selected':''}>Final</option>`}`;
 }
 function lessonForm(id,part,qf){
   const l=id?Store.d.lessons[id]:null;
   S.draft={id:id||null,subject:l?l.subject:'chem',title:l?l.title:'',levels:l?(l.levels||[]).slice():[],content:l?(l.content||''):'',
-    topics:l&&l.topics?l.topics.map(t=>({tid:t.tid||('t'+uid()),name:t.name||'',stars:+t.stars||0,goals:(t.goals||[]).join('\n'),story:t.story||''})):[blankT()],story:l?isStory(l):false,
+    topics:l&&l.topics?l.topics.map(t=>({tid:t.tid||('t'+uid()),name:t.name||'',stars:+t.stars||0,goals:(t.goals||[]).join('\n'),story:t.story||''})):[blankT()],story:l?isStory(l):false,checks:l?(l.checks||[]).slice():[],
     midAfter:l?(l.midAfter||''):'',bulkTopic:'',hidden:null,
     questions:l?(l.questions||[]).map(q=>isMEQ(q)?{type:'meq',topic:q.topic||'',q:q.q||'',choices:['','','',''],answer:0,explain:q.explain||'',key:q.key!=null?q.key:(q.answer||''),max:qMax(q),qid:qKey(q),born:+q.born||0}
       :{type:'mcq',topic:q.topic||'',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2,qid:qKey(q),born:+q.born||0}):[],
@@ -2576,7 +2609,7 @@ function starPick(i,cur){
 /* quiz editor: show one set at a time so there is less scrolling */
 function qfShow(d,q){const f=d.qf||'all';if(f==='all')return true;if(f==='final')return !q.topic||q.topic==='final';return q.topic===f}
 function qfBar(d){const f=d.qf||'all';const cnt=x=>d.questions.filter(q=>x==='all'||(x==='final'?(!q.topic||q.topic==='final'):q.topic===x)).length;
-  const sets=[['all','ทุกชุด'],...(d.story?draftSets(d):d.topics.map((t,i)=>[t.tid,'หัวข้อ '+(i+1)])),['mid','Midterm'],['final','Final']];
+  const sets=d.story?[['all','ทุกชุด'],...draftSets(d)]:[['all','ทุกชุด'],...d.topics.map((t,i)=>[t.tid,'หัวข้อ '+(i+1)]),['mid','Midterm'],['final','Final']];
   return `<div class="field"><span>ดูทีละชุด</span><div class="chips">${sets.map(([v,n])=>`<button type="button" class="chip" data-act="qfSet" data-id="${esc(v)}" aria-pressed="${f===v}">${n}<span class="n">${cnt(v)}</span></button>`).join('')}</div></div>`}
 function paintLessonForm(){
   const d=S.draft;const nm=d.questions.filter(q=>q.type!=='meq').length,ne=d.questions.length-nm;
@@ -2601,12 +2634,14 @@ ${d.part!=='quiz'?`
 `:''}${d.part==='quiz'?`
     <div class="panel qsettings">
       <b class="label">ตั้งค่าชุดข้อสอบ</b>
-      <label class="field"><span>Midterm อยู่ตรงไหน</span><select id="lfMid"><option value="">ไม่มี Midterm</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${d.midAfter===t.tid?'selected':''}>หลังหัวข้อ ${i+1}${i+1<d.topics.length?' (ก่อนหัวข้อ '+(i+2)+')':''}${t.name?' · '+esc(t.name):''}</option>`).join('')}</select>
-      <small>โจทย์ Midterm และ Final เป็นชุดของตัวเอง ตั้งในช่อง "อยู่ในชุด" ของแต่ละข้อ ไม่ดึงโจทย์จากหัวข้อมารวม</small></label>
-      <div class="field"><span>น้องเห็นชุดไหนบ้าง · แตะเพื่อสลับ (สีเข้ม = น้องเห็น · สีขาว = ซ่อนไว้)</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}><span>${d.story?esc(t.name||'Story '+(i+1))+' · Reading':'หัวข้อ '+(i+1)}</span></label>${d.story?`<label class="opt"><input type="checkbox" id="t${i}_showv" ${d.hidden.includes(t.tid+VS)?'':'checked'}><span>${esc(t.name||'Story '+(i+1))} · Vocab</span></label>`:''}`).join('')}<label class="opt"><input type="checkbox" id="lfShowMid" ${d.hidden.includes('mid')?'':'checked'}><span>Midterm</span></label><label class="opt"><input type="checkbox" id="lfShowFin" ${d.hidden.includes('final')?'':'checked'}><span>Final</span></label></div></div>
+      ${d.story?`<div class="field"><span>${CK_NAME} อยู่หลังเรื่องไหน · เลือกได้หลายจุด ชื่อเรียง 1, 2, 3 ให้เอง</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_ck" data-change="lfCk" ${draftCk(d).includes(t.tid)?'checked':''}><span>หลัง ${esc(t.name||'Story '+(i+1))}</span></label>`).join('')}</div>
+      <small>แต่ละ Checkpoint ออกคำศัพท์ของทุกเรื่องตั้งแต่เรื่องแรกจนถึงเรื่องนั้น ทำแบบข้อสอบ ส่งทีเดียวแล้วค่อยเฉลย</small></div>`:`<label class="field"><span>Midterm อยู่ตรงไหน</span><select id="lfMid"><option value="">ไม่มี Midterm</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${d.midAfter===t.tid?'selected':''}>หลังหัวข้อ ${i+1}${i+1<d.topics.length?' (ก่อนหัวข้อ '+(i+2)+')':''}${t.name?' · '+esc(t.name):''}</option>`).join('')}</select>
+      <small>โจทย์ Midterm และ Final เป็นชุดของตัวเอง ตั้งในช่อง "อยู่ในชุด" ของแต่ละข้อ ไม่ดึงโจทย์จากหัวข้อมารวม</small></label>`}
+      <div class="field"><span>น้องเห็นชุดไหนบ้าง · แตะเพื่อสลับ (สีเข้ม = น้องเห็น · สีขาว = ซ่อนไว้)</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}><span>${d.story?esc(t.name||'Story '+(i+1))+' · Reading':'หัวข้อ '+(i+1)}</span></label>${d.story?`<label class="opt"><input type="checkbox" id="t${i}_showv" ${d.hidden.includes(t.tid+VS)?'':'checked'}><span>${esc(t.name||'Story '+(i+1))} · Vocab</span></label>`:''}${d.story&&draftCk(d).includes(t.tid)?`<label class="opt"><input type="checkbox" id="t${i}_showc" ${d.hidden.includes(CK+t.tid)?'':'checked'}><span>${CK_NAME} ${draftCk(d).indexOf(t.tid)+1}</span></label>`:''}`).join('')}${d.story?'':`<label class="opt"><input type="checkbox" id="lfShowMid" ${d.hidden.includes('mid')?'':'checked'}><span>Midterm</span></label><label class="opt"><input type="checkbox" id="lfShowFin" ${d.hidden.includes('final')?'':'checked'}><span>Final</span></label>`}</div></div>
     </div>
     <h3>โจทย์ · MCQ ${nm} ข้อ · MEQ ${ne} ข้อ</h3>
     ${qfBar(d)}
+    ${(()=>{const vs=draftVocab(d,d.qf);return vs?`<div class="panel ckgen"><span class="small">ชุดนี้ใช้คำศัพท์ ${vs.length} คำ · สร้าง MCQ "คำนี้แปลว่าอะไร" ให้ทุกคำที่ยังไม่มีโจทย์ในชุดนี้ แล้วแก้ต่อเองได้</span><button type="button" class="btn sm" data-act="ckGen" ${vs.length?'':'disabled'}>สร้างโจทย์คำศัพท์อัตโนมัติ</button></div>`:''})()}
     ${d.questions.map((q,i)=>`<fieldset class="qedit" data-drag="q" data-ix="${i}" ${qfShow(d,q)?'':'hidden'}><legend><button type="button" class="grip" data-grip aria-label="ลากเพื่อย้าย"><svg viewBox="0 0 12 18" aria-hidden="true"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></svg></button>ข้อ ${i+1} · ${q.type==='meq'?'MEQ':'MCQ'}</legend>
       <div class="row2"><select id="q${i}_type" data-change="qtype" aria-label="แบบโจทย์"><option value="mcq" ${q.type!=='meq'?'selected':''}>MCQ ตัวเลือก</option><option value="meq" ${q.type==='meq'?'selected':''}>MEQ เขียนตอบ</option></select>
       <div class="btns" style="justify-content:flex-end"><button class="btn sm ghost" data-act="qUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="qDown" data-id="${i}" ${i<d.questions.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="qDel" data-id="${i}">ลบข้อนี้</button></div></div>
@@ -2630,7 +2665,9 @@ function syncDraft(){
   const d=S.draft;if(!d)return;
   d.subject=val('lfSubj')||d.subject;if(document.getElementById('lfTitle'))d.title=val('lfTitle');if($('#sheetCard input[name="lfLv"]'))d.levels=radios('lfLv');const mid=document.getElementById('lfMid');if(mid)d.midAfter=mid.value;const bt=document.getElementById('bulkTopic');if(bt)d.bulkTopic=bt.value;const ct=document.getElementById('lfContent');if(ct)d.content=ct.value;
   const hs=new Set(d.hidden||[]);const flag=(id,key)=>{const e=document.getElementById(id);if(e){if(e.checked)hs.delete(key);else hs.add(key)}};
-  flag('lfShowMid','mid');flag('lfShowFin','final');d.topics.forEach((t,i)=>{flag('t'+i+'_show',t.tid);flag('t'+i+'_showv',t.tid+VS)});d.hidden=[...hs];const sb=document.getElementById('lfStory');if(sb)d.story=sb.checked;
+  flag('lfShowMid','mid');flag('lfShowFin','final');d.topics.forEach((t,i)=>{flag('t'+i+'_show',t.tid);flag('t'+i+'_showv',t.tid+VS);flag('t'+i+'_showc',CK+t.tid)});
+  if(document.getElementById('t0_ck')){const was=new Set(d.checks||[]);d.checks=d.topics.filter((t,i)=>{const e=document.getElementById('t'+i+'_ck');return e?e.checked:was.has(t.tid)}).map(t=>t.tid);d.checks.forEach(x=>{if(!was.has(x))hs.add(CK+x)})}
+  d.hidden=[...hs];const sb=document.getElementById('lfStory');if(sb)d.story=sb.checked;
   d.topics.forEach((t,i)=>{if(!document.getElementById('t'+i+'_name'))return;t.name=val('t'+i+'_name');const s=radio('t'+i+'_star');t.stars=s?+s:0;const g=document.getElementById('t'+i+'_goals');if(g)t.goals=g.value;const sx=document.getElementById('t'+i+'_story');if(sx)t.story=sx.value});
   d.questions.forEach((q,i)=>{if(!document.getElementById('q'+i+'_q'))return;
     const t=document.getElementById('q'+i+'_type');if(t)q.type=t.value;const tp=document.getElementById('q'+i+'_topic');if(tp)q.topic=tp.value;
@@ -2664,7 +2701,9 @@ async function saveLesson(){
   syncDraft();const d=S.draft;
   if(!d.title){toast('ใส่ชื่อบทก่อนบันทึก');return}
   const topics=d.topics.filter(t=>t.name.trim()||t.goals.trim()||(t.story||'').trim()).map(t=>({tid:t.tid,name:t.name.trim(),stars:t.stars||0,goals:t.goals.split('\n').map(s=>s.replace(/^\s*[-•]\s*/,'').trim()).filter(Boolean),story:(t.story||'').replace(/\s+$/,'')}));
-  const tids=topics.flatMap(t=>d.story?[t.tid,t.tid+VS]:[t.tid]);const okTopic=x=>x==='mid'||x==='final'||tids.includes(x)?x:'final';
+  const checks=topics.filter(t=>(d.checks||[]).includes(t.tid)).map(t=>t.tid);
+  const tids=topics.flatMap(t=>d.story?[t.tid,t.tid+VS,...(checks.includes(t.tid)?[CK+t.tid]:[])]:[t.tid]);const okTopic=x=>x==='mid'||x==='final'||tids.includes(x)?x:'final';
+  if(d.story&&d.questions.some(q=>q.q.trim()&&!tids.includes(q.topic))){toast('มีโจทย์อยู่ในชุดที่เอาออกไปแล้ว เปลี่ยน "อยู่ในชุด" ของโจทย์นั้นก่อน');return}
   /* each question keeps a key and the time it was added, so the site knows which ones each kid has already done */
   const seen=new Set(),now=Date.now();
   const tag=q=>{let qid=q.qid&&!seen.has(q.qid)?q.qid:'q'+uid();seen.add(qid);return {qid,born:q.born!=null?q.born:now}};
@@ -2675,7 +2714,7 @@ async function saveLesson(){
   const bad=qs.find(q=>q.type==='mcq'&&(q.choices.length<2||q.answer<0));
   if(bad){toast('มี MCQ ที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
   const id=d.id||uid();const old=d.id&&Store.d.lessons[d.id];
-  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,story:!!d.story,topics,midAfter:topics.some(t=>t.tid===d.midAfter)?d.midAfter:'',hidden:(d.hidden||[]).filter(x=>x==='mid'||x==='final'||tids.includes(x)),content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
+  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,story:!!d.story,checks,topics,midAfter:topics.some(t=>t.tid===d.midAfter)?d.midAfter:'',hidden:(d.hidden||[]).filter(x=>x==='mid'||x==='final'||tids.includes(x)),content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
   closeSheet();S.learn.open=id;toast('บันทึกบทเรียนแล้ว');render();
 }
 
@@ -2776,6 +2815,10 @@ const ACT={
   openLesson(t){S.learn.open=t.dataset.id;S.story=null;S.confirm=null;render();window.scrollTo({top:0})},
   closeLesson(){S.learn.open=null;S.story=null;render()},
   /* story reader */
+  async ckToggle(t){const l=Store.d.lessons[S.learn.open];if(!l||!S.bro)return;const tid=t.dataset.id;const c=new Set(l.checks||[]);
+    if(c.has(tid)){if(scopeCount(l,CK+tid)){toast('ชุดนี้มีโจทย์อยู่ ย้ายหรือลบโจทย์ก่อน');return}c.delete(tid);await Store.put('lessons',l.id,Object.assign({},l,{checks:[...c]}));toast('เอา '+CK_NAME+' ออกแล้ว')}
+    else{c.add(tid);const h=new Set(l.hidden||[]);h.add(CK+tid);const nl=Object.assign({},l,{checks:[...c],hidden:[...h]});await Store.put('lessons',l.id,nl);toast('เพิ่ม '+scopeName(nl,CK+tid)+' แล้ว · ยังซ่อนจากน้องอยู่')}
+    render()},
   sxOpen(t){if(!S.learn.open)return;S.story={lid:S.learn.open,tid:t.dataset.id,part:0,all:S.story&&S.story.all};render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxClose(){S.story=null;render()},
   sxPart(t){if(!S.story)return;S.story.part=+t.dataset.id;render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
@@ -2817,6 +2860,7 @@ const ACT={
   tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   tDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
   qAdd(t){syncDraft();const d=S.draft,a=d.questions;const tp0=d.topics[0];const cur=d.qf&&d.qf!=='all'?d.qf:(a.length?a[a.length-1].topic:(tp0?tp0.tid:'final'));a.push(blankQ(t.dataset.id,cur));paintLessonForm()},
+  ckGen,
   qfSet(t){syncDraft();S.draft.qf=t.dataset.id;if(t.dataset.id!=='all')S.draft.bulkTopic=t.dataset.id;paintLessonForm();$('#sheetCard').scrollTop=0},
   quizForm(t){S.confirm=null;lessonForm(t.dataset.id,'quiz',t.dataset.set||'all')},
   qDel(t){syncDraft();S.draft.questions.splice(+t.dataset.id,1);paintLessonForm()},
@@ -4143,7 +4187,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('input',e=>{autoGrow(e.target);if(e.target===FMT.el)fmtTrack(e.target);if(e.target.dataset&&e.target.dataset.input==='meq'&&S.quiz&&S.quiz.ans&&!S.quiz.ans[S.quiz.i].locked){S.quiz.ans[S.quiz.i].text=e.target.value;const cb=document.getElementById('qCheckBtn');if(cb)cb.disabled=!e.target.value.trim()}});
 document.addEventListener('change',e=>{
   const c=e.target.dataset&&e.target.dataset.change;if(!c)return;
-  if(c==='qtype'||c==='lfStory'){syncDraft();paintLessonForm()}
+  if(c==='qtype'||c==='lfStory'||c==='lfCk'){syncDraft();paintLessonForm()}
   if(c==='qsCustom'){const v=parseFloat(e.target.value);if(v>0){const st=qset();const sec=Math.round(v*60);if(st.timer==='q')st.qSec=sec;else st.setSec=sec;LS.set('qset',st);render()}}
   if(c==='unoStack'){S.uno.stack=e.target.checked;persist()}
   if(c==='scLow'){S.score.low=e.target.checked;persist()}
@@ -4724,7 +4768,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-07T23:41:00+07:00';
+const SITE_UPDATED='2026-11-07T23:51:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
