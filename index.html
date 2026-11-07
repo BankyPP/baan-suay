@@ -521,7 +521,8 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-row{--c:#6B7785;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);min-width:0}
 .f7-row{cursor:pointer}.f7-row input{cursor:text}
 .f7-row .f7-key{position:relative}.f7-kb{display:none;position:absolute;top:2px;right:3px;font:600 .58rem/1 var(--f-head);opacity:.6;pointer-events:none}
-@media (hover:hover){.f7-row.on .f7-kb{display:block}}
+.f7-row.on .f7-kb{display:block}
+@media (hover:none) and (max-width:600px){.f7-row.on .f7-kb{display:none}}
 .f7-row.on,.f7-row:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
 .f7-who{background:none;border:0;padding:0;cursor:pointer;border-radius:50%;line-height:0}
 .f7-name{display:grid;gap:6px;min-width:0}
@@ -568,7 +569,7 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-sc ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .f7-sc li{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:5px 9px;border-radius:9px;background:var(--sunk);line-height:1}
 .f7-sc kbd+kbd{margin-left:3px}
-@media (hover:none){.f7-sc{display:none}}
+@media (hover:none) and (max-width:600px){.f7-sc{display:none}}
 .f7-keys span{white-space:nowrap}
 .f7-keys span.w{white-space:normal}
 .f7-erow{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
@@ -4561,7 +4562,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-07T21:52:00+07:00';
+const SITE_UPDATED='2026-11-07T21:55:00+07:00';
 /* the stamp is a fallback: the live site asks GitHub when index.html was last committed, so the time is always real */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
