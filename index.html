@@ -2939,7 +2939,7 @@ function f7PlayView(f){
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys">${f.ver==='v'?'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>1</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> = 10 11 12 13 · <kbd>Z</kbd> หรือ <kbd>0</kbd> Zero · <kbd>X</kbd> ÷2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = −2 ถึง −10 · <kbd>B</kbd> +15'+(f.brutal?' · <kbd>H</kbd> −15 โดน':'')+' · <kbd>⌫</kbd> ลบเลขท้าย · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>0</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> = 10 11 12 · <kbd>X</kbd> ×2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = +2 ถึง +10 · <kbd>B</kbd> +15 · <kbd>⌫</kbd> ลบเลขท้าย · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys">${f.ver==='v'?'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>1</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> = 10 11 12 13 · <kbd>Z</kbd> หรือ <kbd>0</kbd> Zero · <kbd>X</kbd> ÷2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = −2 ถึง −10 · <kbd>B</kbd> +15'+(f.brutal?' · <kbd>H</kbd> −15 โดน':'')+' · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Enter</kbd> บวกแต้มแล้วยังเลือกคนเดิมอยู่ · <kbd>Tab</kbd> กล่องถัดไป (<kbd>⇧</kbd><kbd>Tab</kbd> ย้อน) · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>0</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> = 10 11 12 · <kbd>X</kbd> ×2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = +2 ถึง +10 · <kbd>B</kbd> +15 · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Enter</kbd> บวกแต้มแล้วยังเลือกคนเดิมอยู่ · <kbd>Tab</kbd> กล่องถัดไป (<kbd>⇧</kbd><kbd>Tab</kbd> ย้อน) · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
@@ -2959,8 +2959,9 @@ function f7AddFor(i){
   const n=f7Calc(f,e);const before=f7Tot(p);
   f7Snap(f,f7Fmt(n)+' ให้ '+playerName(p));
   p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(F7_HALF,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,half,zero,hit,n,at:Date.now()});
-  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.half[k]=false;f.zero[k]=false;f.hit[k]=false;f.lastRow=null;f.sel=null;persist();
+  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.half[k]=false;f.zero[k]=false;f.hit[k]=false;f.lastRow=null;persist();
   const a=document.activeElement;if(a&&a.blur)a.blur();render();
+  if(f.sel===i){const rw=document.querySelector('.f7-row[data-row="'+i+'"]');if(rw)try{rw.scrollIntoView({block:'nearest'})}catch(x){}}
   const t=f7Tot(p);toast(before<f.target&&t>=f.target?`${playerName(p)} ถึง ${f.target} แล้ว! เล่นให้จบรอบนี้`:`${playerName(p)} ${f7Fmt(n)} รวม ${t}`);
 }
 function f7Step(d){const f=f7();const n=f.players.length;if(n<2)return;f.cur=((f.cur+d)%n+n)%n;persist();render()}
@@ -3026,7 +3027,7 @@ Object.assign(ACT,{
     if(c)a=a.filter(v=>v!==m);else a.push(m);
     f.mods[k]=a.sort((x,y)=>x-y);f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7AddPts(t){f7AddFor(+t.dataset.id)},
-  f7Undo(){const f=f7();const h=f.hist.pop();if(!h){toast('ไม่มีอะไรให้ย้อนแล้ว');return}f.players=h.players;f.cur=Math.min(h.cur,Math.max(0,f.players.length-1));persist();render();toast('ย้อนกลับ: '+h.label)},
+  f7Undo(){const f=f7();const h=f.hist.pop();if(!h){toast('ไม่มีอะไรให้ย้อนแล้ว');return}if(h.players.length!==f.players.length)f.sel=null;f.players=h.players;f.cur=Math.min(h.cur,Math.max(0,f.players.length-1));persist();render();toast('ย้อนกลับ: '+h.label)},
   f7Edit(t){S.confirm=null;S.f7e=null;f7EditForm(+t.dataset.id)},
   f7EDel(t){f7ESync();const row=S.f7e&&S.f7e.rows[+t.dataset.id];if(row)row.del=!row.del;f7EditForm(S.f7e.i)},
   f7ECancel(){S.f7e=null;S.confirm=null;closeSheet()},
@@ -3040,7 +3041,7 @@ Object.assign(ACT,{
     f7Snap(f,'แก้แต้ม '+playerName(p));p.entries=ents;persist();render();toast(`แก้แต้ม ${playerName(p)} แล้ว ${before} → ${after}`)},
   f7RemoveAsk(){f7ESync();S.confirm='f7rm:'+S.f7e.i;f7EditForm(S.f7e.i)},
   f7Remove(){const f=f7();const i=S.f7e?S.f7e.i:-1;const p=f.players[i];S.confirm=null;S.f7e=null;closeSheet();if(!p)return;
-    f7Snap(f,'เอา '+playerName(p)+' ออก');f.players.splice(i,1);if(f.cur>i||f.cur>=f.players.length)f.cur=Math.max(0,f.cur>i?f.cur-1:0);
+    f7Snap(f,'เอา '+playerName(p)+' ออก');f.players.splice(i,1);if(f.sel===i)f.sel=null;else if(f.sel>i)f.sel--;if(f.cur>i||f.cur>=f.players.length)f.cur=Math.max(0,f.cur>i?f.cur-1:0);
     if(!f.players.length)f.phase='setup';persist();render();toast('เอา '+playerName(p)+' ออกแล้ว กดย้อนกลับได้')},
   f7PlayerForm(){f7PlayerForm()},
   f7Join(t){const f=f7();const id=t.dataset.id;if(f.players.some(p=>p.id===id))return;f7Snap(f,'เพิ่ม '+playerName({id}));f.players.push({id,entries:[]});persist();render();f7PlayerForm();toast('เพิ่ม '+playerName({id})+' แล้ว')},
@@ -3076,6 +3077,8 @@ document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==='Escape'&&S.flip.sel!=null){f7Select(null);return}
   const si=S.flip.sel;const row=si!=null&&document.querySelector('.f7-row[data-row="'+si+'"]');
+  if(row&&e.key==='Tab'){e.preventDefault();const rows=[...document.querySelectorAll('.f7-rows .f7-row[data-row]')];const j=rows.indexOf(row);const nx=rows[((j+(e.shiftKey?-1:1))%rows.length+rows.length)%rows.length];
+    if(nx){f7Mark(+nx.dataset.row);try{nx.scrollIntoView({block:'nearest'})}catch(x){}}return}
   if(row&&e.key!=='Enter'){
     const V=S.flip.ver==='v';const c=e.code||'';const N=n=>'[data-act="f7Num"][data-n="'+n+'"]';const mods=V?F7V_MODS:F7_MODS;
     let q=null;
