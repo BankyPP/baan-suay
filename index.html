@@ -2939,7 +2939,7 @@ function f7PlayView(f){
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys">${f.ver==='v'?'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>1</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> = 10 11 12 13 · <kbd>Z</kbd> หรือ <kbd>0</kbd> Zero · <kbd>X</kbd> ÷2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = −2 ถึง −10 · <kbd>B</kbd> +15'+(f.brutal?' · <kbd>H</kbd> −15 โดน':'')+' · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Esc</kbd> เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>0</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> = 10 11 12 · <kbd>X</kbd> ×2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = +2 ถึง +10 · <kbd>B</kbd> +15 · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Esc</kbd> เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys">${f.ver==='v'?'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>1</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> = 10 11 12 13 · <kbd>Z</kbd> หรือ <kbd>0</kbd> Zero · <kbd>X</kbd> ÷2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = −2 ถึง −10 · <kbd>B</kbd> +15'+(f.brutal?' · <kbd>H</kbd> −15 โดน':'')+' · <kbd>⌫</kbd> ลบเลขท้าย · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>0</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> = 10 11 12 · <kbd>X</kbd> ×2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = +2 ถึง +10 · <kbd>B</kbd> +15 · <kbd>⌫</kbd> ลบเลขท้าย · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
@@ -3013,7 +3013,7 @@ Object.assign(ACT,{
   f7Hit(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
     f.hit[k]=!f.hit[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7Turn(t){f7Step(+t.dataset.id)},
-  f7SetTurn(t){f7Select(+t.dataset.id)},
+  f7SetTurn(t){const i=+t.dataset.id;f7Select(S.flip.sel===i?null:i)},
   f7X2(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
     f.x2[k]=!f.x2[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7B15(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
@@ -3102,7 +3102,7 @@ function f7Mark(i){const f=S.flip;if(!f)return;f.sel=i;LS.set('flip',f);document
 function f7Select(i){f7Mark(i);const a=document.activeElement;if(a&&a.dataset&&a.dataset.f7!=null)a.blur()}
 document.addEventListener('click',e=>{if(!f7On())return;const t=e.target;if(!t.closest)return;const r=t.closest('.f7-row[data-row]');
   if(!r){if(S.flip.sel!=null&&t.closest('#app,main,body')&&!t.closest('#sheet'))f7Mark(null);return}
-  const i=+r.dataset.row;if(t.closest('button,input,a,label,select,textarea')){if(S.flip.sel!=null&&S.flip.sel!==i)f7Mark(null);return}f7Select(i)});
+  const i=+r.dataset.row;if(t.closest('button,input,a,label,select,textarea')){if(S.flip.sel!=null&&S.flip.sel!==i)f7Mark(null);return}f7Select(S.flip.sel===i?null:i)});
 document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.f7!=null&&S.flip&&S.flip.sel!=null)f7Mark(null)});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
   f.draft[f7key(p)]=t.value;LS.set('flip',f);const pv=document.getElementById('f7Prev_'+t.dataset.f7);if(pv)pv.innerHTML=f7PrevHTML(f,p)});
