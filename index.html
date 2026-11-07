@@ -808,6 +808,177 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .xw-clue>span b{font:600 .86rem var(--f-head);color:var(--ink)}
 .xw-clue code{font:600 .86rem ui-monospace,Menlo,monospace;letter-spacing:.08em}
 @media (max-width:420px){.wa-board{gap:6px}.wa-tile{border-radius:8px}.wa-tile span{font-size:.92rem}}
+
+/* ---------- CATAN helper ---------- */
+body.ct-lock{overflow:hidden}
+.ct{--hx-line:#F1E3BE;color:var(--ink);font-family:var(--f-body)}
+.ct.full{position:fixed;inset:0;z-index:30;background:var(--paper);padding:max(6px,env(safe-area-inset-top,0px)) max(6px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));box-sizing:border-box}
+.ct.seats{display:grid;grid-template-columns:var(--lw) minmax(0,1fr) var(--rw);grid-template-rows:var(--th) minmax(0,1fr) var(--bh);gap:6px}
+.ct.stack{display:flex;flex-direction:column;gap:8px}
+.ct.stack.full{overflow:auto;-webkit-overflow-scrolling:touch}
+.ct-cell{position:relative;min-width:0;min-height:0;overflow:hidden}
+.ct-l,.ct-r,.ct-t,.ct-b{container-type:size}
+.ct-rot{position:absolute;inset:0}
+.ct-l .ct-rot,.ct-r .ct-rot{inset:auto;left:50%;top:50%;width:100cqh;height:100cqw;transform:translate(-50%,-50%) rotate(90deg)}
+.ct-r .ct-rot{transform:translate(-50%,-50%) rotate(-90deg)}
+.ct-t .ct-rot{transform:rotate(180deg)}
+.ct-rot>.ct-seat{height:100%;box-sizing:border-box;overflow:auto;overscroll-behavior:contain}
+.ct-board{position:relative;min-width:0;min-height:0;display:grid;place-items:center}
+.ct.stack .ct-board{height:min(64vh,94vw);flex:none}
+.ct-svg{width:100%;height:100%;display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.ct-svg text{font-family:"Sarabun",var(--f-body);text-anchor:middle;pointer-events:none}
+.ct-sea{fill:#3E90D2;stroke:#2B6FA8;stroke-width:.08}
+.ct-hx polygon{stroke:var(--hx-line);stroke-width:.07;stroke-linejoin:round}
+.ct-hx.tap{cursor:pointer}
+.ct-hx.sel polygon{stroke:#fff;stroke-width:.16}
+.ct-hx.hit polygon{stroke:#FFD43B;stroke-width:.17}
+.ct-hx.blk polygon{stroke:#E0402F;stroke-width:.14;stroke-dasharray:.18 .1}
+.ct-hx.rob polygon{stroke:#fff;stroke-width:.1;stroke-dasharray:.2 .12;animation:ctDash 1s linear infinite}
+@keyframes ctDash{to{stroke-dashoffset:-.64}}
+.ct-ti{font-size:.34px;opacity:.9}
+.ct-q{font-size:.42px;font-weight:700;fill:rgba(20,28,36,.5)}
+.ct-tok{fill:#F6ECD3;stroke:#B49D6E;stroke-width:.03}
+.ct-hx.hit .ct-tok{fill:#FFF3A8}
+.ct-num{font-size:.36px;font-weight:700;fill:#1D232A}
+.ct-num.red,.ct-pip.red{fill:#C9352B}
+.ct-pip{fill:#1D232A}
+.ct-dock{stroke:#8A6A3B;stroke-width:.06;stroke-linecap:round}
+.ct-port circle{fill:#FFF8E8;stroke:#7A5C2E;stroke-width:.04}
+.ct-port.empty circle{fill:rgba(255,255,255,.28);stroke:#fff;stroke-dasharray:.08 .06}
+.ct-port.empty text{fill:#fff}
+.ct-port.tap{cursor:pointer}.ct-port.sel circle{stroke:#FFD43B;stroke-width:.1}
+.ct-pt{font-size:.19px;font-weight:700;fill:#3A2A12}.ct-pt.sm{font-size:.14px}.ct-pe{font-size:.22px}
+.ct-rd0{stroke:#1D232A;stroke-width:.24;stroke-linecap:round}
+.ct-rd{stroke-width:.15;stroke-linecap:round}
+.ct-bld{stroke:#1D232A;stroke-width:.045;stroke-linejoin:round}
+.ct-robber{fill:#4A4F57;stroke:#1D232A;stroke-width:.03}
+.ct-robber ellipse{fill:rgba(0,0,0,.3);stroke:none}
+.ct-hot{cursor:pointer}
+.ct-hotn{fill:#fff;stroke:#1D232A;stroke-width:.05;animation:ctPulse 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes ctPulse{50%{transform:scale(1.35)}}
+.ct-hitc{fill:transparent}
+.ct-hote{stroke:#fff;stroke-width:.13;stroke-linecap:round;stroke-dasharray:.1 .09}
+.ct-hitl{stroke:transparent;stroke-width:.42}
+.ct-hot:hover .ct-hotn,.ct-hot:hover .ct-hote{stroke:#FFD43B}
+/* seats */
+.ct-seat{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--pc);border-radius:14px;padding:7px 10px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.ct-seat.cur{border-color:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 35%,transparent),var(--shadow)}
+.ct-sh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;min-width:0}
+.ct-nm{font:600 1rem/1.1 var(--f-head)}
+.ct-now{font:500 .72rem/1 var(--f-head);background:var(--ink);color:var(--paper);padding:4px 7px;border-radius:999px}
+.ct-badge{font:500 .78rem/1 var(--f-head);background:#FFF1C2;color:#5B4300;padding:4px 6px;border-radius:8px}
+.ct-vp{font:500 .82rem/1 var(--f-head);color:var(--muted)}.ct-vp b{font-size:1.25rem;color:var(--ink)}.ct-vp small{font-size:.75rem}
+.ct-st{font:400 .86rem/1 var(--f-body);white-space:nowrap}.ct-st.warn{color:var(--bad);font-weight:700}
+.ct-sbtn{margin-left:auto;display:flex;gap:4px}
+.ct-ib{min-width:34px;min-height:32px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-size:.95rem}
+.ct-ib[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.ct-hand{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.ct-hand.hid{color:var(--muted);letter-spacing:1px;font-size:.8rem}
+.ct-rc{display:inline-flex;align-items:center;gap:3px;padding:3px 7px 3px 4px;border-radius:9px;background:color-mix(in srgb,var(--rc,#888) 18%,var(--surface));border:1px solid color-mix(in srgb,var(--rc,#888) 45%,transparent);font-family:var(--f-body)}
+.ct-rc i{font-style:normal;font-size:1rem}.ct-rc b{font-size:.95rem}.ct-rc.zero{opacity:.45}
+.ct-dvs{display:inline-flex;gap:5px;flex-wrap:wrap}.ct-dv{font-size:.88rem;padding:3px 6px;border-radius:8px;background:var(--sunk)}.ct-dv small{margin-left:3px;color:var(--muted)}
+.ct-body{display:grid;gap:8px;min-width:0}
+.ct-steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px;counter-reset:s}
+.ct-steps li{font:500 .76rem/1 var(--f-head);padding:5px 8px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.ct-steps li.done{text-decoration:line-through;opacity:.6}
+.ct-steps li.now{background:var(--pc);color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.35)}
+.ct-say{margin:0;font:400 .98rem/1.35 var(--f-body)}
+.ct-alert{background:var(--bad-bg);color:var(--bad);padding:8px 10px;border-radius:10px;font:400 .95rem/1.3 var(--f-body)}
+.ct-win{background:#FFF1C2;color:#5B4300;padding:10px 12px;border-radius:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:500 1rem/1.3 var(--f-head)}
+.ct-dpad{display:grid;grid-template-columns:repeat(auto-fit,minmax(42px,1fr));gap:5px}
+.ct-dn{min-height:46px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 1.15rem/1 var(--f-head);cursor:pointer}
+.ct-dn.red{color:#C9352B}.ct-dn.seven{background:var(--ink);color:var(--paper)}
+.ct-dn:active,.ct-bb:active,.ct-devb:active{transform:scale(.96)}
+.ct-bbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
+.ct-bb{display:grid;gap:2px;justify-items:start;text-align:left;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:54px}
+.ct-bb b{font:500 .98rem/1.1 var(--f-head)}.ct-bb small{font-size:.85rem;letter-spacing:-1px}
+.ct-bb em{font:normal .76rem/1.2 var(--f-body);color:var(--bad)}.ct-bb.short{opacity:.75}
+.ct-bb:disabled{opacity:.45;cursor:default}
+.ct-endt{margin-left:auto}
+.ct-pan{border:1px dashed var(--line);border-radius:12px;padding:8px 10px;display:grid;gap:7px}
+.ct-trc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.ct-stps{display:flex;flex-wrap:wrap;gap:6px}
+.ct-stp{display:inline-flex;align-items:center;gap:4px;padding:3px;border-radius:10px;background:var(--sunk)}
+.ct-stp>span:not(.ct-rc){font-size:.9rem;padding:0 4px}
+.ct-stp button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 1.05rem/1 var(--f-head);cursor:pointer}
+.ct-stp button:disabled{opacity:.35}
+.ct-stp b{min-width:18px;text-align:center;font-family:var(--f-body)}
+.ct-err{color:var(--bad);font-size:.9rem}.ct-warn{color:#9A6A00;font-size:.9rem}.ct-okk{color:var(--good);font-size:.9rem}
+.ct-devs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px}
+.ct-devb{display:grid;gap:2px;justify-items:start;text-align:left;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.ct-devb b{font:500 .95rem/1.1 var(--f-head)}.ct-devb small{font-size:.78rem;color:var(--muted)}.ct-devb:disabled{opacity:.4}
+.ct .pawn.xs{width:20px;height:20px;font-size:.6rem;min-width:20px}
+/* corners */
+.ct-cor{display:grid;gap:5px;align-content:start;font-size:.85rem;height:100%;overflow:auto}
+.ct-cor .label{font-size:.7rem}
+.ct-who{display:flex;align-items:center;gap:6px;font:600 .95rem/1.1 var(--f-head)}
+.ct-lastroll{display:flex;align-items:center;gap:6px}.ct-lastroll b{font:700 1.6rem/1 var(--f-head)}.ct-lastroll b.seven{color:var(--bad)}
+.ct-dface{font-size:1.5rem;line-height:1}
+.ct-prod{display:flex;flex-wrap:wrap;gap:3px 8px;font-size:.82rem}.ct-prod span{display:inline-flex;align-items:center;gap:3px}
+.ct-bank{display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:3px}.ct-bank .ct-rc{padding:1px 4px 1px 2px;gap:2px;justify-content:center}.ct-bank .ct-rc i{font-size:.8rem}.ct-bank .ct-rc b{font-size:.8rem}
+.ct-tl,.ct-tr,.ct-bl,.ct-br{container-type:size}
+.ct-cbtn{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px;align-content:end}
+.ct-cbtn .btn{min-height:32px;padding:0 6px;font-size:.84rem;white-space:nowrap}.ct-cbtn .ct-wide{grid-column:1/-1}
+@container (max-width:210px){.ct-cbtn .t{display:none}.ct-cbtn .btn{font-size:1.05rem;padding:0 2px}.ct-cbtn .ct-wide{grid-column:auto}.ct-cbtn .ct-chatb{grid-column:1/-1;font-size:.84rem}.ct-cbtn .ct-chatb .t{display:inline}}
+@container (min-width:211px){.ct-cbtn{grid-template-columns:1fr 1fr}}
+@container (max-height:110px){.ct-cor .label{display:none}.ct-lastroll b{font-size:1.25rem}.ct-dface{font-size:1.15rem}}
+
+.ct-top,.ct-bot{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+.ct.stack .ct-cbtn{display:flex;flex-wrap:wrap;gap:6px;height:auto}.ct.stack .ct-cbtn .btn{width:auto}
+.ct-seats{display:grid;gap:8px}
+.ct-fix{position:absolute;left:6px;top:6px;max-width:min(420px,calc(100% - 12px));background:var(--surface);border:2px solid var(--focus);border-radius:12px;padding:8px;display:grid;gap:6px;font-size:.88rem;box-shadow:var(--shadow)}
+.ct-inline .ct{margin-top:10px}
+/* chat */
+.ct-chat{position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 16px));height:min(640px,calc(100% - 16px));background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:14px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto auto;gap:8px;box-sizing:border-box}
+.ct.stack .ct-chat{position:fixed;z-index:35}
+.ct-chead{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-head);font-size:1.05rem}
+.ct-chead .x{border:0;background:none;font-size:1.6rem;cursor:pointer;color:var(--ink);line-height:1}
+.ct-msgs{overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px;overscroll-behavior:contain}
+.ct-msg{max-width:88%;padding:8px 12px;border-radius:14px;font:400 .97rem/1.45 var(--f-body);overflow-wrap:anywhere}
+.ct-msg.u{align-self:flex-end;background:var(--ink);color:var(--paper);border-bottom-right-radius:4px}
+.ct-msg.a{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:4px}
+.ct-msg p,.ct-msg ul,.ct-msg ol{margin:.2em 0}.ct-msg ul,.ct-msg ol{padding-left:1.2em}
+.ct-qs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+.ct-cin{display:flex;gap:6px}.ct-cin input{flex:1;min-width:0;font:400 1rem var(--f-body);padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+/* setup + board editor */
+.ct-plist{display:grid;gap:8px}
+.ct-prow{display:grid;gap:6px;padding:10px;border-radius:14px;border:1px solid var(--line);border-left:6px solid var(--pc)}
+.ct-pwho{display:flex;align-items:center;gap:8px;font-family:var(--f-head)}.ct-pwho .btn{margin-left:auto}
+.ct-pcs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ct-pcs .label{min-width:62px}
+.ct-pcb{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--c);cursor:pointer;font:700 1rem/1 var(--f-head);color:#1D232A}
+.ct-pcb[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
+.ct-opts{display:grid;gap:8px;padding-top:8px}
+.ct-bed{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.ct-bed{grid-template-columns:1fr}}
+.ct-bwrap{aspect-ratio:1.15;width:100%;position:sticky;top:8px}
+@media (max-width:820px){.ct-bwrap{position:static}}
+.ct-bside{display:grid;gap:12px;min-width:0}
+.seg2{display:flex;flex-wrap:wrap;gap:6px}
+.ct-pal{display:grid;gap:8px}
+.ct-tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ct-tb{display:grid;gap:2px;padding:8px;border-radius:12px;border:2px solid transparent;background:color-mix(in srgb,var(--c) 30%,var(--surface));color:var(--ink);cursor:pointer;text-align:left}
+.ct-tb b{font:500 .92rem/1.1 var(--f-head)}.ct-tb small{font-size:.75rem;color:var(--muted)}
+.ct-tb[aria-pressed="true"]{border-color:var(--ink)}
+.ct-ngrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.ct-nb{display:grid;gap:1px;padding:6px 0;border-radius:10px;border:2px solid var(--line);background:#F6ECD3;color:#1D232A;cursor:pointer}
+.ct-nb b{font:700 1.1rem/1 var(--f-body)}.ct-nb.red b{color:#C9352B}.ct-nb small{font-size:.7rem;color:#6B5A3A}
+.ct-nb[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}.ct-nb:disabled{opacity:.35}
+small.over{color:var(--bad)!important;font-weight:700}
+.ct-chk{display:grid;gap:3px}
+.ct-photo{display:grid;gap:8px;padding-top:8px}.ct-photo img{width:100%;border-radius:12px;border:1px solid var(--line)}
+.ct-photo textarea{font:400 .95rem var(--f-body);padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);width:100%;box-sizing:border-box}
+.ct-first{display:grid;gap:8px;padding-top:6px;border-top:1px solid var(--line)}
+.ct-fch b{margin-left:4px}
+/* end */
+.ct-rk{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--line);border-left:6px solid var(--pc)}
+.ct-rk small{grid-column:2/-1;color:var(--muted)}.ct-rk.win{background:#FFF6D6}
+.ct-stats{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px;align-items:end;padding:8px 0}
+.ct-sb{display:grid;justify-items:center;gap:2px}.ct-sb b{font:600 .85rem var(--f-head)}.ct-sb small{font-size:.75rem;color:var(--muted)}
+.ct-sbar{position:relative;width:100%;height:110px;background:var(--sunk);border-radius:6px;overflow:hidden}
+.ct-sbar i{position:absolute;left:15%;right:15%;bottom:0;background:var(--focus);border-radius:4px 4px 0 0}
+.ct-sbar u{position:absolute;left:0;right:0;height:2px;background:var(--bad)}
+.ct-log{margin:0;padding-left:1.6em;display:grid;gap:4px;font-size:.92rem}
+.ct.stack .ct-bank{display:flex;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -844,7 +1015,7 @@ window.FIREBASE_CONFIG = {
 <!-- ===== จบส่วนตั้งค่า ===== -->
 <script>
 /* ข้อมูลตั้งต้นของบ้าน: ใส่ตอนฐานข้อมูลยังว่าง และเพิ่มเฉพาะของใหม่ (ver สูงกว่าที่เคยใส่) */
-window.HOUSE_SEED = {"v": 12, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 12, "games/taboo": 9}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก Fold, Check, Call, Bet หรือ Raise\n- คนที่ไม่ Fold จนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่น Fold หมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้อง Call เท่าไร\n- Bet หรือ Raise เท่าไรก็ได้ ไม่มีขั้นต่ำ แค่ Raise ต้องมากกว่าที่ต้อง Call ใส่เป็นยอดรวมของเราในรอบนั้น (Raise to) จอบอกให้ว่าต้องหยิบชิปลงเพิ่มเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}, "taboo": {"at": 1792850000000, "helper": "taboo", "kind": "party", "min": 3, "max": 12, "minutes": 15, "name": "คำต้องห้าม", "props": "มือถือหรือไอแพดคนละเครื่อง", "rules": "## เล่นยังไง\n- ทุกคนเปิดตัวช่วยคำต้องห้ามในเครื่องของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลัก\n- เริ่ม round แล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเอง แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร\n- ใครเผลอพูดตกรอบ กด “ฉันโดน” แล้วเลือกว่าใครฆ่า หรือคนฆ่ากด “ฉันฆ่าได้”\n- หมดเวลาหรือเหลือคนสุดท้าย คนที่รอดได้ทายคำของตัวเอง\n- เล่นกี่ round ก็ได้ แต้มรวมกันจนกดจบเกม\n\n## แต้มต่อ round\n- ฆ่าได้ +1 ต่อคน\n- รอดถึงจบ round +1\n- รอดแล้วทายคำของตัวเองถูก +1\n\n## ผู้ดำเนินเกม (Game Master)\n- เลือกได้ในห้องรอ ไม่เล่น แต่คุมเกม: เริ่ม round ใครตาย ใครฆ่า เปลี่ยนคำ ตัดสินว่าทายถูกไหม สรุป round\n\n## นั่งยังไง\n- นั่งเป็นวงกลม: จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น\n- นั่งเป็นแถวหรืออยู่คนละที่: จอโชว์คำของทุกคน ยกเว้นของตัวเอง\n\n## คีย์ลัด\n- Space เริ่ม/พัก/round ต่อไป · D ฉันโดน · K ฉันฆ่าได้ · 1–9 คนที่โดน · H ซ่อนคำ · R เปลี่ยนคำ\n- ⌘/Ctrl + Z ย้อนคนล่าสุดที่โดน · ⌘/Ctrl + Enter จบเกม รวมคะแนน"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/taboo", "games/poker"]};
+window.HOUSE_SEED = {"v": 13, "ver": {"lessons/chem-electro": 2, "games/flip7": 5, "games/poker": 12, "games/taboo": 9, "games/catan": 13}, "data": {"boards": {"bsgs-2026": {"at": 1791682000000, "cats": [{"name": "อาหย่อย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "นักทุบคีย์บอร์ด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "บ้านไหนสวย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "โชคดีมีชัย", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "วิดนิด", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "เมะ&เคะ&เกะ", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "หนังสือพิมพ์", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}, {"name": "จานชาม", "qs": [{"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}, {"a": "", "pts": "", "q": ""}]}], "final": {"a": "", "cat": "", "q": ""}, "ptsMode": "seq", "step": 10, "title": "2026 Baan Suay Game Show"}}, "games": {"bsgs": {"at": 1791682000000, "helper": "bsgs", "kind": "party", "max": 8, "min": 2, "minutes": 40, "name": "Baan Suay Game Show", "props": "จอ 1 เครื่องให้พิธีกรถือ", "rules": "- คนที่ได้เลือก เลือกหัวข้อและคะแนนบนกระดาน\n- พิธีกรอ่านคำถาม คนที่ตอบถูกได้คะแนนตามช่อง\n- เล่นจนหมดกระดาน แล้วปิดด้วย Final Question ที่ทุกคนลงเดิมพัน"}, "ex-uno": {"at": 1791680000000, "example": true, "helper": "uno", "kind": "compete", "max": 10, "min": 2, "minutes": 20, "name": "UNO", "props": "ไพ่ UNO 1 สำรับ", "rules": "## ใช้จอช่วยอะไร\n- บอกว่าตาใคร หมุนทางไหน\n- นับ +2 / +4 ที่ซ้อนกัน\n\n## กติกาเพิ่มของบ้าน\n- เขียนเพิ่มได้ตรงนี้"}, "flip7": {"at": 1792763453498, "helper": "flip7", "kind": "compete", "min": 3, "max": 18, "minutes": 20, "name": "Flip 7", "props": "ไพ่ Flip 7 1 กล่อง", "rules": "## เล่นยังไง\n- ถึงตาตัวเอง เลือกเปิดไพ่เพิ่มอีกใบ หรือพอแล้วเก็บแต้มรอบนี้ไว้\n- เปิดได้เลขซ้ำกับที่มีอยู่ = แตก รอบนี้ได้ 0\n- เปิดเลขไม่ซ้ำครบ 7 ใบ = Flip 7 ได้โบนัส +15 แล้วจบรอบทันที\n- แต้มรอบนี้ = ผลรวมเลข การ์ด ×2 คูณผลรวมเลข แล้วค่อยบวกการ์ด +2 ถึง +10 และโบนัส +15\n- จบรอบที่มีคนถึง 200 แล้วคนแต้มสูงสุดชนะ\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่น แล้วรายชื่อเรียงจากแต้มมากสุดอยู่บนเอง\n- ใส่แต้มของใครก็ได้ ตอนไหนก็ได้ พิมพ์หลายเลขทีเดียว เช่น 3 7 12 หรือกดปุ่มเลข 0–12 แล้วกดบวกแต้ม (หรือ Enter)\n- ได้การ์ดพิเศษ กดปุ่ม ×2, +2, +4, +6, +8, +10 หรือ +15 ก่อนกดบวกแต้ม\n- ×2 คูณเฉพาะผลรวมเลข การ์ด +2 ถึง +10 และ +15 บวกทีหลัง ไม่ถูกคูณ\n- กดปุ่มการ์ดซ้ำเพื่อเอาออก\n- ใส่แต้มติดลบได้ เช่น -5\n- ใส่ผิด กดย้อนกลับ หรือกดแก้เพื่อแก้แต้มครั้งไหนก็ได้\n- เพิ่มคนเล่นระหว่างเกมได้ ตั้งเป้าเองได้ (ตั้งต้น 200) มีแถบบอกเมื่อมีคนถึงเป้า\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับผู้ชนะ"}, "poker": {"at": 1792800000000, "helper": "poker", "kind": "compete", "min": 2, "max": 10, "minutes": 45, "name": "โป๊กเกอร์ (Texas Hold'em)", "props": "ไพ่ 1 สำรับ ไม่ต้องมีชิปจริง", "rules": "## เล่นยังไง\n- ทุกคนได้ไพ่ในมือ 2 ใบ แล้วเปิดไพ่กลางทีละช่วง 3, 1, 1 ใบ รวม 5 ใบ\n- เอาไพ่ในมือกับไพ่กลางมาเลือก 5 ใบที่ดีที่สุด\n- เดิมพัน 4 รอบ: ก่อน Flop, Flop, Turn, River แต่ละรอบเลือก Fold, Check, Call, Bet หรือ Raise\n- คนที่ไม่ Fold จนจบ เปิดไพ่ ใครมือดีสุดได้กองกลาง หรือถ้าคนอื่น Fold หมด คนที่เหลือได้เลย\n\n## ใช้จอช่วยอะไร\n- เลือกคนเล่นตามที่นั่ง ใส่ชิปเริ่มต้นกับ Blind\n- เลื่อนปุ่ม Dealer และเก็บ Small/Big blind ให้เองทุกมือ\n- บอกว่าถึงตาใคร ต้อง Call เท่าไร\n- Bet หรือ Raise เท่าไรก็ได้ ไม่มีขั้นต่ำ แค่ Raise ต้องมากกว่าที่ต้อง Call ใส่เป็นยอดรวมของเราในรอบนั้น (Raise to) จอบอกให้ว่าต้องหยิบชิปลงเพิ่มเท่าไร\n- มีคน All-in แยกกองหลักกับกองย่อยให้เอง เลือกคนชนะทีละกอง เสมอกันก็แบ่งให้\n- กดผิด กดย้อนกลับได้ทุกขั้น\n- ซื้อชิปเพิ่ม เปลี่ยน Blind เพิ่มคนเล่นได้ระหว่างมือ\n- จบเกมแล้วบันทึกผลเข้าบ้าน ให้แต้มบ้านกับคนชิปมากสุด"}, "taboo": {"at": 1792850000000, "helper": "taboo", "kind": "party", "min": 3, "max": 12, "minutes": 15, "name": "คำต้องห้าม", "props": "มือถือหรือไอแพดคนละเครื่อง", "rules": "## เล่นยังไง\n- ทุกคนเปิดตัวช่วยคำต้องห้ามในเครื่องของตัวเอง คนนึงสร้างห้อง คนอื่นกรอกรหัส 6 หลัก\n- เริ่ม round แล้วทุกคนได้คำต้องห้ามคนละคำ ห้ามพูดคำของตัวเอง แต่ตัวเองไม่รู้ว่าคำของตัวเองคืออะไร\n- ใครเผลอพูดตกรอบ กด “ฉันโดน” แล้วเลือกว่าใครฆ่า หรือคนฆ่ากด “ฉันฆ่าได้”\n- หมดเวลาหรือเหลือคนสุดท้าย คนที่รอดได้ทายคำของตัวเอง\n- เล่นกี่ round ก็ได้ แต้มรวมกันจนกดจบเกม\n\n## แต้มต่อ round\n- ฆ่าได้ +1 ต่อคน\n- รอดถึงจบ round +1\n- รอดแล้วทายคำของตัวเองถูก +1\n\n## ผู้ดำเนินเกม (Game Master)\n- เลือกได้ในห้องรอ ไม่เล่น แต่คุมเกม: เริ่ม round ใครตาย ใครฆ่า เปลี่ยนคำ ตัดสินว่าทายถูกไหม สรุป round\n\n## นั่งยังไง\n- นั่งเป็นวงกลม: จอโชว์คำของตัวเองตัวใหญ่ หันจอออกให้คนอื่นเห็น\n- นั่งเป็นแถวหรืออยู่คนละที่: จอโชว์คำของทุกคน ยกเว้นของตัวเอง\n\n## คีย์ลัด\n- Space เริ่ม/พัก/round ต่อไป · D ฉันโดน · K ฉันฆ่าได้ · 1–9 คนที่โดน · H ซ่อนคำ · R เปลี่ยนคำ\n- ⌘/Ctrl + Z ย้อนคนล่าสุดที่โดน · ⌘/Ctrl + Enter จบเกม รวมคะแนน"}, "catan": {"at": 1794030000000, "helper": "catan", "kind": "compete", "min": 3, "max": 4, "minutes": 75, "name": "Catan", "props": "กล่อง Catan (เล่นจริงบนโต๊ะ) + จอ 1 เครื่องวางข้างกระดาน", "rules": "## เล่นยังไง\n- เกาะมี 19 ช่อง แต่ละช่องผลิตทรัพยากร: เนินดินให้อิฐ ป่าให้ไม้ ทุ่งหญ้าให้ขนแกะ ไร่ข้าวให้ข้าว ภูเขาให้แร่\n- ทุกตาทอยเต๋า 2 ลูก ช่องที่มีเลขนั้นผลิต ใครมีบ้านติดได้การ์ด บ้าน 1 ใบ เมือง 2 ใบ\n- ทอยได้ 7 คนการ์ดเกิน 7 ใบทิ้งครึ่ง แล้วย้ายโจรไปขโมย 1 ใบ\n- แลกการ์ดกับคนอื่นหรือธนาคาร แล้วสร้างถนน บ้าน เมือง หรือซื้อการ์ดพัฒนา\n- ใครได้ 10 แต้มในตาตัวเองก่อนชนะ\n\n## ใช้จอช่วยอะไร\n- ถ่ายรูปกระดานเก็บไว้ หรือกดเลือกพื้นที่และเลขทีละช่องให้ตรงกระดานจริง สุ่มกระดาน หรือใช้กระดานผู้เริ่มต้น\n- หน้าจอแบบนั่งล้อมโต๊ะ กระดานอยู่กลาง แต่ละคนมีแผงของตัวเองหันเข้าหาตัว\n- บอกทุกขั้นของตาว่าตอนนี้ตาใคร ต้องทำอะไร\n- กดเลขเต๋าที่ทอยได้ หรือกดทอยในเครื่อง แล้วจอแจกการ์ดให้ทุกคนเอง\n- กดสร้างบ้าน ถนน เมือง บนจุดที่สร้างได้จริงตามกติกา หักการ์ดให้เอง\n- ทิ้งการ์ด ย้ายโจร ขโมย แลกกับคน แลกกับธนาคารตามท่าเรือ ซื้อและเล่นการ์ดพัฒนา\n- นับแต้ม ถนนยาวที่สุด กองทัพใหญ่ที่สุด บอกเมื่อมีคนชนะ\n- ย้อนกลับได้ทุกขั้น แก้การ์ดในมือและแก้กระดานได้ตลอด\n- แชทถามกติกาได้ตลอด ตอบเฉพาะกติกา ไม่ช่วยคิดว่าควรเล่นยังไง และไม่เก็บแชท"}}, "kids": {"b1": {"band": "uni", "code": "B1", "color": "#2F5BD3", "grade": "มหาลัยปี 4", "league": false, "nick": "", "order": 1}, "b2": {"band": "pri2", "code": "B2", "color": "#7650CC", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 5}, "p": {"band": "sec", "code": "P", "color": "#D23F77", "grade": "มัธยม", "league": true, "nick": "", "order": 2}, "r": {"band": "pri2", "code": "R", "color": "#23935F", "grade": "ประถมปลาย", "league": true, "nick": "", "order": 4}, "w": {"band": "kinder", "code": "W", "color": "#E5612A", "grade": "กำลังจะเข้าโรงเรียน", "league": true, "nick": "", "order": 6}, "y": {"band": "sec", "code": "Y", "color": "#D9940F", "grade": "มัธยม", "league": true, "nick": "", "order": 3}}, "lessons": {"chem-electro": {"subject": "chem", "title": "เคมีไฟฟ้า", "levels": ["sec2"], "topics": [], "content": "", "questions": [], "at": 1791720000000}, "ex-mole": {"at": 1791680000000, "content": "## โมลคืออะไร\n- 1 โมล = 6.02 × 10^{23} อนุภาค เรียกว่าเลขอาโวกาโดร\n- มวลของสาร 1 โมล เท่ากับมวลอะตอมหรือมวลโมเลกุล ในหน่วยกรัม\n\n## สูตรที่ใช้บ่อย\n- n = m ÷ M (n = จำนวนโมล, m = มวลเป็นกรัม, M = มวลโมเลกุล g/mol)\n- จำนวนอนุภาค = n × 6.02 × 10^{23}\n\n> ตัวอย่าง: H_2O มี M = 2(1) + 16 = 18 g/mol ถ้ามีน้ำ 36 g จะมี 36 ÷ 18 = 2 mol", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["28 g/mol", "44 g/mol", "32 g/mol", "60 g/mol"], "explain": "12 + 2(16) = 44 g/mol", "q": "CO_2 มีมวลโมเลกุลเท่าไร (C = 12, O = 16)", "type": "mcq"}, {"answer": 1, "choices": ["0.25 mol", "0.5 mol", "2 mol", "20 mol"], "explain": "M = 23 + 16 + 1 = 40 g/mol จึงได้ 20 ÷ 40 = 0.5 mol", "q": "NaOH 20 g มีกี่โมล (Na = 23, O = 16, H = 1)", "type": "mcq"}, {"answer": 1, "choices": ["6.02 × 10^{23}", "1.204 × 10^{24}", "3.01 × 10^{23}", "2"], "explain": "2 × 6.02 × 10^{23} = 1.204 × 10^{24} อะตอม", "q": "He 2 mol มีกี่อะตอม", "type": "mcq"}, {"answer": "เพราะแต่ละโมเลกุลหนักไม่เท่ากัน H_2 = 2 g/mol ส่วน O_2 = 32 g/mol", "explain": "โมลนับจำนวนอนุภาค ไม่ได้บอกน้ำหนัก", "q": "H_2 1 mol กับ O_2 1 mol มีจำนวนโมเลกุลเท่ากัน แต่ทำไมมวลไม่เท่ากัน", "type": "open"}], "subject": "chem", "title": "โมลและมวลโมเลกุล"}, "ex-phrasal": {"at": 1791678000000, "content": "## คำที่ใช้ทุกวันในบ้าน\n- **turn on / turn off** = เปิด / ปิด (ไฟ ทีวี พัดลม)\n- **pick up** = หยิบขึ้นมา หรือไปรับใคร\n- **put away** = เก็บเข้าที่\n- **wake up** = ตื่นนอน\n- **clean up** = เก็บกวาด ทำความสะอาด", "example": true, "levels": ["pri2", "sec"], "questions": [{"answer": 1, "choices": ["turn on", "put away", "wake up", "pick on"], "explain": "put away = เก็บเข้าที่", "q": "Please ___ your toys after playing.", "type": "mcq"}, {"answer": 0, "choices": ["wake up", "clean up", "turn off", "put away"], "explain": "wake up = ตื่นนอน", "q": "I ___ at 7 every morning.", "type": "mcq"}, {"answer": "ปิดไฟก่อนนอน", "explain": "", "q": "แปลประโยคนี้: Turn off the lights before you sleep.", "type": "open"}], "subject": "eng", "title": "Phrasal verbs ในบ้าน"}, "ex-speed": {"at": 1791679000000, "content": "## สองคำที่ชอบสับสน\n- **อัตราเร็ว** = ระยะทาง ÷ เวลา เป็นปริมาณสเกลาร์ (บอกแค่ขนาด)\n- **ความเร็ว** = การกระจัด ÷ เวลา เป็นปริมาณเวกเตอร์ (มีทั้งขนาดและทิศ)\n\n> การกระจัดคือระยะจากจุดเริ่มถึงจุดสุดท้ายเป็นเส้นตรง เดินกลับมาที่เดิม การกระจัดเป็น 0", "example": true, "levels": ["sec"], "questions": [{"answer": 1, "choices": ["2 m/s", "0 m/s", "4 m/s", "200 m/s"], "explain": "กลับมาที่จุดเริ่ม การกระจัด = 0 ความเร็วเฉลี่ยจึงเป็น 0", "q": "วิ่งรอบสนามยาว 400 m ครบ 1 รอบใน 200 s ความเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 1, "choices": ["0 m/s", "2 m/s", "0.5 m/s", "400 m/s"], "explain": "400 ÷ 200 = 2 m/s", "q": "จากข้อที่แล้ว อัตราเร็วเฉลี่ยเท่าไร", "type": "mcq"}, {"answer": 2, "choices": ["มวล", "อัตราเร็ว", "ความเร็ว", "เวลา"], "explain": "ความเร็วมีทิศทาง", "q": "ข้อใดเป็นปริมาณเวกเตอร์", "type": "mcq"}], "subject": "phys", "title": "อัตราเร็วกับความเร็ว"}}, "meta": {"house": {"name": "Baan Suay"}}, "posts": {"ex-welcome": {"at": 1791680000000, "author": "b1", "date": "", "example": true, "pin": true, "text": "เว็บนี้ไว้เก็บแต้ม บทเรียน และเกมของบ้านเรา\n- ทำควิซในห้องเรียนได้แต้ม\n- เล่นเกมจริงบนโต๊ะ ใช้จอแค่ช่วยนับ", "title": "เปิดบ้านหกพี่น้องแล้ว", "type": "news"}}}, "force": ["games/taboo", "games/poker"]};
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -872,7 +1043,7 @@ const kindName=id=>(KINDS.find(k=>k[0]===id)||[0,'เกม'])[1];
 const POSTTYPES=[['news','ข่าวในบ้าน'],['plan','นัดหมาย'],['memory','ความทรงจำ'],['story','เรื่องเล่า']];
 const postType=id=>(POSTTYPES.find(k=>k[0]===id)||[0,'โพสต์'])[1];
 const SWATCHES=['#2F5BD3','#D23F77','#D9940F','#23935F','#7650CC','#E5612A','#0E8C9C','#8A6A3B','#C2416B','#4A5868'];
-const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['flip7','ตัวช่วย Flip 7'],['poker','ตัวช่วยโป๊กเกอร์'],['timer','จับเวลาและสุ่ม'],['taboo','ตัวช่วยคำต้องห้าม']];
+const HELPERS=[['','ไม่ใช้ตัวช่วย'],['bsgs','Baan Suay Game Show'],['uno','ตัวช่วย UNO'],['score','กระดานคะแนน'],['flip7','ตัวช่วย Flip 7'],['poker','ตัวช่วยโป๊กเกอร์'],['timer','จับเวลาและสุ่ม'],['taboo','ตัวช่วยคำต้องห้าม'],['catan','ตัวช่วย Catan']];
 
 function bandFits(levels,band){
   if(!levels||!levels.length||!band) return true;
@@ -1077,7 +1248,7 @@ const S={
   tab:LS.get('tab','home'), bro:LS.get('bro',false), lb:'month',
   learn:{subj:'all',kid:'all',open:null}, quiz:null, confirm:null,
   gameKind:'all', stickerKid:null, tool:LS.get('tool',null),
-  bs:LS.get('bs',null), uno:LS.get('uno',null), score:LS.get('score',null), flip:LS.get('flip',null), poker:LS.get('poker',null),
+  bs:LS.get('bs',null), uno:LS.get('uno',null), score:LS.get('score',null), flip:LS.get('flip',null), poker:LS.get('poker',null), catan:(c=>{if(c&&c.view)c.view.chat=false;if(c&&c.chat)delete c.chat;return c})(LS.get('catan',null)),
   timer:{total:60,left:60,run:false,endAt:0,done:false}, rnd:{pool:null,pick:null,spinning:false}, dice:{n:2,vals:[3,5]}, coin:null,
   draft:null
 };
@@ -1106,7 +1277,7 @@ async function xbRun(code){try{(new Function('H',code))(window.House)}catch(e){i
 async function xbSeal(obj){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},XB.key,new TextEncoder().encode(JSON.stringify(obj))));
   const out=new Uint8Array(12+ct.length);out.set(iv);out.set(ct,12);return b64e(out)}
 async function xbOpen(str){const raw=b64d(str);const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},XB.key,raw.slice(12));return JSON.parse(new TextDecoder().decode(pt))}
-const persist=()=>{LS.set('tab',S.tab);LS.set('bro',S.bro);LS.set('tool',S.tool);LS.set('bs',S.bs);LS.set('uno',S.uno);LS.set('score',S.score);LS.set('flip',S.flip);LS.set('poker',S.poker)};
+const persist=()=>{LS.set('tab',S.tab);LS.set('bro',S.bro);LS.set('tool',S.tool);LS.set('bs',S.bs);LS.set('uno',S.uno);LS.set('score',S.score);LS.set('flip',S.flip);LS.set('poker',S.poker);if(S.catan)try{ctSave()}catch(e){}};
 
 /* ---------- render ---------- */
 let pending=false;
@@ -1130,6 +1301,7 @@ function render(){
   v.innerHTML=(VIEWS[S.tab]||vHome)();
   if(S.tab==='words')waAfter();
   if(S.tab==='tools'&&S.tool==='timer')paintTimer();
+  try{ctAfter()}catch(e){}
   if(S.bro&&XB.state==='off'&&LS.get('xk',''))extLoad(false);
   if(EXT.after)try{EXT.after()}catch(e){}
 }
@@ -1520,6 +1692,7 @@ function vGames(){
 
 /* ---------- tools ---------- */
 const TOOL_LIST=[
+  {id:'catan',name:'ตัวช่วย Catan',desc:'กระดานบนจอตรงกับของจริง กดสร้างบ้าน ถนน เมือง ทอยเต๋า แจกการ์ด โจร แลก การ์ดพัฒนา นับแต้มให้ทุกอย่าง มีแชทถามกติกา'},
   {id:'bsgs',name:'Baan Suay Game Show',desc:'กระดานเกมโชว์แบบ Jeopardy เลือกหัวข้อและคะแนน มี Final Question'},
   {id:'uno',name:'ตัวช่วย UNO',desc:'บอกว่าตาใคร หมุนทางไหน ต้องจั่วกี่ใบ'},
   {id:'flip7',name:'Flip 7',desc:'นับแต้มแยกคน เรียงตามคะแนน ใส่หลายเลขแล้ว Enter ทีเดียว มีปุ่มเลข ×2 และ +15 ตั้งเป้าได้'},
@@ -1528,7 +1701,7 @@ const TOOL_LIST=[
   {id:'score',name:'กระดานคะแนน',desc:'เก็บแต้มบอร์ดเกม แบบแข่งกันหรือช่วยกัน'},
   {id:'timer',name:'จับเวลาและสุ่ม',desc:'นับถอยหลัง สุ่มคนเริ่ม ทอยลูกเต๋า โยนเหรียญ'}
 ];
-const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},flip7:{view:vFlip7},poker:{view:vPoker},timer:{view:vTimer},taboo:{view:vTaboo}};
+const TOOLS={bsgs:{view:vBsgs},uno:{view:vUno},score:{view:vScore},flip7:{view:vFlip7},poker:{view:vPoker},timer:{view:vTimer},taboo:{view:vTaboo},catan:{view:vCatan}};
 function vTools(){
   if(S.tool&&TOOLS[S.tool]){const t=TOOL_LIST.find(x=>x.id===S.tool)||TOOLS[S.tool];
     return `<section class="sec"><div class="sec-head"><div><button class="back" data-act="closeTool">← ตัวช่วยทั้งหมด</button><h2>${esc(t.name||'')}</h2></div></div>${TOOLS[S.tool].view()}</section>`}
@@ -3365,6 +3538,7 @@ function endInfo(){
   if(S.tab==='words')return waEndInfo()||cwEndInfo();
   if(S.tab!=='tools'||!S.tool)return null;
   switch(S.tool){
+    case 'catan':return ctEndInfo();
     case 'bsgs':{const s=S.bs;if(!s||s.phase==='setup'||s.phase==='end')return null;return {name:'Baan Suay Game Show',note:'ไปหน้าสรุปคะแนนเลย ช่องที่ยังไม่เปิดจะไม่ได้เล่น',go:()=>ACT.bsEndNow()}}
     case 'uno':{const u=S.uno;if(!u||u.phase!=='play')return null;return {name:'UNO',note:'ไปหน้าเลือกว่าใครลงไพ่ใบสุดท้าย',go:()=>ACT.unoEnd()}}
     case 'score':{const s=S.score;if(!s||s.phase!=='play')return null;
@@ -4011,10 +4185,783 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-05T09:45:00+07:00';
+const SITE_UPDATED='2026-11-07T13:44:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
+/* ---------- CATAN: คู่มือกติกาในเครื่อง (ใช้ตอบแชทเมื่อไม่มี AI และส่งให้ AI เป็นแหล่งอ้างอิง) ----------
+   ที่มา: คู่มือ Catan ฉบับภาษาอังกฤษพิมพ์ครั้งที่ 5 (Game Rules หน้า 2-5, Almanac หน้า 6-14, Game Overview หน้า 16) */
+const CT_KB=[
+{t:'ลำดับในแต่ละตา',k:['ลำดับ','ขั้นตอน','เฟส','phase','ในตาเรา','ตาหนึ่ง','1 ตา','turn','เทิร์น','ทำอะไรก่อน','ก่อนหลัง','ส่งต่อ','จบตา','ตาต่อไป'],
+ a:'- ทอยเต๋า 2 ลูก ทุกคนได้การ์ดตามเลขที่ออก (ถ้าออก 7 ทำขั้นโจรแทน)\n- แลกการ์ด กับคนอื่นหรือกับธนาคาร\n- สร้างถนน บ้าน เมือง หรือซื้อการ์ดพัฒนา\n- เล่นการ์ดพัฒนาได้ 1 ใบตอนไหนก็ได้ในตาตัวเอง แม้แต่ก่อนทอย\n- เสร็จแล้วส่งเต๋าให้คนทางซ้าย (วนตามเข็มนาฬิกา)\n> กติกาพื้นฐานให้แลกก่อนแล้วค่อยสร้าง แต่คู่มือแนะนำคนเล่นเป็นแล้วให้ "รวมขั้นแลกกับสร้าง" คือแลกกับสร้างสลับกันได้ เปิดได้ในตั้งค่า'},
+{t:'ทอยเต๋าและการได้การ์ด',k:['ทอย','ลูกเต๋า','เต๋า','ได้การ์ด','ได้อะไร','ผลิต','รายได้','production','roll','dice','ออกเลข'],
+ a:'- ทอยเต๋า 2 ลูก เอาเลขรวม ช่องที่มีเลขนั้นจะผลิต\n- ทุกคนที่มีบ้านติดช่องนั้นได้การ์ดของช่องนั้น บ้านละ 1 ใบ เมืองละ 2 ใบ ได้ทุกคน ไม่ใช่แค่คนทอย\n- บ้านหลังเดียวติดได้ถึง 3 ช่อง\n- ช่องที่มีโจรอยู่ไม่ผลิต\n- เนินดินให้อิฐ ป่าให้ไม้ ทุ่งหญ้าให้ขนแกะ ไร่ข้าวให้ข้าว ภูเขาให้แร่ ทะเลทรายไม่ให้อะไร'},
+{t:'ทอยได้ 7 และโจร',k:['7','เจ็ด','โจร','robber','ขโมย','ย้ายโจร'],
+ a:'ทอยได้ 7 ไม่มีใครได้การ์ด แล้วทำตามนี้\n1. ใครมีการ์ดทรัพยากรเกิน 7 ใบ (8 ใบขึ้นไป) ต้องเลือกทิ้งครึ่งหนึ่ง ปัดลง เช่น 9 ใบทิ้ง 4\n2. คนทอยต้องย้ายโจรไปช่องอื่น (ช่องไหนก็ได้รวมทะเลทราย) ห้ามวางช่องเดิม\n3. ขโมยการ์ด 1 ใบแบบสุ่มจากคนที่มีบ้านหรือเมืองติดช่องนั้น ถ้ามีหลายคนเลือกได้ว่าจะขโมยใคร\n- ช่องที่โจรอยู่ไม่ผลิตจนกว่าโจรจะย้ายออก'},
+{t:'ทิ้งการ์ดตอนทอยได้ 7',k:['ทิ้ง','ทิ้งการ์ด','discard','เกิน 7','8 ใบ','ครึ่ง'],
+ a:'- นับเฉพาะการ์ดทรัพยากร การ์ดพัฒนาไม่นับ\n- มี 8 ใบขึ้นไปต้องทิ้งครึ่งหนึ่ง ปัดลง (8→4, 9→4, 11→5)\n- คนที่ทิ้งเป็นคนเลือกเองว่าจะทิ้งใบไหน คืนเข้ากองธนาคาร\n- มี 7 ใบพอดีไม่ต้องทิ้ง'},
+{t:'ขโมยการ์ด',k:['ขโมย','steal','สุ่ม','หยิบการ์ด','ถามจำนวน','กี่ใบ'],
+ a:'- ขโมยได้จากคนที่มีบ้านหรือเมืองติดช่องที่วางโจร ถ้ามีหลายคนเลือกเหยื่อได้\n- คนโดนขโมยคว่ำการ์ดไว้ แล้วหยิบ 1 ใบแบบสุ่ม\n- ถ้าเขาไม่มีการ์ดเลย ก็ไม่ได้อะไร\n- ถามคนอื่นได้เสมอว่าถือการ์ดอยู่กี่ใบ และเขาต้องตอบตามจริง'},
+{t:'แลกการ์ดกับคนอื่น',k:['แลก','เทรด','trade','แลกกับคน','domestic','ขอการ์ด','ให้การ์ด','ยื่นข้อเสนอ','ต่อรอง'],
+ a:'- แลกได้ในตาตัวเองหลังทอยเต๋า กี่ครั้งก็ได้ อัตราเท่าไรก็ได้ที่ตกลงกัน\n- ทุกการแลกต้องมีคนที่ถึงตาอยู่ด้วย คนอื่นแลกกันเองไม่ได้\n- ตอนไม่ใช่ตาเรา เสนอแลกกับคนที่ถึงตาได้ แต่เขาเลือกว่าจะแลกไหม\n- ห้ามให้การ์ดฟรี ห้ามแลกการ์ดชนิดเดียวกัน (เช่น 3 แร่ แลก 1 แร่)\n- การ์ดพัฒนาแลกหรือให้ไม่ได้'},
+{t:'แลกกับธนาคาร (ทางทะเล)',k:['ธนาคาร','bank','4:1','4 ต่อ 1','3:1','2:1','ทะเล','maritime','แลกกับกอง'],
+ a:'- แลกได้เสมอ 4:1 คือคืนการ์ดชนิดเดียวกัน 4 ใบ เอาชนิดไหนก็ได้ 1 ใบ ไม่ต้องมีท่าเรือ\n- มีบ้านหรือเมืองติดท่าเรือ 3:1 แลกการ์ดชนิดเดียวกัน 3 ใบได้ 1 ใบ\n- ท่าเรือ 2:1 ใช้ได้แค่การ์ดชนิดที่วาดบนท่าเรือ ชนิดอื่นไม่ได้ลดเลย\n- แลกกับธนาคารได้เฉพาะตาตัวเอง'},
+{t:'ท่าเรือ',k:['ท่าเรือ','harbor','port','เรือ','ท่า'],
+ a:'- ต้องมีบ้านหรือเมืองบนจุดริมทะเลที่ติดท่าเรือนั้น ถึงจะใช้ท่าเรือได้\n- ท่าเรือ ? 3:1 ใช้กับการ์ดชนิดไหนก็ได้ ท่าเรือ 2:1 ใช้ได้แค่ชนิดของมัน\n- ถ้าเล่นแบบรวมขั้นแลกกับสร้าง ใช้ท่าเรือได้ในตาเดียวกับที่สร้างบ้านตรงนั้น'},
+{t:'สร้างถนน',k:['ถนน','road','สร้างถนน','ทาง','เส้นทาง'],
+ a:'- ใช้ อิฐ 1 + ไม้ 1\n- ต้องต่อจากถนน บ้าน หรือเมืองของตัวเอง\n- ทางหนึ่งมีถนนได้เส้นเดียว สร้างเลียบชายฝั่งได้\n- ต่อผ่านจุดที่มีบ้านของคนอื่นไม่ได้\n- มีถนนได้ไม่เกิน 15 เส้น\n- ถนนไม่ได้แต้ม ยกเว้นได้การ์ดถนนยาวที่สุด'},
+{t:'สร้างบ้าน',k:['บ้าน','settlement','สร้างบ้าน','หมู่บ้าน','นิคม'],
+ a:'- ใช้ อิฐ 1 + ไม้ 1 + ขนแกะ 1 + ข้าว 1\n- วางที่มุมช่อง (จุดที่ช่องมาชนกัน) ห้ามวางกลางขอบ\n- ต้องมีถนนของตัวเองมาถึงจุดนั้น\n- ต้องทำตามกฎระยะห่าง: 3 จุดที่ติดกันต้องว่างทั้งหมด\n- บ้านได้ 1 แต้ม มีได้ 5 หลัง\n- ถ้าสร้างครบ 5 หลังแล้ว ต้องอัปเป็นเมืองก่อน บ้านจะกลับมาให้สร้างใหม่ได้'},
+{t:'กฎระยะห่าง',k:['ระยะ','ห่าง','distance','ติดกัน','ใกล้','ชิด','ข้างๆ'],
+ a:'- สร้างบ้านได้เฉพาะจุดว่าง ที่ทั้ง 3 จุดข้าง ๆ ไม่มีบ้านหรือเมืองของใครเลย รวมถึงของตัวเองด้วย\n- พูดอีกแบบคือบ้านที่ใกล้ที่สุดต้องห่างอย่างน้อย 2 จุด\n- ใช้ตลอดเกม รวมตอนวางบ้านตั้งต้นด้วย'},
+{t:'สร้างเมือง',k:['เมือง','city','อัพ','อัป','upgrade','โบสถ์'],
+ a:'- ใช้ ข้าว 2 + แร่ 3\n- สร้างตรง ๆ ไม่ได้ ต้องอัปจากบ้านของตัวเอง เอาบ้านคืนกอง แล้ววางเมืองแทนที่เดิม\n- เมืองได้ 2 แต้ม และได้การ์ด 2 ใบเวลาช่องข้าง ๆ ผลิต\n- มีเมืองได้ 4 เมือง'},
+{t:'จำนวนชิ้นที่มี',k:['ชิ้น','เหลือ','หมด','กี่อัน','กี่หลัง','กี่เส้น','pieces','จำกัด'],
+ a:'- แต่ละคนมีถนน 15 เส้น บ้าน 5 หลัง เมือง 4 เมือง สร้างเกินนี้ไม่ได้\n- ถนนกับเมืองที่สร้างแล้วอยู่บนกระดานจนจบเกม\n- บ้านที่อัปเป็นเมืองกลับมาใช้ใหม่ได้'},
+{t:'ซื้อการ์ดพัฒนา',k:['การ์ดพัฒนา','ซื้อการ์ด','development','dev','ซื้อ'],
+ a:'- ใช้ แร่ 1 + ขนแกะ 1 + ข้าว 1 แล้วหยิบใบบนสุดของกอง\n- เก็บไว้ในมือแบบคว่ำ ไม่ให้คนอื่นเห็น\n- มี 3 แบบ: อัศวิน การ์ดพัฒนา (สร้างถนน ปีอุดมสมบูรณ์ ผูกขาด) และการ์ดแต้ม\n- กองหมดแล้วซื้อไม่ได้'},
+{t:'เล่นการ์ดพัฒนา',k:['เล่นการ์ด','ใช้การ์ด','play','กี่ใบต่อตา','ตาเดียวกับที่ซื้อ','ซื้อแล้วเล่น'],
+ a:'- เล่นได้ตาละ 1 ใบ (อัศวิน หรือการ์ดพัฒนา) ตอนไหนก็ได้ในตาตัวเอง แม้แต่ก่อนทอย\n- ห้ามเล่นใบที่เพิ่งซื้อในตานั้น\n- ยกเว้นการ์ดแต้ม ถ้าซื้อมาแล้วทำให้ครบ 10 แต้ม เปิดชนะได้ทันที\n- การ์ดพัฒนาเล่นแล้วออกจากเกม ส่วนอัศวินวางหงายไว้หน้าตัวเอง'},
+{t:'การ์ดอัศวิน',k:['อัศวิน','knight','ทหาร','soldier'],
+ a:'- เล่นแล้วต้องย้ายโจรทันที ไปช่องอื่น (ห้ามช่องเดิม) แล้วขโมย 1 ใบจากคนที่มีบ้านติดช่องนั้น\n- ไม่ต้องทิ้งการ์ดแบบตอนทอยได้ 7\n- วางการ์ดหงายไว้หน้าตัวเอง นับไปทำกองทัพใหญ่ที่สุด'},
+{t:'กองทัพใหญ่ที่สุด',k:['กองทัพ','largest army','army','ทัพ'],
+ a:'- คนแรกที่มีอัศวินหงายครบ 3 ใบ ได้การ์ดกองทัพใหญ่ที่สุด 2 แต้ม\n- ถ้ามีคนเล่นอัศวินมากกว่าคนถือ (มากกว่า ไม่ใช่เท่ากัน) เขาเอาการ์ดไปทันทีพร้อม 2 แต้ม'},
+{t:'ถนนยาวที่สุด',k:['ถนนยาว','ยาวที่สุด','longest','ถนนยาวสุด','ตัดถนน','ขาด'],
+ a:'- คนแรกที่มีถนนต่อกันอย่างน้อย 5 เส้น ได้การ์ดถนนยาวที่สุด 2 แต้ม\n- นับเส้นยาวที่สุดเส้นเดียว ทางแยกไม่นับ\n- ถ้ามีคนสร้างได้ยาวกว่าคนถือ เขาเอาการ์ดไปทันที (เสียแต้ม 2 ได้แต้ม 2 รวมต่างกัน 4)\n- สร้างบ้านบนจุดว่างกลางถนนของคนอื่นได้ ถนนเขาจะขาดเป็นสองท่อน\n- ถ้าคนถือโดนตัดแต่ยังเสมอคนอื่น ยังถือต่อ\n- ถ้าคนถือไม่ยาวสุดแล้ว และมีหลายคนเสมอกัน (หรือไม่มีใครถึง 5) วางการ์ดพักไว้ จนกว่าจะมีคนเดียวที่ยาวสุด'},
+{t:'การ์ดสร้างถนน',k:['road building','สร้างถนนฟรี','ถนนฟรี','ถนน 2'],
+ a:'- วางถนนฟรี 2 เส้นทันที ตามกติกาการสร้างถนนปกติ'},
+{t:'การ์ดปีอุดมสมบูรณ์',k:['year of plenty','ปีอุดม','อุดมสมบูรณ์','เอาการ์ด 2'],
+ a:'- หยิบการ์ดทรัพยากรอะไรก็ได้ 2 ใบจากธนาคาร (ชนิดเดียวกันหรือต่างกันก็ได้) ใช้สร้างในตานั้นได้เลย'},
+{t:'การ์ดผูกขาด',k:['monopoly','ผูกขาด','โมโนโพลี'],
+ a:'- บอกชื่อทรัพยากร 1 ชนิด ทุกคนต้องให้การ์ดชนิดนั้นทั้งหมดที่มีในมือ ใครไม่มีก็ไม่ต้องให้'},
+{t:'การ์ดแต้ม',k:['การ์ดแต้ม','victory point card','vp card','library','university','market','chapel','great hall','แต้มลับ'],
+ a:'- ใบละ 1 แต้ม เก็บคว่ำไว้ ไม่ต้องเล่น\n- เปิดได้ในตาตัวเองเมื่อแต้มรวมครบ 10 เพื่อชนะ หรือเปิดหลังมีคนอื่นชนะ\n- เปิดกี่ใบก็ได้ในตาเดียว รวมตาที่เพิ่งซื้อมาด้วย'},
+{t:'แต้มและการชนะ',k:['แต้ม','ชนะ','win','10','victory','vp','จบเกม','กี่แต้ม'],
+ a:'- บ้าน 1 แต้ม เมือง 2 แต้ม ถนนยาวที่สุด 2 แต้ม กองทัพใหญ่ที่สุด 2 แต้ม การ์ดแต้มใบละ 1\n- เริ่มเกมทุกคนมี 2 แต้มจากบ้าน 2 หลัง\n- คนแรกที่มี 10 แต้มขึ้นไปในตาตัวเองชนะทันที\n- ถ้าครบ 10 ตอนตาคนอื่น ต้องรอถึงตาตัวเองก่อนถึงจะชนะ'},
+{t:'วางบ้านตั้งต้น',k:['ตั้งต้น','เริ่มเกม','วางบ้านแรก','setup','รอบแรก','รอบสอง','ใครเริ่ม','เริ่มก่อน','งู'],
+ a:'- ทุกคนทอยเต๋า คนได้สูงสุดเริ่ม (แบบผู้เริ่มต้นให้คนอายุมากสุดเริ่ม)\n- รอบ 1: คนเริ่มวางบ้าน 1 หลัง + ถนน 1 เส้นติดบ้าน แล้ววนตามเข็มนาฬิกา\n- รอบ 2: คนสุดท้ายของรอบแรกวางก่อน แล้ววนทวนเข็มนาฬิกา คนเริ่มจึงวางหลังที่ 2 เป็นคนสุดท้าย\n- บ้านหลังที่ 2 ไม่ต้องต่อกับหลังแรก ถนนเส้นที่ 2 ต้องติดบ้านหลังที่ 2\n- ทุกครั้งต้องทำตามกฎระยะห่าง\n- วางบ้านหลังที่ 2 แล้วรับการ์ดทันที ช่องละ 1 ใบจากทุกช่องที่ติดบ้านหลังนั้น\n- คนเริ่ม (คนวางหลังที่ 2 คนสุดท้าย) ทอยเต๋าเริ่มตาแรก'},
+{t:'การ์ดในธนาคารไม่พอ',k:['ไม่พอ','การ์ดหมด','ธนาคารหมด','supply','กองหมด'],
+ a:'- ถ้าการ์ดชนิดไหนในธนาคารไม่พอแจกทุกคนที่ควรได้ ตานั้นไม่มีใครได้การ์ดชนิดนั้นเลย\n- ยกเว้นถ้ามีคนเดียวที่ได้ชนิดนั้น ให้เขาเท่าที่เหลือในกอง\n- การ์ดชนิดอื่นแจกตามปกติ'},
+{t:'ทะเลทราย',k:['ทะเลทราย','desert'],
+ a:'- ช่องเดียวที่ไม่ผลิตอะไรและไม่มีเลข\n- โจรเริ่มเกมอยู่ที่ทะเลทราย และย้ายโจรกลับมาทะเลทรายได้'},
+{t:'เลขบนช่องและโอกาสออก',k:['เลข','จุด','pips','โอกาส','บ่อย','6','8','2','12','เลขแดง'],
+ a:'- เลขมี 2 ถึง 12 ไม่มี 7 มี 2 กับ 12 อย่างละอัน ที่เหลืออย่างละ 2 อัน\n- จุดใต้เลขบอกว่ามีกี่แบบที่ทอยได้เลขนั้น จุดยิ่งเยอะยิ่งออกบ่อย\n- โอกาสตามคู่มือ: 2 กับ 12 = 3% · 3 กับ 11 = 6% · 4 กับ 10 = 8% · 5 กับ 9 = 11% · 6 กับ 8 = 14% · 7 = 17%\n- ถ้าวางเลขแบบสุ่ม เลขแดง (6 กับ 8) ต้องไม่อยู่ติดกัน'},
+{t:'ชายฝั่ง',k:['ชายฝั่ง','ริมทะเล','coast','ขอบกระดาน'],
+ a:'- ช่องที่ติดทะเลเรียกว่าชายฝั่ง สร้างถนนเลียบชายฝั่งได้\n- สร้างบ้านและเมืองริมทะเลได้ แต่จุดนั้นติดแค่ 1 หรือ 2 ช่อง'},
+{t:'จุดและทาง',k:['จุด','มุม','intersection','ขอบ','path','วางตรงไหนได้'],
+ a:'- บ้านและเมืองวางที่จุด (มุมที่ช่องมาชนกัน) เท่านั้น\n- ถนนวางที่ทาง (ขอบระหว่างช่อง หรือระหว่างช่องกับทะเล) ทางละ 1 เส้น\n- บ้านได้การ์ดจากทุกช่องที่ติดจุดนั้น'},
+{t:'วางกระดาน',k:['จัดกระดาน','วางกระดาน','สุ่มกระดาน','board','map','ผู้เริ่มต้น','beginner'],
+ a:'- เกมแรกคู่มือแนะนำกระดานผู้เริ่มต้น (Illustration A) วางบ้านและถนนตามรูป แล้วรับการ์ดจากบ้านที่มีดาว\n- เล่น 3 คน ไม่ใช้ตำแหน่งสีแดง\n- แบบสุ่ม: สุ่มวางช่อง สุ่มวางท่าเรือ แล้ววางเลขตามตัวอักษรวนทวนเข็มเข้าหาตรงกลาง หรือสุ่มเลขแต่ห้ามให้ 6 กับ 8 อยู่ติดกัน\n- ทะเลทรายไม่มีเลข'}
+];
+/* คำที่แปลว่าขอคำแนะนำ ไม่ใช่ถามกติกา */
+const CT_ADV=/(ควร|น่าจะ|ดีไหม|ดีมั้ย|ดีมั๊ย|ดีมะ|ดีป่ะ|ดีปะ|ดีกว่า|ดีสุด|ดีที่สุด|ไหนดี|ไรดี|ไงดี|อะไรดี|ตรงไหนดี|ยังไงดี|เอาไงดี|แนะนำ|กลยุทธ์|กลยุทธ|เทคนิค|ทริค|ทริก|เคล็ดลับ|คุ้ม|ช่วยคิด|ช่วยเลือก|เลือกให้|เล่นยังไงถึงชนะ|ทำยังไงถึงชนะ|ได้เปรียบ|เสียเปรียบ|ใครจะชนะ|strategy|should|best|better|recommend|advice|advise|tips?\b|worth|good move|opinion)/i;
+const CT_NOW=/(ทำอะไรได้|ทำไรได้|ทำอะไรต่อ|ทำไรต่อ|ต้องทำอะไร|ต้องทำไร|ขั้นต่อไป|ตอนนี้ต้อง|ตอนนี้ทำ|ตอนนี้ได้|what can i|what now|my options)/i;
+
+/* ---------- CATAN: ตัวช่วยเล่น Catan ----------
+   เล่นบนกระดานจริง จอช่วยจำทุกอย่าง: กระดาน บ้าน ถนน การ์ดในมือ ธนาคาร การ์ดพัฒนา โจร แต้ม ถนนยาว กองทัพ
+   กระดาน 19 ช่อง เก็บใน C.hex[i]={t,n} เรียงแถว 3-4-5-4-3 จากบนลงล่าง ซ้ายไปขวา (ช่องที่ 1-19)
+   จุดวางบ้าน 54 จุด (node) และทาง 72 เส้น (edge) คำนวณจากเรขาคณิตครั้งเดียวใน CTG
+   แชทถามกติกา: ในเวอร์ชัน artifact ใช้ Claude (capability sample) ถ้าไม่มี ใช้คู่มือในเครื่อง CT_KB
+   ทั้งสองแบบตอบเฉพาะกติกา ไม่ให้คำแนะนำการเล่น */
+const CT_RES=['b','l','w','g','o'];
+const CT_RN={b:'อิฐ',l:'ไม้',w:'ขนแกะ',g:'ข้าว',o:'แร่'};
+const CT_RE={b:'🧱',l:'🌲',w:'🐑',g:'🌾',o:'🪨'};
+const CT_RC={b:'#B4532E',l:'#2E7639',w:'#78B23F',g:'#D7A62A',o:'#6E7482'};
+const CT_T={H:{n:'เนินดิน',r:'b',c:'#C46A3F'},F:{n:'ป่า',r:'l',c:'#2F7A3A'},P:{n:'ทุ่งหญ้า',r:'w',c:'#93C552'},W:{n:'ไร่ข้าว',r:'g',c:'#E4BA3A'},M:{n:'ภูเขา',r:'o',c:'#8B909D'},D:{n:'ทะเลทราย',r:null,c:'#E6D7A8'}};
+const CT_TK=['H','F','P','W','M','D'];
+const CT_TCOUNT={H:3,F:4,P:4,W:4,M:3,D:1};
+const CT_NUMS=[2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
+const CT_PC={red:{n:'แดง',c:'#C9352B'},blue:{n:'น้ำเงิน',c:'#2A5EC4'},white:{n:'ขาว',c:'#F4F4F1'},orange:{n:'ส้ม',c:'#EA7A26'}};
+const CT_PCK=['red','blue','white','orange'];
+const CT_DEV={k:{n:'อัศวิน',en:'Knight',c:14,i:'⚔️'},v:{n:'การ์ดแต้ม',en:'Victory Point',c:5,i:'⭐'},rb:{n:'สร้างถนน',en:'Road Building',c:2,i:'🛣️'},yp:{n:'ปีอุดมสมบูรณ์',en:'Year of Plenty',c:2,i:'🎁'},mo:{n:'ผูกขาด',en:'Monopoly',c:2,i:'💰'}};
+const CT_DEVK=['k','v','rb','yp','mo'];
+const CT_COST={road:{b:1,l:1},set:{b:1,l:1,w:1,g:1},city:{g:2,o:3},dev:{o:1,w:1,g:1}};
+const CT_BN={road:'ถนน',set:'บ้าน',city:'เมือง',dev:'การ์ดพัฒนา'};
+const CT_SIDES=[['b','ล่าง'],['l','ซ้าย'],['t','บน'],['r','ขวา']];
+const CT_SN=['NE','E','SE','SW','W','NW'];
+const CT_PORTK=['3','b','l','w','g','o'];
+const CT_ROWS=[3,4,5,4,3];
+const CT_PIPS=n=>n?6-Math.abs(7-n):0;
+const CT_DICE='⚀⚁⚂⚃⚄⚅';
+
+/* geometry: pointy-top hexes of size 1, centre of the island at 0,0 */
+const CTG=(()=>{
+  const hx=[];for(let r=-2;r<=2;r++)for(let q=Math.max(-2,-2-r);q<=Math.min(2,2-r);q++)hx.push({q,r,x:Math.sqrt(3)*(q+r/2),y:1.5*r,c:[],e:[]});
+  const N=[],E=[],nk={},ek={};
+  const node=(x,y)=>{const k=Math.round(x*1000)+'_'+Math.round(y*1000);if(nk[k]==null){nk[k]=N.length;N.push({x,y,h:[],e:[],n:[]})}return nk[k]};
+  hx.forEach((h,i)=>{for(let k=0;k<6;k++){const a=(60*k-90)*Math.PI/180;const id=node(h.x+Math.cos(a),h.y+Math.sin(a));h.c.push(id);N[id].h.push(i)}});
+  hx.forEach((h,i)=>{for(let k=0;k<6;k++){const a=h.c[k],b=h.c[(k+1)%6];const key=Math.min(a,b)+'_'+Math.max(a,b);let id=ek[key];
+    if(id==null){id=ek[key]=E.length;E.push({a,b,h:[]});N[a].e.push(id);N[b].e.push(id);N[a].n.push(b);N[b].n.push(a)}E[id].h.push(i);h.e.push(id)}});
+  const adj=hx.map(()=>[]);E.forEach(e=>{if(e.h.length===2){adj[e.h[0]].push(e.h[1]);adj[e.h[1]].push(e.h[0])}});
+  const mid=i=>{const e=E[i];return {x:(N[e.a].x+N[e.b].x)/2,y:(N[e.a].y+N[e.b].y)/2}};
+  const ang=i=>{const m=mid(i);return ((Math.atan2(m.y,m.x)+2.4)+4*Math.PI)%(2*Math.PI)};
+  const coast=E.map((e,i)=>i).filter(i=>E[i].h.length===1).sort((a,b)=>ang(a)-ang(b));
+  return {hx,N,E,adj,mid,coast};
+})();
+const CT_STD_PORTS=()=>{const idx=[0,3,6,10,13,16,20,23,26],ty=['3','g','o','3','w','3','3','b','l'];const o={};idx.forEach((k,j)=>o[CTG.coast[k]]=ty[j]);return o};
+/* กระดานผู้เริ่มต้นตามคู่มือ (Illustration A) */
+const CT_BEGIN='M10 P2 F9 W12 H6 P4 H10 W9 F11 D F3 M8 F8 M3 W4 P5 H5 W6 P11';
+const CT_BEGIN_PCS={red:[[0,1,4],[7,8,12]],orange:[[2,5,6],[13,14,17]],white:[[10,11,15],[3,4,8]],blue:[[14,15,18],[12,13,16]]}; // [บ้านที่ 1, บ้านมีดาว]
+const ctNodeOf=hs=>{const k=hs.slice().sort((a,b)=>a-b).join();return CTG.N.findIndex(n=>n.h.slice().sort((a,b)=>a-b).join()===k)};
+
+/* ---------- state ---------- */
+function ctNew(keep){return {v:1,phase:'setup',players:keep?keep.players.map(p=>ctBare(p)):[],opts:keep?keep.opts:{combine:false,open:false,target:10,seats:true},
+  hex:keep?keep.hex:null,ports:keep?keep.ports:CT_STD_PORTS(),robber:null,nodes:{},edges:{},bank:{b:19,l:19,w:19,g:19,o:19},deck:{k:14,v:5,rb:2,yp:2,mo:2},
+  lr:null,la:null,first:keep?keep.first:null,order:[],T:null,place:null,rolls:{},log:[],hist:[],
+  view:{rot:keep?keep.view.rot:0,full:true,ed:'hex',sel:0,psel:null,peek:{},chat:false,fix:null,fr:null},award:2,saved:false,win:null,back:null}}
+const ctBare=p=>{const o=p.id?{id:p.id}:{name:p.name,code:p.code,color:p.color};o.pc=p.pc;o.side=p.side;return o};
+const ct=()=>{if(!S.catan||S.catan.v!==1)S.catan=ctNew();if(S.catan.chat)delete S.catan.chat;return S.catan};
+/* แชทถามกติกา: อยู่ในหน่วยความจำเท่านั้น ไม่บันทึกที่ไหนเลย ปิดหน้าต่างแชทหรือปิดเว็บแล้วหายถาวร */
+let CT_CHAT=[];
+const ctSave=()=>{try{const c=S.catan;const ch=c&&c.view&&c.view.chat;if(ch)c.view.chat=false;LS.set('catan',c);if(ch)c.view.chat=true}catch(e){}};
+const ctName=p=>playerName(p);
+const ctCol=p=>(CT_PC[p.pc]||CT_PC.red).c;
+const ctCards=p=>CT_RES.reduce((a,r)=>a+(p.res[r]||0),0);
+const ctDevN=p=>CT_DEVK.reduce((a,k)=>a+(p.dev[k]||0)+(p.nd[k]||0),0);
+const ctCur=C=>C.phase==='place'?C.place.seq[C.place.i]:C.T?C.T.p:null;
+function ctPieces(C,i){let s=0,c=0,r=0;for(const k in C.nodes){const x=C.nodes[k];if(x.p===i){if(x.c)c++;else s++}}for(const k in C.edges)if(C.edges[k]===i)r++;return {s,c,r}}
+function ctVP(C,i,hid){const p=C.players[i];const pc=ctPieces(C,i);let v=pc.s+2*pc.c+(C.lr===i?2:0)+(C.la===i?2:0);if(hid)v+=(p.dev.v||0)+(p.nd.v||0);return v}
+const ctCan=(p,cost)=>Object.keys(cost).every(r=>(p.res[r]||0)>=cost[r]);
+const ctMiss=(p,cost)=>Object.keys(cost).filter(r=>(p.res[r]||0)<cost[r]).map(r=>CT_RN[r]+' '+(cost[r]-(p.res[r]||0))).join(', ');
+const ctCostH=cost=>Object.keys(cost).map(r=>CT_RE[r].repeat(cost[r])).join('');
+function ctPay(C,p,cost){Object.keys(cost).forEach(r=>{p.res[r]-=cost[r];C.bank[r]+=cost[r]})}
+function ctTake(C,p,r,n){n=Math.min(n,C.bank[r]);p.res[r]+=n;C.bank[r]-=n;return n}
+function ctLog(C,t){C.log.push({t,n:C.T?C.T.n:0,at:Date.now()});if(C.log.length>500)C.log.shift()}
+function ctSnap(C){const o={_ln:C.log.length};Object.keys(C).forEach(k=>{if(k!=='hist'&&k!=='view'&&k!=='log')o[k]=C[k]});C.hist.push(JSON.stringify(o));if(C.hist.length>60)C.hist.shift()}
+const ctPN=(C,i)=>ctName(C.players[i]);
+const ctResTxt=o=>CT_RES.filter(r=>o[r]).map(r=>CT_RE[r]+(o[r]>1?'×'+o[r]:'')).join(' ');
+function ctTurn(p,n){return {p,n,rolled:false,roll:null,dice:null,dev:false,built:false,stage:null,prod:null,disc:null,dsel:{},mode:null,panel:null,rb:0,tr:null,bk:{},vic:null,cand:null,yp:{},mo:null,knPre:false}}
+function ctPortsOf(C,i){const has={};Object.keys(C.ports).forEach(e=>{const E=CTG.E[e];[E.a,E.b].forEach(n=>{const o=C.nodes[n];if(o&&o.p===i)has[C.ports[e]]=1})});return has}
+const ctRatio=(C,i,r)=>{const h=ctPortsOf(C,i);return h[r]?2:h['3']?3:4};
+
+/* ---------- rules: legality ---------- */
+const ctNodeFree=(C,n)=>!C.nodes[n]&&!CTG.N[n].n.some(m=>C.nodes[m]);
+const ctSetOK=(C,i,n,setup)=>ctNodeFree(C,n)&&(setup||CTG.N[n].e.some(e=>C.edges[e]===i));
+function ctRoadOK(C,i,e,from){
+  if(C.edges[e]!=null)return false;const E=CTG.E[e];
+  if(from!=null)return E.a===from||E.b===from;
+  return [E.a,E.b].some(n=>{const o=C.nodes[n];if(o)return o.p===i;return CTG.N[n].e.some(x=>x!==e&&C.edges[x]===i)});
+}
+const ctCityOK=(C,i,n)=>{const o=C.nodes[n];return !!(o&&o.p===i&&!o.c)};
+function ctLegal(C){
+  const cur=ctCur(C);const out={nodes:[],edges:[],hex:false};if(cur==null)return out;
+  if(C.view.fix){const k=C.view.fix.k;if(k==='set'||k==='city'||k==='del')out.nodes=CTG.N.map((n,i)=>i);if(k==='road'||k==='del')out.edges=CTG.E.map((e,i)=>i);if(k==='robber')out.hex=true;return out}
+  if(C.phase==='place'){const P=C.place;if(P.step==='set')out.nodes=CTG.N.map((n,i)=>i).filter(n=>ctSetOK(C,cur,n,true));else out.edges=CTG.E.map((e,i)=>i).filter(e=>ctRoadOK(C,cur,e,P.last));return out}
+  const T=C.T;if(!T)return out;
+  if(T.stage==='robber'){out.hex=true;return out}
+  if(T.stage==='rb'||T.mode==='road')out.edges=CTG.E.map((e,i)=>i).filter(e=>ctRoadOK(C,cur,e));
+  if(T.mode==='set')out.nodes=CTG.N.map((n,i)=>i).filter(n=>ctSetOK(C,cur,n,false));
+  if(T.mode==='city')out.nodes=CTG.N.map((n,i)=>i).filter(n=>ctCityOK(C,cur,n));
+  return out;
+}
+function ctRoadLen(C,i){
+  const my=Object.keys(C.edges).filter(e=>C.edges[e]===i).map(Number);if(!my.length)return 0;const set=new Set(my);let best=0;
+  const blocked=n=>{const o=C.nodes[n];return !!(o&&o.p!==i)};
+  const dfs=(n,used,len)=>{if(len>best)best=len;if(len&&blocked(n))return;for(const e of CTG.N[n].e){if(!set.has(e)||used.has(e))continue;used.add(e);const E=CTG.E[e];dfs(E.a===n?E.b:E.a,used,len+1);used.delete(e)}};
+  const st=new Set();my.forEach(e=>{st.add(CTG.E[e].a);st.add(CTG.E[e].b)});st.forEach(n=>dfs(n,new Set(),0));return best;
+}
+function ctUpdLR(C){
+  const L=C.players.map((p,i)=>ctRoadLen(C,i));const mx=Math.max(0,...L);const old=C.lr;
+  if(mx<5)C.lr=null;else if(C.lr!=null&&L[C.lr]===mx){}else{const c=L.map((l,i)=>l===mx?i:-1).filter(i=>i>=0);C.lr=c.length===1?c[0]:null}
+  if(C.lr!==old){if(C.lr!=null)ctLog(C,'🛣️ '+ctPN(C,C.lr)+' ได้การ์ดถนนยาวที่สุด ('+L[C.lr]+' เส้น) +2 แต้ม'+(old!=null?' จาก '+ctPN(C,old):''));else ctLog(C,'🛣️ การ์ดถนนยาวที่สุดถูกพักไว้ (ไม่มีคนเดียวที่ยาวที่สุด)');
+    toast(C.lr!=null?'🛣️ '+ctPN(C,C.lr)+' ได้ถนนยาวที่สุด +2 แต้ม':'การ์ดถนนยาวที่สุดถูกพักไว้')}
+}
+function ctUpdLA(C,i){const k=C.players[i].kn;if(k>=3&&(C.la==null||(C.la!==i&&k>C.players[C.la].kn))){const old=C.la;C.la=i;ctLog(C,'⚔️ '+ctPN(C,i)+' ได้การ์ดกองทัพใหญ่ที่สุด ('+k+' อัศวิน) +2 แต้ม'+(old!=null?' จาก '+ctPN(C,old):''));toast('⚔️ '+ctPN(C,i)+' ได้กองทัพใหญ่ที่สุด +2 แต้ม')}}
+
+/* ---------- board ---------- */
+const ctEmptyHex=()=>Array.from({length:19},()=>({t:null,n:null}));
+function ctParseHexes(str){const tk=String(str).trim().split(/[\s/,]+/).filter(Boolean);if(tk.length!==19)return null;
+  const out=[];for(const t of tk){const m=t.match(/^([HFPWMD])(\d{1,2})?$/i);if(!m)return null;const ty=m[1].toUpperCase();const n=m[2]?+m[2]:null;if(n!=null&&(n<2||n>12||n===7))return null;out.push({t:ty,n:ty==='D'?null:n})}return out}
+function ctParseCode(code){
+  const s=String(code||'').replace(/catan\d*:?/i,'').trim();if(!s)return null;const [hp,pp]=s.split('|');const hex=ctParseHexes(hp);if(!hex)return null;
+  let ports=null;if(pp!=null&&pp.trim()){ports={};for(const t of pp.trim().split(/[\s,]+/).filter(Boolean)){const m=t.match(/^(\d{1,2})(NE|E|SE|SW|W|NW)([3blwgo])$/i);if(!m)return null;
+    const e=ctPortEdge(+m[1]-1,CT_SN.indexOf(m[2].toUpperCase()));if(e==null)return null;ports[e]=m[3].toLowerCase()}}
+  return {hex,ports};
+}
+function ctPortEdge(h,k){const H=CTG.hx[h];if(!H||k<0)return null;const e=H.e[k];return CTG.E[e].h.length===1?e:null}
+function ctCode(C){const rows=[];let i=0;CT_ROWS.forEach(n=>{rows.push(C.hex.slice(i,i+n).map(h=>(h.t||'?')+(h.n||'')).join(' '));i+=n});
+  const ps=Object.keys(C.ports).map(e=>{const E=CTG.E[e];const h=E.h[0];return (h+1)+CT_SN[CTG.hx[h].e.indexOf(+e)]+C.ports[e]});
+  return 'CATAN1 '+rows.join(' / ')+(ps.length?' | '+ps.join(' '):'')}
+function ctRandBoard(){const ts=shuffle(CT_TK.flatMap(t=>Array(CT_TCOUNT[t]).fill(t)));
+  for(let tries=0;tries<800;tries++){const ns=shuffle(CT_NUMS);let j=0;const hex=ts.map(t=>({t,n:t==='D'?null:ns[j++]}));
+    const bad=hex.some((h,i)=>(h.n===6||h.n===8)&&CTG.adj[i].some(k=>hex[k].n===6||hex[k].n===8));if(!bad)return hex}
+  return ts.map(t=>({t,n:null}))}
+function ctBoardCheck(C){
+  const errs=[],warns=[];const H=C.hex||[];const cnt={},nc={};
+  H.forEach((h,i)=>{if(!h.t){errs.push('ช่อง '+(i+1)+' ยังไม่ได้เลือกพื้นที่');return}cnt[h.t]=(cnt[h.t]||0)+1;if(h.t!=='D'&&!h.n)errs.push('ช่อง '+(i+1)+' ('+CT_T[h.t].n+') ยังไม่มีเลข');if(h.n)nc[h.n]=(nc[h.n]||0)+1});
+  if(errs.length>4)errs.splice(4,errs.length-4,'…และอีก '+(errs.length-4)+' ช่อง');
+  CT_TK.forEach(t=>{if((cnt[t]||0)!==CT_TCOUNT[t]&&H.every(h=>h.t))warns.push(CT_T[t].n+' มี '+(cnt[t]||0)+' ช่อง (กล่องปกติมี '+CT_TCOUNT[t]+')')});
+  if(!(cnt.D>=1)&&H.every(h=>h.t))warns.push('ไม่มีทะเลทราย โจรจะเริ่มที่ช่องกลาง');
+  [2,3,4,5,6,8,9,10,11,12].forEach(n=>{const want=n===2||n===12?1:2;if(H.every(h=>h.t==='D'||h.n)&&(nc[n]||0)!==want)warns.push('เลข '+n+' มี '+(nc[n]||0)+' อัน (กล่องปกติมี '+want+')')});
+  if(H.some((h,i)=>(h.n===6||h.n===8)&&CTG.adj[i].some(k=>H[k].n===6||H[k].n===8)))warns.push('มีเลขแดง (6 หรือ 8) อยู่ติดกัน คู่มือบอกว่าถ้าวางเลขแบบสุ่ม เลขแดงห้ามติดกัน');
+  return {ok:!errs.length,errs,warns};
+}
+
+/* ---------- photo + AI (artifact only) ---------- */
+const CT_AI={s:null,img:false,tried:false,busy:false};
+function ctAIInit(){if(CT_AI.tried)return;CT_AI.tried=true;if(!(window.claude&&typeof window.claude.use==='function'))return;
+  Promise.resolve(window.claude.use('sample')).then(async s=>{if(!s)return;CT_AI.s=s;try{const l=await s.limits();CT_AI.img=!!(l&&l.images)}catch(e){}if(S.tab==='tools'&&S.tool==='catan')render()}).catch(()=>{})}
+function ctPhoto(){return LS.get('catanPhoto','')}
+function ctLoadPhoto(file){if(!file)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const m=1400,sc=Math.min(1,m/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*sc);cv.height=Math.round(im.height*sc);
+  cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);const url=cv.toDataURL('image/jpeg',.82);CT_TMP_PHOTO=url;try{LS.set('catanPhoto',url)}catch(e){}
+  toast('ได้รูปกระดานแล้ว');render()};im.src=fr.result};fr.readAsDataURL(file)}
+let CT_TMP_PHOTO='';
+async function ctAIRead(){const C=ct();const url=CT_TMP_PHOTO||ctPhoto();if(!url||!CT_AI.s||CT_AI.busy)return;CT_AI.busy=true;render();
+  try{const blob=await (await fetch(url)).blob();
+    const r=await CT_AI.s(`This is a photo of a CATAN base-game board (19 terrain hexes). Read every hex.
+Orient the island so its hex rows run horizontally with 3,4,5,4,3 hexes from top to bottom; of the two orientations that do this, pick the one closest to the photo's own "up".
+For each hex give a terrain letter + its number token: H=hills (red-brown clay, gives brick), F=forest (dark green trees, lumber), P=pasture (light green grass with sheep, wool), W=fields (yellow wheat, grain), M=mountains (grey rock, ore), D=desert (sand, no number, write just D).
+Tokens may be upside down. 6 and 9 are told apart by the underline/dot under the number and by colour: 6 and 8 are printed RED. Pips: 6/8=5 dots, 5/9=4, 4/10=3, 3/11=2, 2/12=1.
+A normal box has H3 F4 P4 W4 M3 D1 and numbers 2 and 12 once, 3,4,5,6,8,9,10,11 twice each.
+Also list the harbours you can see: the hex it touches (r = row 1-5, c = column from the left starting at 1), the side of that hex facing the sea (NE,E,SE,SW,W,NW) and the type: "3" for a ? 3:1 harbour, or b (brick), l (lumber), w (wool), g (grain), o (ore) for a 2:1 harbour.
+Reply with ONLY JSON: {"rows":[["W5","P6","W3"],["..4 items"],["..5 items"],["..4 items"],["..3 items"]],"ports":[{"r":1,"c":1,"side":"NW","type":"3"}],"note":"one short sentence in Thai naming any hex you are unsure of, or empty"}`,{images:[blob]});
+    const t=r.text||'';const j=JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1));
+    const flat=(j.rows||[]).flat();const hex=ctParseHexes(flat.join(' '));if(!hex)throw new Error('อ่านช่องไม่ครบ 19 ช่อง');
+    ctSnap(C);C.hex=hex;const pt={};(j.ports||[]).forEach(p=>{const r0=(+p.r||0)-1,c0=(+p.c||0)-1;if(r0<0||r0>4||c0<0||c0>=CT_ROWS[r0])return;const h=CT_ROWS.slice(0,r0).reduce((a,b)=>a+b,0)+c0;
+      const e=ctPortEdge(h,CT_SN.indexOf(String(p.side||'').toUpperCase()));const ty=String(p.type||'').toLowerCase()[0];if(e!=null&&CT_PORTK.includes(ty))pt[e]=ty});
+    if(Object.keys(pt).length>=5)C.ports=pt;
+    ctSave();toast('AI อ่านกระดานแล้ว ตรวจทีละช่องอีกครั้งนะ');C.view.aiNote=(j.note||'')+(Object.keys(pt).length>=5?'':' (ท่าเรืออ่านได้ไม่ครบ ใช้ท่าเรือเดิมไว้ก่อน)');
+  }catch(e){toast(e&&e.code==='not_granted'?'ไม่ได้รับอนุญาตให้ใช้ AI':e&&e.code==='rate_limited'?'AI ใช้บ่อยไป รอสักครู่':'AI อ่านรูปไม่สำเร็จ ลองรูปที่ตรงและชัดขึ้น หรือกดเลือกช่องเอง');if(e&&e.code==='not_granted')CT_AI.s=null}
+  CT_AI.busy=false;render()}
+
+/* ---------- start ---------- */
+function ctInitPlayers(C){C.players.forEach(p=>{p.res={b:0,l:0,w:0,g:0,o:0};p.dev={k:0,v:0,rb:0,yp:0,mo:0};p.nd={k:0,v:0,rb:0,yp:0,mo:0};p.kn=0})}
+function ctOrder(C){const rank=s=>'bltr'.indexOf(s);const idx=C.players.map((p,i)=>i).sort((a,b)=>rank(C.players[a].side)-rank(C.players[b].side));const k=idx.indexOf(C.first);return idx.slice(k).concat(idx.slice(0,k))}
+function ctResetPieces(C){C.nodes={};C.edges={};C.bank={b:19,l:19,w:19,g:19,o:19};C.deck={k:14,v:5,rb:2,yp:2,mo:2};C.lr=null;C.la=null;C.rolls={};C.log=[];C.hist=[];C.win=null;C.saved=false;
+  const d=C.hex.findIndex(h=>h.t==='D');C.robber=d>=0?d:9;ctInitPlayers(C);C.order=ctOrder(C)}
+function ctStartPlace(){const C=ct();ctResetPieces(C);const o=C.order;C.place={seq:o.concat(o.slice().reverse()),i:0,step:'set',last:null};C.T=null;C.phase='place';C.view.fix=null;
+  ctLog(C,'เริ่มวางบ้านตั้งต้น · '+o.map(i=>ctPN(C,i)).join(' → '));}
+function ctStartBeginner(){const C=ct();ctResetPieces(C);
+  C.players.forEach((p,i)=>{const pre=CT_BEGIN_PCS[p.pc];if(!pre)return;pre.forEach((hs,j)=>{const n=ctNodeOf(hs);C.nodes[n]={p:i,c:0};
+    const e=CTG.N[n].e.filter(e=>CTG.E[e].h.length===2).find(e=>{const E=CTG.E[e];const o=E.a===n?E.b:E.a;return !CTG.N[o].n.some(m=>m!==n&&C.nodes[m])})||CTG.N[n].e[0];C.edges[e]=i;
+    if(j===1)CTG.N[n].h.forEach(h=>{const r=CT_T[C.hex[h].t].r;if(r)ctTake(C,p,r,1)})})});
+  C.phase='play';C.place=null;C.T=ctTurn(C.order[0],1);ctUpdLR(C);ctLog(C,'เริ่มเกมแบบผู้เริ่มต้น ทุกคนได้การ์ดจากบ้านที่มีดาว');}
+function ctPlaceNode(C,n){const P=C.place;const i=ctCur(C);if(P.step!=='set'||!ctSetOK(C,i,n,true))return;ctSnap(C);C.nodes[n]={p:i,c:0};P.last=n;P.step='road';
+  const second=P.i>=C.order.length;let got='';
+  if(second){const g={};CTG.N[n].h.forEach(h=>{const r=CT_T[C.hex[h].t].r;if(r){ctTake(C,C.players[i],r,1);g[r]=(g[r]||0)+1}});got=ctResTxt(g)}
+  ctLog(C,ctPN(C,i)+' วางบ้านหลังที่ '+(second?2:1)+(got?' ได้ '+got:''));if(got)toast(ctPN(C,i)+' ได้ '+got)}
+function ctPlaceEdge(C,e){const P=C.place;const i=ctCur(C);if(P.step!=='road'||!ctRoadOK(C,i,e,P.last))return;ctSnap(C);C.edges[e]=i;ctLog(C,ctPN(C,i)+' วางถนนตั้งต้น');
+  P.i++;P.step='set';P.last=null;
+  if(P.i>=P.seq.length){C.phase='play';C.T=ctTurn(C.order[0],1);ctUpdLR(C);ctLog(C,'วางครบแล้ว '+ctPN(C,C.order[0])+' เริ่มทอยก่อน');toast('วางครบแล้ว เริ่มเกม! ตาแรกของ '+ctPN(C,C.order[0]))}}
+
+/* ---------- turn ---------- */
+function ctProduce(C,n){const gain=C.players.map(()=>({}));
+  C.hex.forEach((h,hi)=>{if(h.n!==n||hi===C.robber)return;const r=CT_T[h.t].r;if(!r)return;CTG.hx[hi].c.forEach(nd=>{const o=C.nodes[nd];if(o)gain[o.p][r]=(gain[o.p][r]||0)+(o.c?2:1)})});
+  const out=C.players.map(()=>({}));const short=[];
+  CT_RES.forEach(r=>{const who=gain.map((g,i)=>[i,g[r]||0]).filter(x=>x[1]>0);if(!who.length)return;const tot=who.reduce((a,x)=>a+x[1],0);
+    if(tot<=C.bank[r])who.forEach(([i,k])=>out[i][r]=k);else{short.push(r);if(who.length===1&&C.bank[r]>0)out[who[0][0]][r]=C.bank[r]}});
+  out.forEach((g,i)=>CT_RES.forEach(r=>{if(g[r]){C.players[i].res[r]+=g[r];C.bank[r]-=g[r]}}));
+  const blocked=C.robber!=null&&C.hex[C.robber]&&C.hex[C.robber].n===n;return {out,short,blocked}}
+function ctRoll(C,n,dice){const T=C.T;if(!T||T.rolled||T.stage)return;ctSnap(C);T.rolled=true;T.roll=n;T.dice=dice||null;T.panel=null;C.rolls[n]=(C.rolls[n]||0)+1;
+  if(n===7){T.prod=null;const d={};C.players.forEach((p,i)=>{const k=ctCards(p);if(k>7)d[i]=Math.floor(k/2)});T.disc=d;T.dsel={};
+    T.stage=Object.keys(d).length?'discard':'robber';ctLog(C,'🎲 '+ctPN(C,T.p)+' ทอยได้ 7'+(Object.keys(d).length?' · ต้องทิ้งการ์ด: '+Object.keys(d).map(i=>ctPN(C,+i)+' '+d[i]+' ใบ').join(', '):''));}
+  else{const r=ctProduce(C,n);T.prod=r;const got=r.out.map((g,i)=>ctResTxt(g)?ctPN(C,i)+' '+ctResTxt(g):'').filter(Boolean);
+    ctLog(C,'🎲 '+ctPN(C,T.p)+' ทอยได้ '+n+(got.length?' · '+got.join(' · '):' · ไม่มีใครได้การ์ด')+(r.blocked?' · โจรกันไว้ 1 ช่อง':'')+(r.short.length?' · ธนาคาร'+r.short.map(x=>CT_RN[x]).join(' ')+'ไม่พอ':''));}}
+function ctAfterRobber(C){const T=C.T;const h=C.robber;const who=new Set();CTG.hx[h].c.forEach(n=>{const o=C.nodes[n];if(o&&o.p!==T.p)who.add(o.p)});
+  T.cand=[...who];T.vic=null;if(!T.cand.length){T.stage=null;ctLog(C,'ไม่มีใครติดช่องโจร ไม่ได้ขโมย')}else T.stage='steal'}
+function ctStealFrom(C,j,r){const T=C.T;const v=C.players[j],me=C.players[T.p];
+  if(!r){const bag=[];CT_RES.forEach(x=>{for(let k=0;k<(v.res[x]||0);k++)bag.push(x)});r=bag.length?bag[Math.floor(Math.random()*bag.length)]:null}
+  if(r&&(v.res[r]||0)>0){v.res[r]--;me.res[r]++;ctLog(C,'🦹 '+ctPN(C,T.p)+' ขโมยการ์ด 1 ใบจาก '+ctPN(C,j));toast('ขโมยได้ '+CT_RE[r]+' '+CT_RN[r]+' (บอกเฉพาะคนขโมยนะ)')}
+  else{ctLog(C,'🦹 '+ctPN(C,j)+' ไม่มีการ์ด ขโมยไม่ได้');toast(ctPN(C,j)+' ไม่มีการ์ดให้ขโมย')}
+  T.stage=null;T.vic=null;T.cand=null}
+function ctEndTurn(C){const T=C.T;if(!T||!T.rolled||T.stage)return;ctSnap(C);const p=C.players[T.p];CT_DEVK.forEach(k=>{p.dev[k]+=p.nd[k];p.nd[k]=0});
+  const o=C.order;const nx=o[(o.indexOf(T.p)+1)%o.length];C.T=ctTurn(nx,T.n+1);C.view.fix=null;ctLog(C,'— ตาที่ '+(T.n+1)+' ของ '+ctPN(C,nx)+' —')}
+function ctDevPlayable(C,i){const T=C.T;if(!T||T.p!==i||T.dev||T.stage)return [];const p=C.players[i];return ['k','rb','yp','mo'].filter(k=>p.dev[k]>0)}
+
+/* ---------- small html helpers ---------- */
+const ctRC=(r,n,cls)=>`<span class="ct-rc ${cls||''}" style="--rc:${CT_RC[r]}" title="${CT_RN[r]}"><i>${CT_RE[r]}</i>${n==null?'':`<b>${n}</b>`}</span>`;
+const ctStep=(act,key,r,n,max)=>`<div class="ct-stp">${ctRC(r)}<button type="button" data-act="${act}" data-id="${key}:${r}:-1" ${n>0?'':'disabled'} aria-label="ลด${CT_RN[r]}">−</button><b>${n}</b><button type="button" data-act="${act}" data-id="${key}:${r}:1" ${max!=null&&n>=max?'disabled':''} aria-label="เพิ่ม${CT_RN[r]}">+</button></div>`;
+const ctDiceFace=d=>d?`<span class="ct-dface">${CT_DICE[d[0]-1]}${CT_DICE[d[1]-1]}</span>`:'';
+function ctHandVisible(C,i){const t=C.view.peek[i];return C.opts.open||(t&&Date.now()-t<8000)}
+function ctHand(C,i){const p=C.players[i];if(!ctHandVisible(C,i))return `<div class="ct-hand hid"><span class="ct-back">${'▮'.repeat(Math.min(ctCards(p),12))||'ไม่มีการ์ด'}</span></div>`;
+  const dv=CT_DEVK.filter(k=>p.dev[k]||p.nd[k]).map(k=>`<span class="ct-dv">${CT_DEV[k].i}${p.dev[k]+p.nd[k]}${p.nd[k]?`<small>ใหม่ ${p.nd[k]}</small>`:''}</span>`).join('');
+  return `<div class="ct-hand">${CT_RES.map(r=>ctRC(r,p.res[r]||0,(p.res[r]||0)?'':'zero')).join('')}${dv?`<span class="ct-dvs">${dv}</span>`:''}</div>`}
+
+/* ---------- board svg ---------- */
+function ctSVG(C,mode){
+  const a=(C.view.rot||0)*Math.PI/3,ca=Math.cos(a),sa=Math.sin(a);const R=(x,y)=>[x*ca-y*sa,x*sa+y*ca];const f=v=>(+v).toFixed(3);
+  const NP=CTG.N.map(n=>R(n.x,n.y)),HP=CTG.hx.map(h=>R(h.x,h.y));const H=C.hex||ctEmptyHex();
+  const L=mode==='play'?ctLegal(C):{nodes:[],edges:[],hex:false};const T=C.T;const roll=mode==='play'&&T&&T.rolled&&T.roll!==7?T.roll:null;
+  let s=`<polygon class="ct-sea" points="${[0,1,2,3,4,5].map(k=>f(5.55*Math.cos(k*Math.PI/3))+','+f(5.55*Math.sin(k*Math.PI/3))).join(' ')}"/>`;
+  H.forEach((h,i)=>{const pts=CTG.hx[i].c.map(n=>f(NP[n][0])+','+f(NP[n][1])).join(' ');const ter=h.t&&CT_T[h.t];const [x,y]=HP[i];
+    let act='';if(mode==='edit'&&C.view.ed==='hex')act=`data-act="ctEdHex" data-id="${i}"`;else if(L.hex&&(C.view.fix||i!==C.robber))act=`data-act="ctRob" data-id="${i}"`;
+    const cls=['ct-hx'];if(act)cls.push('tap');if(mode==='edit'&&C.view.ed==='hex'&&C.view.sel===i)cls.push('sel');if(roll&&h.n===roll)cls.push(i===C.robber?'blk':'hit');if(L.hex&&i!==C.robber)cls.push('rob');
+    s+=`<g class="${cls.join(' ')}" ${act}><polygon points="${pts}" fill="${ter?ter.c:'#C9D3DB'}"/>`;
+    if(ter&&ter.r)s+=`<text class="ct-ti" x="${f(x)}" y="${f(y-.56)}">${CT_RE[ter.r]}</text>`;
+    if(!h.t&&mode==='edit')s+=`<text class="ct-q" x="${f(x)}" y="${f(y+.12)}">${i+1}</text>`;
+    if(h.n){const red=h.n===6||h.n===8;s+=`<circle class="ct-tok" cx="${f(x)}" cy="${f(y+.05)}" r=".38"/><text class="ct-num${red?' red':''}" x="${f(x)}" y="${f(y+.12)}">${h.n}</text>`;
+      const pp=CT_PIPS(h.n);for(let k=0;k<pp;k++)s+=`<circle class="ct-pip${red?' red':''}" cx="${f(x+(k-(pp-1)/2)*.085)}" cy="${f(y+.29)}" r=".03"/>`}
+    else if(h.t&&h.t!=='D'&&mode==='edit')s+=`<text class="ct-q" x="${f(x)}" y="${f(y+.12)}">?</text>`;
+    s+='</g>'});
+  /* harbours */
+  const hasP=Object.keys(C.ports||{});const editP=mode==='edit'&&C.view.ed==='port';
+  (editP?CTG.coast:hasP.map(Number)).forEach(e=>{const E=CTG.E[e],m=CTG.mid(e),hc=CTG.hx[E.h[0]];const px=m.x+(m.x-hc.x)*.62,py=m.y+(m.y-hc.y)*.62;const [X,Y]=R(px,py);const ty=C.ports[e];
+    if(ty)s+=`<line class="ct-dock" x1="${f(NP[E.a][0])}" y1="${f(NP[E.a][1])}" x2="${f(X)}" y2="${f(Y)}"/><line class="ct-dock" x1="${f(NP[E.b][0])}" y1="${f(NP[E.b][1])}" x2="${f(X)}" y2="${f(Y)}"/>`;
+    s+=`<g class="ct-port${editP?' tap':''}${editP&&C.view.psel===e?' sel':''}${ty?'':' empty'}" ${editP?`data-act="ctEdPort" data-id="${e}"`:''}><circle cx="${f(X)}" cy="${f(Y)}" r=".33"/>`+
+      (ty?(ty==='3'?`<text class="ct-pt" x="${f(X)}" y="${f(Y+.1)}">3:1</text>`:`<text class="ct-pe" x="${f(X)}" y="${f(Y-.02)}">${CT_RE[ty]}</text><text class="ct-pt sm" x="${f(X)}" y="${f(Y+.24)}">2:1</text>`):`<text class="ct-pt" x="${f(X)}" y="${f(Y+.1)}">+</text>`)+'</g>'});
+  if(mode==='play'||mode==='view'){
+    Object.keys(C.edges).forEach(e=>{const E=CTG.E[e],A=NP[E.a],B=NP[E.b],c=ctCol(C.players[C.edges[e]]||{});const x1=A[0]+(B[0]-A[0])*.16,y1=A[1]+(B[1]-A[1])*.16,x2=A[0]+(B[0]-A[0])*.84,y2=A[1]+(B[1]-A[1])*.84;
+      s+=`<line class="ct-rd0" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/><line class="ct-rd" stroke="${c}" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/>`});
+    if(C.robber!=null&&CTG.hx[C.robber]){const [x,y]=HP[C.robber];const ox=H[C.robber].n?x-.5:x,oy=y+.05;
+      s+=`<g class="ct-robber"><ellipse cx="${f(ox)}" cy="${f(oy+.3)}" rx=".2" ry=".07"/><path d="M${f(ox-.17)} ${f(oy+.3)}Q${f(ox-.2)} ${f(oy-.05)} ${f(ox)} ${f(oy-.08)}Q${f(ox+.2)} ${f(oy-.05)} ${f(ox+.17)} ${f(oy+.3)}Z"/><circle cx="${f(ox)}" cy="${f(oy-.2)}" r=".13"/></g>`}
+    Object.keys(C.nodes).forEach(n=>{const o=C.nodes[n],[x,y]=NP[n],c=ctCol(C.players[o.p]||{});const sc=.22;
+      const pts=(o.c?[[-1.25,.9],[1.25,.9],[1.25,-.15],[.15,-.15],[.15,-.7],[-.55,-1.35],[-1.25,-.7]]:[[-.9,.85],[.9,.85],[.9,-.2],[0,-1.05],[-.9,-.2]]).map(([u,v])=>f(x+u*sc)+','+f(y+v*sc)).join(' ');
+      s+=`<polygon class="ct-bld" fill="${c}" points="${pts}"/>`});
+    L.edges.forEach(e=>{const E=CTG.E[e],A=NP[E.a],B=NP[E.b];s+=`<g class="ct-hot" data-act="ctEdge" data-id="${e}"><line class="ct-hote" x1="${f(A[0]+(B[0]-A[0])*.18)}" y1="${f(A[1]+(B[1]-A[1])*.18)}" x2="${f(A[0]+(B[0]-A[0])*.82)}" y2="${f(A[1]+(B[1]-A[1])*.82)}"/><line class="ct-hitl" x1="${f(A[0])}" y1="${f(A[1])}" x2="${f(B[0])}" y2="${f(B[1])}"/></g>`});
+    L.nodes.forEach(n=>{const [x,y]=NP[n];s+=`<g class="ct-hot" data-act="ctNode" data-id="${n}"><circle class="ct-hitc" cx="${f(x)}" cy="${f(y)}" r=".34"/><circle class="ct-hotn" cx="${f(x)}" cy="${f(y)}" r=".17"/></g>`});
+  }
+  return `<svg class="ct-svg" viewBox="-5.75 -5.0 11.5 10.0" preserveAspectRatio="xMidYMid meet" role="img" aria-label="กระดาน Catan">${s}</svg>`;
+}
+
+/* ---------- setup view ---------- */
+function ctSetupView(C){
+  const o=C.players;
+  return `<div class="stage ct-setup">
+    <div><h3>เลือกคนเล่น 3–4 คน</h3><p class="muted small">แตะเรียงตามที่นั่งรอบโต๊ะ วนตามเข็มนาฬิกา แตะซ้ำเพื่อเอาออก (เล่น 2 คนก็ได้ แต่คู่มือออกแบบไว้ 3–4 คน)</p></div>
+    <div class="pawns">${kids().map(k=>pawnBtn(k,'ctPick',o.some(p=>p.id===k.id),'lg')).join('')}</div>
+    <div class="row2"><label class="field"><span>เพื่อนหรือแขก</span><input type="text" id="ctGuestIn" placeholder="ชื่อ เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="ctGuest">เพิ่มแขก</button></div></div>
+    ${o.length?`<div class="ct-plist">${o.map((p,i)=>`<div class="ct-prow" style="--pc:${ctCol(p)}">
+      <div class="ct-pwho">${playerPawn(p,'sm')}<b>${esc(ctName(p))}</b><button type="button" class="btn sm ghost" data-act="ctDrop" data-id="${i}" aria-label="เอาออก">×</button></div>
+      <div class="ct-pcs"><span class="label">สีชิ้นส่วน</span>${CT_PCK.map(c=>`<button type="button" class="ct-pcb" style="--c:${CT_PC[c].c}" data-act="ctPc" data-id="${i}:${c}" aria-pressed="${p.pc===c}" aria-label="${CT_PC[c].n}">${p.pc===c?'✓':''}</button>`).join('')}</div>
+      <div class="ct-pcs"><span class="label">นั่งด้าน</span>${CT_SIDES.map(([s,n])=>`<button type="button" class="chip" data-act="ctSide" data-id="${i}:${s}" aria-pressed="${p.side===s}">${n}</button>`).join('')}</div></div>`).join('')}</div>`:'<p class="muted small">ยังไม่มีคนเล่น</p>'}
+    <details class="rules"><summary>ตั้งค่ากติกา</summary><div class="ct-opts">
+      <label class="check"><input type="checkbox" data-ct="combine" ${C.opts.combine?'checked':''}> รวมขั้นแลกกับสร้าง (แลกและสร้างสลับกันได้ คู่มือแนะนำสำหรับคนเล่นเป็นแล้ว)</label>
+      <label class="check"><input type="checkbox" data-ct="open" ${C.opts.open?'checked':''}> เปิดการ์ดในมือทุกคนบนจอ (เหมาะกับตอนสอนเล่น)</label>
+      <label class="check"><input type="checkbox" data-ct="seats" ${C.opts.seats?'checked':''}> จอแบบนั่งล้อมกระดาน หมุนแผงให้หันหาคนนั่งแต่ละด้าน (จอกว้าง)</label>
+      <label class="field" style="max-width:180px"><span>แต้มที่ต้องได้</span><input type="number" min="3" max="20" value="${C.opts.target}" data-ct="target"></label></div></details>
+    <div class="btns"><button class="btn primary big" data-act="ctToBoard" ${o.length>=2?'':'disabled'}>${o.length>=2?'ต่อไป: ตั้งกระดาน →':'ต้องมีอย่างน้อย 2 คน'}</button>${o.length?'<button class="btn ghost" data-act="ctClear">ล้างคนเล่น</button>':''}</div>
+  </div>`;
+}
+
+/* ---------- board editor ---------- */
+function ctBoardView(C){
+  const H=C.hex;const chk=ctBoardCheck(C);const used={},nused={};H.forEach(h=>{if(h.t)used[h.t]=(used[h.t]||0)+1;if(h.n)nused[h.n]=(nused[h.n]||0)+1});
+  const sel=C.view.sel,sh=H[sel]||{};const ph=CT_TMP_PHOTO||ctPhoto();const ed=C.view.ed;
+  const numsU=[2,3,4,5,6,8,9,10,11,12];
+  const pal=ed==='hex'?`<div class="ct-pal"><div class="label">ช่องที่ ${sel+1} · แตะช่องบนกระดานเพื่อเลือกช่องอื่น</div>
+      <div class="ct-tgrid">${CT_TK.map(t=>{const left=CT_TCOUNT[t]-(used[t]||0);return `<button type="button" class="ct-tb" style="--c:${CT_T[t].c}" data-act="ctSetT" data-id="${t}" aria-pressed="${sh.t===t}"><b>${CT_T[t].r?CT_RE[CT_T[t].r]:'🏜️'} ${CT_T[t].n}</b><small class="${left<0?'over':''}">เหลือ ${left}</small></button>`}).join('')}</div>
+      <div class="ct-ngrid">${numsU.map(n=>{const left=(n===2||n===12?1:2)-(nused[n]||0);return `<button type="button" class="ct-nb${n===6||n===8?' red':''}" data-act="ctSetN" data-id="${n}" aria-pressed="${sh.n===n}" ${sh.t==='D'?'disabled':''}><b>${n}</b><small class="${left<0?'over':''}">${left}</small></button>`}).join('')}<button type="button" class="ct-nb" data-act="ctSetN" data-id="0" aria-pressed="${!sh.n}"><b>–</b><small>ไม่มี</small></button></div>
+      <p class="muted small" style="margin:0">เลือกพื้นที่ แล้วเลือกเลข จอจะเลื่อนไปช่องถัดไปเอง (ทะเลทรายเลื่อนเลย)</p></div>`
+    :`<div class="ct-pal"><div class="label">${C.view.psel!=null?'ท่าเรือที่เลือก: เลือกชนิด':'แตะวงกลมรอบเกาะเพื่อเลือกตำแหน่งท่าเรือ'}</div>
+      ${C.view.psel!=null?`<div class="chips">${CT_PORTK.map(k=>`<button type="button" class="chip" data-act="ctSetP" data-id="${k}" aria-pressed="${C.ports[C.view.psel]===k}">${k==='3'?'? 3:1':CT_RE[k]+' '+CT_RN[k]+' 2:1'}</button>`).join('')}<button type="button" class="chip" data-act="ctSetP" data-id="x">ไม่มีท่าเรือ</button></div>`:''}
+      <p class="muted small" style="margin:0">มีท่าเรือ ${Object.keys(C.ports).length} ที่ (กล่องปกติมี 9: 3:1 สี่ที่ และ 2:1 อย่างละที่)</p></div>`;
+  return `<div class="ct-bed">
+    <div class="ct-bwrap">${ctSVG(C,'edit')}</div>
+    <div class="ct-bside">
+      <div class="seg2"><button type="button" class="chip" data-act="ctEd" data-id="hex" aria-pressed="${ed==='hex'}">ช่องและเลข</button><button type="button" class="chip" data-act="ctEd" data-id="port" aria-pressed="${ed==='port'}">ท่าเรือ</button><button type="button" class="chip" data-act="ctRot">⟳ หมุนกระดาน</button></div>
+      ${pal}
+      <div class="ct-chk">${chk.errs.map(x=>`<div class="ct-err">• ${esc(x)}</div>`).join('')}${chk.warns.map(x=>`<div class="ct-warn">• ${esc(x)}</div>`).join('')}${chk.ok&&!chk.warns.length?'<div class="ct-okk">✓ กระดานครบตามกล่อง</div>':''}</div>
+      <details class="rules" ${ph?'open':''}><summary>📷 รูปกระดาน</summary><div class="ct-photo">
+        ${ph?`<img src="${ph}" alt="รูปกระดานที่ถ่ายไว้">`:''}
+        <label class="btn sm"><input type="file" accept="image/*" capture="environment" data-ct="photo" hidden>${ph?'ถ่าย/เลือกรูปใหม่':'ถ่ายหรือเลือกรูปกระดาน'}</label>
+        ${ph&&CT_AI.s&&CT_AI.img?`<button class="btn sm primary" data-act="ctAIRead" ${CT_AI.busy?'disabled':''}>${CT_AI.busy?'AI กำลังอ่านรูป…':'🤖 ให้ AI ตั้งกระดานจากรูป'}</button>`:''}
+        ${ph?'<button class="btn sm ghost" data-act="ctPhotoDel">ลบรูป</button>':''}
+        ${C.view.aiNote?`<p class="ct-warn small">${esc(C.view.aiNote)}</p>`:''}
+        ${CT_AI.s?'':'<p class="muted small" style="margin:0">ในเว็บนี้รูปใช้ดูเทียบตอนกดเลือกช่อง · อยากให้ตั้งอัตโนมัติ ส่งรูปให้ Claude ในแชท แล้วเอารหัสกระดานมาวางข้างล่าง (หรือเปิดเวอร์ชัน Claude ที่มีปุ่ม AI อ่านรูป)</p>'}</div></details>
+      <details class="rules"><summary>🔤 รหัสกระดาน</summary><div class="ct-photo">
+        <textarea id="ctCodeIn" rows="3" placeholder="วางรหัส เช่น CATAN1 M10 P2 F9 / …"></textarea>
+        <div class="btns"><button class="btn sm" data-act="ctCodeUse">ใช้รหัสนี้</button><button class="btn sm ghost" data-act="ctCodeCopy">คัดลอกรหัสกระดานนี้</button></div>
+        <p class="muted small" style="margin:0">ตัวอักษร: H เนินดิน F ป่า P ทุ่งหญ้า W ไร่ข้าว M ภูเขา D ทะเลทราย ตามด้วยเลข เรียงแถว 3-4-5-4-3 · ท่าเรือหลัง | เช่น 1NW3 = ช่อง 1 ด้านบนซ้าย 3:1</p></div></details>
+      <div class="btns"><button class="btn sm" data-act="ctRand">🎲 สุ่มทั้งกระดาน</button><button class="btn sm" data-act="ctBeginBoard">กระดานผู้เริ่มต้น</button><button class="btn sm ghost" data-act="ctClearBoard">ล้างกระดาน</button></div>
+      ${C.back?`<div class="btns"><button class="btn primary big" data-act="ctBackPlay" ${chk.ok?'':'disabled'}>กลับไปเล่นต่อ</button></div>`:ctFirstHTML(C,chk)}
+    </div></div>`;
+}
+function ctFirstHTML(C,chk){
+  const fr=C.view.fr;const isBegin=C.hex.map(h=>h.t+(h.n||'')).join(' ')===CT_BEGIN;
+  return `<div class="ct-first"><div class="label">ใครเริ่มก่อน · คู่มือให้ทุกคนทอยเต๋า คนได้สูงสุดเริ่ม</div>
+    <div class="chips">${C.players.map((p,i)=>`<button type="button" class="chip ct-fch" data-act="ctFirst" data-id="${i}" aria-pressed="${C.first===i}">${playerPawn(p,'sm')} ${esc(ctName(p))}${fr&&fr[i]?` <b>${fr[i]}</b>`:''}</button>`).join('')}<button type="button" class="chip" data-act="ctFirstRoll">🎲 ทอยแข่งในเครื่อง</button></div>
+    <div class="btns"><button class="btn primary big" data-act="ctGoPlace" ${chk.ok&&C.first!=null?'':'disabled'}>${C.first==null?'เลือกคนเริ่มก่อน':!chk.ok?'ตั้งกระดานให้ครบก่อน':'เริ่มวางบ้านตั้งต้น →'}</button>
+    ${isBegin&&C.first!=null?'<button class="btn big" data-act="ctGoBegin">วางบ้านตามคู่มือผู้เริ่มต้น</button>':''}<button class="btn ghost" data-act="ctToSetup">← คนเล่น</button></div>
+    ${isBegin?'<p class="muted small" style="margin:0">วางตามคู่มือ: บ้านและถนนของแต่ละสีอยู่ตามรูปในคู่มือ (ถนนอาจไม่ตรงรูปเป๊ะ แก้ได้ที่ ⚙) แล้วรับการ์ดจากบ้านที่มีดาวให้เลย · เล่น 3 คนอย่าเลือกสีแดง</p>':''}</div>`;
+}
+
+/* ---------- table (place + play) ---------- */
+function ctStageInfo(C){
+  if(C.phase==='place'){const P=C.place;const second=P.i>=C.order.length;return {steps:['วางบ้าน','วางถนน'],at:P.step==='set'?0:1,
+    say:(P.step==='set'?`วางบ้านหลังที่ ${second?2:1}: แตะจุดสีบนกระดาน (จุดที่ 3 จุดข้าง ๆ ว่าง)`:'วางถนน 1 เส้นติดบ้านที่เพิ่งวาง')+(second&&P.step==='set'?' · หลังที่ 2 ได้การ์ดจากทุกช่องที่ติดทันที':'')}}
+  const T=C.T;const seven=T.rolled&&T.roll===7;const kn=T.stage==='robber'&&!seven||T.knPre;
+  const steps=['ทอยเต๋า'];if(seven){steps.push('ทิ้งการ์ด','ย้ายโจร','ขโมย')}else if(kn&&(T.stage==='robber'||T.stage==='steal')){steps.push('อัศวิน: ย้ายโจร','ขโมย')}
+  if(C.opts.combine)steps.push('แลก/สร้าง');else steps.push('แลก','สร้าง');steps.push('จบตา');
+  let at=0,say='';
+  if(T.stage==='discard'){at=1;say='ทอยได้ 7! คนที่มีการ์ดเกิน 7 ใบทิ้งครึ่งหนึ่ง ที่แผงของตัวเอง'}
+  else if(T.stage==='robber'){at=steps.findIndex(s=>/ย้ายโจร/.test(s));say='ย้ายโจรไปช่องอื่น: แตะช่องบนกระดาน (ห้ามช่องเดิม)'}
+  else if(T.stage==='steal'){at=steps.indexOf('ขโมย');say='เลือกคนที่จะขโมย 1 ใบ'}
+  else if(T.stage==='rb'){at=steps.length-2;say='การ์ดสร้างถนน: แตะทางบนกระดาน วางฟรีอีก '+T.rb+' เส้น'}
+  else if(!T.rolled){at=0;say='ทอยเต๋า 2 ลูก แล้วกดเลขที่ได้'+(ctDevPlayable(C,T.p).length?' · เล่นการ์ดพัฒนาก่อนทอยได้ 1 ใบ':'')}
+  else if(C.opts.combine){at=steps.indexOf('แลก/สร้าง');say='แลกและสร้างสลับกันได้ เสร็จแล้วกดจบตา'}
+  else{at=T.built?steps.indexOf('สร้าง'):steps.indexOf('แลก');say=T.built?'สร้างหรือซื้อต่อได้ (แลกไม่ได้แล้วในตานี้) เสร็จแล้วกดจบตา':'แลกการ์ดก่อน แล้วค่อยสร้าง/ซื้อ (สร้างแล้วจะแลกไม่ได้) เสร็จแล้วกดจบตา'}
+  if(T.mode)say=({road:'แตะเส้นประบนกระดานเพื่อวางถนน',set:'แตะจุดสีบนกระดานเพื่อวางบ้าน',city:'แตะบ้านของตัวเองที่จะอัปเป็นเมือง'})[T.mode];
+  return {steps,at,say};
+}
+function ctStepper(si){return `<ol class="ct-steps">${si.steps.map((s,k)=>`<li class="${k<si.at?'done':k===si.at?'now':''}">${esc(s)}</li>`).join('')}</ol><p class="ct-say">${esc(si.say)}</p>`}
+function ctSeatHead(C,i){
+  const p=C.players[i];const cur=ctCur(C)===i;const n=ctCards(p);const vp=ctVP(C,i,false);const hv=ctHandVisible(C,i);const tv=hv?ctVP(C,i,true):vp;
+  return `<div class="ct-sh">${playerPawn(p,'sm')}<b class="ct-nm">${esc(ctName(p))}</b>${cur?'<span class="ct-now">ตานี้</span>':''}
+    ${C.lr===i?'<span class="ct-badge" title="ถนนยาวที่สุด +2">🛣️+2</span>':''}${C.la===i?'<span class="ct-badge" title="กองทัพใหญ่ที่สุด +2">⚔️+2</span>':''}
+    <span class="ct-vp" title="แต้มที่ทุกคนเห็น"><b>${vp}</b>${tv!==vp?`<small>(${tv})</small>`:''} แต้ม</span>
+    <span class="ct-st${n>7?' warn':''}" title="การ์ดในมือ">🃏${n}</span><span class="ct-st" title="การ์ดพัฒนาในมือ">📜${ctDevN(p)}</span><span class="ct-st" title="อัศวินที่เล่นแล้ว">⚔️${p.kn}</span><span class="ct-st" title="ถนนต่อกันยาวสุด">🛣️${ctRoadLen(C,i)}</span>
+    <span class="ct-sbtn"><button type="button" class="ct-ib" data-act="ctPeek" data-id="${i}" aria-pressed="${hv}" title="ดูการ์ดในมือ">👁</button><button type="button" class="ct-ib" data-act="ctHandEd" data-id="${i}" title="แก้การ์ดในมือ">✎</button></span></div>`;
+}
+function ctSeat(C,i,big){
+  const p=C.players[i];const cur=ctCur(C)===i;const T=C.T;let body='';
+  if(C.phase==='place'&&cur)body=ctStepper(ctStageInfo(C))+'<button class="btn sm ghost" data-act="ctUndo">↶ ย้อนกลับ</button>';
+  else if(C.phase==='play'&&T){
+    if(T.stage==='discard'&&T.disc&&T.disc[i]!=null)body=ctDiscUI(C,i);
+    else if(cur)body=ctTurnUI(C);
+  }
+  return `<div class="ct-seat${big?' big':''}${cur?' cur':''}" style="--pc:${ctCol(p)}">${ctSeatHead(C,i)}${big||ctHandVisible(C,i)?ctHand(C,i):''}${body?`<div class="ct-body">${body}</div>`:''}</div>`;
+}
+function ctDiscUI(C,i){const T=C.T;const p=C.players[i];const need=T.disc[i];const sel=T.dsel[i]||{};const got=CT_RES.reduce((a,r)=>a+(sel[r]||0),0);
+  return `<div class="ct-alert">ต้องทิ้ง <b>${need}</b> ใบ (มี ${ctCards(p)} ใบ) · เลือกแล้ว ${got}/${need}</div>
+    <div class="ct-stps">${CT_RES.map(r=>ctStep('ctDisc',i,r,sel[r]||0,Math.min(p.res[r]||0,need-got+(sel[r]||0)))).join('')}</div>
+    <div class="btns"><button class="btn primary" data-act="ctDiscOK" data-id="${i}" ${got===need?'':'disabled'}>ทิ้ง ${need} ใบ</button><button class="btn sm ghost" data-act="ctDiscRand" data-id="${i}">สุ่มทิ้งให้</button></div>`}
+function ctTurnUI(C){
+  const T=C.T,i=T.p,p=C.players[i];const si=ctStageInfo(C);let h=ctStepper(si);
+  const tot=ctVP(C,i,true);
+  if(tot>=C.opts.target)h=`<div class="ct-win">🏆 ${esc(ctName(p))} มี ${tot} แต้มแล้ว (รวมการ์ดแต้มที่ซ่อนอยู่) ชนะได้เลยในตานี้! <button class="btn primary" data-act="ctWin" data-id="${i}">เปิดการ์ด ประกาศชนะ</button></div>`+h;
+  if(T.stage==='discard'){const left=Object.keys(T.disc).map(j=>ctPN(C,+j)+' '+T.disc[j]+' ใบ');return h+`<div class="ct-alert">รอทิ้งการ์ด: ${esc(left.join(', '))}</div>`}
+  if(T.stage==='robber')return h+'<div class="ct-alert">👆 แตะช่องที่จะวางโจร</div>';
+  if(T.stage==='steal'){
+    if(T.vic==null)return h+`<div class="chips">${T.cand.map(j=>`<button type="button" class="chip" data-act="ctVic" data-id="${j}">${playerPawn(C.players[j],'sm')} ${esc(ctPN(C,j))} · ${ctCards(C.players[j])} ใบ</button>`).join('')}</div>`;
+    const v=C.players[T.vic];return h+`<div class="ct-alert">ขโมยจาก ${esc(ctPN(C,T.vic))} (${ctCards(v)} ใบ)</div><div class="btns"><button class="btn primary" data-act="ctStealRand">🎲 สุ่มหยิบในเครื่อง</button><button class="btn sm ghost" data-act="ctVicBack">เปลี่ยนคน</button></div>
+      <div class="label">หรือหยิบการ์ดจริงจากมือเขา แล้วกดว่าได้อะไร</div><div class="chips">${CT_RES.map(r=>`<button type="button" class="chip" data-act="ctStealR" data-id="${r}" ${(v.res[r]||0)>0?'':'disabled'}>${CT_RE[r]} ${CT_RN[r]}</button>`).join('')}</div>`}
+  if(T.stage==='rb')return h+`<div class="btns"><button class="btn sm ghost" data-act="ctRbSkip">วางไม่ได้แล้ว ข้าม</button></div>`;
+  if(!T.rolled){
+    h+=`<div class="ct-dpad">${[2,3,4,5,6,7,8,9,10,11,12].map(n=>`<button type="button" class="ct-dn${n===7?' seven':n===6||n===8?' red':''}" data-act="ctRollN" data-id="${n}">${n}</button>`).join('')}</div>
+      <div class="btns"><button class="btn primary" data-act="ctDice" id="ctDiceBtn">🎲 ทอยในเครื่อง</button>${ctDevPlayable(C,i).length?`<button class="btn sm" data-act="ctPanel" data-id="dev" aria-pressed="${T.panel==='dev'}">📜 เล่นการ์ดก่อนทอย</button>`:''}</div>`;
+    if(T.panel==='dev')h+=ctDevPanel(C);return h;
+  }
+  if(T.mode)return h+`<div class="btns"><button class="btn sm" data-act="ctMode" data-id="">ยกเลิกการวาง</button></div>`;
+  const canTr=C.opts.combine||!T.built;const pc=ctPieces(C,i);const show=ctHandVisible(C,i);
+  const bb=(k,lim,label)=>{const ok=ctCan(p,CT_COST[k]);return `<button type="button" class="ct-bb${show&&!ok?' short':''}" data-act="${k==='dev'?'ctBuyDev':'ctMode'}" data-id="${k}" ${lim?'disabled':''}><b>${label}</b><small>${ctCostH(CT_COST[k])}</small>${show&&!ok?`<em>ขาด ${esc(ctMiss(p,CT_COST[k]))}</em>`:''}${lim?`<em>${lim}</em>`:''}</button>`};
+  h+=`<div class="ct-bbs">${bb('road',pc.r>=15?'หมดแล้ว':'','▬ ถนน')}${bb('set',pc.s>=5?'ครบ 5 หลัง':'','🏠 บ้าน')}${bb('city',pc.c>=4?'ครบ 4 เมือง':!pc.s?'ไม่มีบ้านให้อัป':'','🏛️ เมือง')}${bb('dev',!CT_DEVK.some(k=>C.deck[k])?'กองหมด':'','📜 การ์ดพัฒนา')}</div>
+    <div class="btns"><button class="btn sm" data-act="ctPanel" data-id="trade" aria-pressed="${T.panel==='trade'}" ${canTr?'':'disabled'}>🤝 แลกกับคน</button><button class="btn sm" data-act="ctPanel" data-id="bank" aria-pressed="${T.panel==='bank'}" ${canTr?'':'disabled'}>⚓ แลกกับธนาคาร</button>
+    ${ctDevPlayable(C,i).length?`<button class="btn sm" data-act="ctPanel" data-id="dev" aria-pressed="${T.panel==='dev'}">📜 เล่นการ์ดพัฒนา</button>`:T.dev?'<span class="muted small">เล่นการ์ดพัฒนาไปแล้วตานี้</span>':''}
+    <button class="btn primary ct-endt" data-act="ctEndTurn">จบตา →</button></div>`;
+  if(T.panel==='trade'&&canTr)h+=ctTradePanel(C);if(T.panel==='bank'&&canTr)h+=ctBankPanel(C);if(T.panel==='dev')h+=ctDevPanel(C);if(T.panel==='buy')h+=ctBuyPanel(C);
+  if(T.panel==='yp')h+=ctYPPanel(C);if(T.panel==='mo')h+=ctMoPanel(C);
+  return h;
+}
+function ctTradePanel(C){const T=C.T,i=T.p;const tr=T.tr||(T.tr={w:null,g:{},t:{}});const me=C.players[i];const oth=C.order.filter(j=>j!==i);
+  let h=`<div class="ct-pan"><div class="label">แลกกับใคร</div><div class="chips">${oth.map(j=>`<button type="button" class="chip" data-act="ctTrW" data-id="${j}" aria-pressed="${tr.w===j}">${playerPawn(C.players[j],'sm')} ${esc(ctPN(C,j))}</button>`).join('')}</div>`;
+  if(tr.w!=null){const you=C.players[tr.w];const g=CT_RES.reduce((a,r)=>a+(tr.g[r]||0),0),t=CT_RES.reduce((a,r)=>a+(tr.t[r]||0),0);const same=CT_RES.some(r=>tr.g[r]&&tr.t[r]);
+    const short=CT_RES.some(r=>(tr.g[r]||0)>(me.res[r]||0))||CT_RES.some(r=>(tr.t[r]||0)>(you.res[r]||0));
+    h+=`<div class="ct-trc"><div><div class="label">${esc(ctPN(C,i))} ให้</div><div class="ct-stps">${CT_RES.map(r=>ctStep('ctTrQ','g',r,tr.g[r]||0)).join('')}</div></div>
+      <div><div class="label">${esc(ctPN(C,tr.w))} ให้</div><div class="ct-stps">${CT_RES.map(r=>ctStep('ctTrQ','t',r,tr.t[r]||0)).join('')}</div></div></div>
+      ${same?'<div class="ct-err">แลกการ์ดชนิดเดียวกันไม่ได้</div>':''}${short?'<div class="ct-warn">การ์ดในเครื่องไม่พอ ถ้าในมือจริงมี กด ✎ แก้การ์ดก่อน</div>':''}
+      <div class="btns"><button class="btn primary" data-act="ctTrOK" ${g&&t&&!same&&!short?'':'disabled'}>ตกลงแลก</button></div>`}
+  return h+'</div>'}
+function ctBankPanel(C){const T=C.T,i=T.p,p=C.players[i];const bk=T.bk||(T.bk={});
+  let h=`<div class="ct-pan"><div class="label">คืนการ์ดชนิดไหน (อัตราที่ใช้ได้)</div><div class="chips">${CT_RES.map(r=>{const k=ctRatio(C,i,r);return `<button type="button" class="chip" data-act="ctBkG" data-id="${r}" aria-pressed="${bk.g===r}">${CT_RE[r]} ${k}:1</button>`}).join('')}</div>`;
+  if(bk.g){const k=ctRatio(C,i,bk.g);h+=`<div class="label">เอาการ์ดอะไร 1 ใบ</div><div class="chips">${CT_RES.filter(r=>r!==bk.g).map(r=>`<button type="button" class="chip" data-act="ctBkT" data-id="${r}" aria-pressed="${bk.t===r}" ${C.bank[r]?'':'disabled'}>${CT_RE[r]} ${CT_RN[r]}</button>`).join('')}</div>
+    ${(p.res[bk.g]||0)<k?`<div class="ct-warn">${CT_RN[bk.g]}ในเครื่องมี ${p.res[bk.g]||0} ใบ ต้องใช้ ${k}</div>`:''}
+    <div class="btns"><button class="btn primary" data-act="ctBkOK" ${bk.t&&(p.res[bk.g]||0)>=k?'':'disabled'}>แลก ${CT_RE[bk.g].repeat(k)} → ${bk.t?CT_RE[bk.t]:'?'}</button></div>`}
+  return h+'</div>'}
+function ctDevPanel(C){const T=C.T,p=C.players[T.p];const ok=ctDevPlayable(C,T.p);
+  const nw=CT_DEVK.filter(k=>p.nd[k]&&k!=='v');
+  return `<div class="ct-pan"><div class="label">เล่นได้ 1 ใบต่อตา</div><div class="ct-devs">${ok.map(k=>`<button type="button" class="ct-devb" data-act="ctPlay" data-id="${k}"><b>${CT_DEV[k].i} ${CT_DEV[k].n}</b><small>${CT_DEV[k].en} · มี ${p.dev[k]}</small></button>`).join('')}</div>
+    ${nw.length?`<p class="muted small" style="margin:0">ซื้อตานี้ยังเล่นไม่ได้: ${nw.map(k=>CT_DEV[k].n).join(', ')}</p>`:''}</div>`}
+function ctBuyPanel(C){return `<div class="ct-pan"><div class="label">หยิบการ์ดใบบนสุดจากกองจริง ได้การ์ดอะไร (จ่าย ${ctCostH(CT_COST.dev)} ตอนกด)</div>
+  <div class="ct-devs">${CT_DEVK.map(k=>`<button type="button" class="ct-devb" data-act="ctBuyK" data-id="${k}" ${C.deck[k]?'':'disabled'}><b>${CT_DEV[k].i} ${CT_DEV[k].n}</b><small>เหลือในกอง ${C.deck[k]}</small></button>`).join('')}</div>
+  <div class="btns"><button class="btn primary" data-act="ctBuyK" data-id="rand">🎲 สุ่มในเครื่อง (ไม่มีกองการ์ดจริง)</button><button class="btn sm ghost" data-act="ctPanel" data-id="">ยกเลิก</button></div></div>`}
+function ctYPPanel(C){const T=C.T;const y=T.yp;const n=CT_RES.reduce((a,r)=>a+(y[r]||0),0);
+  return `<div class="ct-pan"><div class="label">ปีอุดมสมบูรณ์: เลือกการ์ด 2 ใบจากธนาคาร (${n}/2)</div><div class="ct-stps">${CT_RES.map(r=>ctStep('ctYP','y',r,y[r]||0,Math.min(C.bank[r],2-n+(y[r]||0)))).join('')}</div>
+  <div class="btns"><button class="btn primary" data-act="ctYPOK" ${n===2||n>0&&CT_RES.every(r=>!C.bank[r]||n>=2)?'':'disabled'}>เอาการ์ด</button><button class="btn sm ghost" data-act="ctPanel" data-id="">ยกเลิก</button></div></div>`}
+function ctMoPanel(C){const T=C.T;const r=T.mo;const tot=r?C.players.reduce((a,p,j)=>a+(j===T.p?0:(p.res[r]||0)),0):0;
+  return `<div class="ct-pan"><div class="label">ผูกขาด: เลือกทรัพยากร 1 ชนิด ทุกคนต้องให้ชนิดนั้นทั้งหมด</div><div class="chips">${CT_RES.map(x=>`<button type="button" class="chip" data-act="ctMoR" data-id="${x}" aria-pressed="${r===x}">${CT_RE[x]} ${CT_RN[x]}</button>`).join('')}</div>
+  ${r?`<div class="btns"><button class="btn primary" data-act="ctMoOK">ประกาศ ${CT_RN[r]}</button><span class="muted small">ตามที่จดในเครื่อง จะได้ ${tot} ใบ</span></div>`:''}<div class="btns"><button class="btn sm ghost" data-act="ctPanel" data-id="">ยกเลิก</button></div></div>`}
+
+function ctCorner(C,k){
+  const T=C.T;
+  if(k==='tl'){const cur=ctCur(C);const p=C.players[cur];
+    return `<div class="ct-cor"><div class="label">${C.phase==='place'?'วางบ้านตั้งต้น '+(C.place.i+1)+'/'+C.place.seq.length:'ตาที่ '+T.n}</div><div class="ct-who">${playerPawn(p,'sm')}<b>${esc(ctName(p))}</b></div>
+      ${T&&T.rolled?`<div class="ct-lastroll">${ctDiceFace(T.dice)}<b class="${T.roll===7?'seven':''}">${T.roll}</b></div>`:''}
+      ${T&&T.prod?`<div class="ct-prod">${T.prod.out.map((g,i)=>ctResTxt(g)?`<span>${playerPawn(C.players[i],'xs')}${ctResTxt(g)}</span>`:'').join('')||'<span class="muted">ไม่มีใครได้</span>'}${T.prod.blocked?'<span class="muted">🦹 โจรกัน</span>':''}</div>`:''}</div>`}
+  if(k==='tr')return `<div class="ct-cor"><div class="label">ธนาคาร</div><div class="ct-bank">${CT_RES.map(r=>ctRC(r,C.bank[r])).join('')}<span class="ct-rc" title="การ์ดพัฒนาในกอง"><i>📜</i><b>${CT_DEVK.reduce((a,x)=>a+C.deck[x],0)}</b></span></div></div>`;
+  const B=(act,ic,t,cls,x)=>`<button class="btn sm ${cls||''}" data-act="${act}" title="${t}" ${x||''}>${ic}<span class="t"> ${t}</span></button>`;
+  if(k==='bl')return `<div class="ct-cor ct-cbtn">${B('ctChat','💬','ถามกติกา','primary ct-wide ct-chatb')}${B('ctLogS','📜','บันทึก')}${B('ctStats','📊','สถิติเต๋า')}${ctPhoto()||CT_TMP_PHOTO?B('ctPhotoS','📷','รูปกระดาน'):''}</div>`;
+  return `<div class="ct-cor ct-cbtn">${B('ctUndo','↶','ย้อนกลับ','ct-wide',C.hist.length?'':'disabled')}${B('ctRot','⟳','หมุนกระดาน')}${B('ctSet','⚙','ตั้งค่า/แก้')}${B('ctFull',C.view.full?'⤡':'⤢',C.view.full?'ย่อจอ':'เต็มจอ','ghost')}</div>`;
+}
+function ctFixBar(C){const F=C.view.fix;if(!F)return '';
+  return `<div class="ct-fix"><b>โหมดแก้กระดาน</b> ไม่หักการ์ด ไม่เช็กกติกา<div class="chips">${[['set','🏠 บ้าน'],['city','🏛️ เมือง'],['road','▬ ถนน'],['robber','🦹 โจร'],['del','🗑 ลบชิ้น']].map(([k,n])=>`<button type="button" class="chip" data-act="ctFixK" data-id="${k}" aria-pressed="${F.k===k}">${n}</button>`).join('')}</div>
+    ${F.k!=='robber'&&F.k!=='del'?`<div class="chips">${C.players.map((p,i)=>`<button type="button" class="chip" data-act="ctFixP" data-id="${i}" aria-pressed="${F.p===i}" style="border-color:${ctCol(p)}">${playerPawn(p,'xs')} ${esc(ctName(p))}</button>`).join('')}</div>`:''}<button class="btn sm primary" data-act="ctFixOff">เสร็จแล้ว</button></div>`}
+function ctTableView(C){
+  const wide=C.view.full&&C.opts.seats&&window.innerWidth>=760;const cur=ctCur(C);const T=C.T;
+  const bigOf=i=>i===cur||!!(T&&T.stage==='discard'&&T.disc&&T.disc[i]!=null);
+  const seatAt=s=>C.players.findIndex(p=>p.side===s);
+  const board=`<div class="ct-board">${ctSVG(C,'play')}${ctFixBar(C)}</div>`;
+  const chat=C.view.chat?ctChatPanel(C):'';
+  if(!wide){
+    const others=C.order.filter(i=>!bigOf(i));const bigs=C.order.filter(bigOf);
+    return `<div class="ct ${C.view.full?'full':''} stack"><div class="ct-top">${ctCorner(C,'tl')}${ctCorner(C,'tr')}</div>
+      ${board}<div class="ct-seats">${bigs.map(i=>ctSeat(C,i,true)).join('')}${others.map(i=>ctSeat(C,i,false)).join('')}</div>
+      <div class="ct-bot">${ctCorner(C,'bl')}${ctCorner(C,'br')}</div>${chat}</div>`}
+  const cell=s=>{const i=seatAt(s);if(i<0)return `<div class="ct-cell ct-${s} ct-empty"></div>`;return `<div class="ct-cell ct-${s}${bigOf(i)?' big':''}"><div class="ct-rot">${ctSeat(C,i,bigOf(i))}</div></div>`};
+  const sz=s=>{const i=seatAt(s);return i<0?(s==='l'||s==='r'?'118px':'96px'):bigOf(i)?(s==='l'||s==='r'?'clamp(220px,28vw,360px)':'clamp(220px,34vh,320px)'):(s==='l'||s==='r'?'118px':'96px')};
+  return `<div class="ct full seats" style="--lw:${sz('l')};--rw:${sz('r')};--th:${sz('t')};--bh:${sz('b')}">
+    <div class="ct-cell ct-tl">${ctCorner(C,'tl')}</div>${cell('t')}<div class="ct-cell ct-tr">${ctCorner(C,'tr')}</div>
+    ${cell('l')}${board}${cell('r')}
+    <div class="ct-cell ct-bl">${ctCorner(C,'bl')}</div>${cell('b')}<div class="ct-cell ct-br">${ctCorner(C,'br')}</div>${chat}</div>`;
+}
+
+/* ---------- chat (rules only) ---------- */
+function ctChatPanel(C){
+  const qs=['ตอนนี้ทำอะไรได้บ้าง','ทอยได้ 7 ทำยังไง','สร้างบ้านต้องมีอะไร','แลกกับธนาคารยังไง','ถนนยาวที่สุดนับยังไง','การ์ดพัฒนามีอะไรบ้าง','ชนะยังไง'];
+  return `<div class="ct-chat" role="dialog" aria-label="ถามกติกา"><div class="ct-chead"><b>💬 ถามกติกา Catan</b><button class="x" data-act="ctChat" aria-label="ปิด">×</button></div>
+    <p class="muted small" style="margin:0">ตอบเฉพาะกติกา และบอกได้ว่าตอนนี้ทำอะไรได้บ้าง แต่ไม่ช่วยคิดว่าควรเล่นยังไง${CT_AI.s?' · ตอบโดย Claude':' · ตอบจากคู่มือในเครื่อง'} · ไม่เก็บแชท ปิดหน้าต่างนี้แล้วข้อความหายหมด</p>
+    <div class="ct-msgs" id="ctMsgs">${CT_CHAT.length?CT_CHAT.map((m,k)=>`<div class="ct-msg ${m.u?'u':'a'}" ${k===CT_CHAT.length-1?'id="ctMsgLast"':''}>${m.u?esc(m.t):m.wait&&!m.t?'<span class="muted">กำลังคิด…</span>':md(m.t)}</div>`).join(''):'<div class="ct-msg a">ถามอะไรเกี่ยวกับกติกาก็ได้ เช่น "ทิ้งการ์ดกี่ใบ" "สร้างถนนผ่านบ้านคนอื่นได้ไหม"</div>'}</div>
+    <div class="chips ct-qs">${qs.map(q=>`<button type="button" class="chip" data-act="ctAskQ" data-id="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+    <div class="ct-cin"><input type="text" id="ctChatIn" placeholder="พิมพ์คำถาม แล้วกด Enter" autocomplete="off"><button class="btn primary" data-act="ctAsk">ถาม</button></div>
+    <div class="btns"><button class="btn sm ghost" data-act="ctKB">📖 กติกาทั้งหมด</button></div></div>`;
+}
+function ctCanDo(C){
+  if(!C||(C.phase!=='play'&&C.phase!=='place'))return 'ยังไม่ได้เริ่มเกม ตอนนี้ตั้งคนเล่นและกระดานอยู่';
+  const cur=ctCur(C);const nm=ctPN(C,cur);
+  if(C.phase==='place'){const P=C.place;return `ตอนนี้ช่วงวางบ้านตั้งต้น ตาของ **${nm}**\n- ${P.step==='set'?'วางบ้าน 1 หลังบนจุดว่างที่ 3 จุดข้าง ๆ ว่าง (กฎระยะห่าง)':'วางถนน 1 เส้นติดบ้านที่เพิ่งวาง'}\n- ยังไม่มีการทอยเต๋า แลก หรือซื้อ จนกว่าทุกคนจะวางครบ 2 รอบ`}
+  const T=C.T,p=C.players[cur];const L=[];
+  if(T.stage==='discard')return `ทอยได้ 7 ตอนนี้รอทิ้งการ์ด: ${Object.keys(T.disc).map(j=>ctPN(C,+j)+' '+T.disc[j]+' ใบ').join(', ')}\n- คนที่ต้องทิ้งเลือกเองว่าจะทิ้งใบไหน\n- เสร็จแล้ว ${nm} ย้ายโจรและขโมย`;
+  if(T.stage==='robber')return `ตาของ **${nm}**: ต้องย้ายโจรไปช่องอื่น (ช่องไหนก็ได้ รวมทะเลทราย ยกเว้นช่องเดิม) แล้วขโมย 1 ใบจากคนที่มีบ้านติดช่องนั้น`;
+  if(T.stage==='steal')return `ตาของ **${nm}**: เลือกขโมย 1 ใบจาก ${T.cand.map(j=>ctPN(C,j)).join(' หรือ ')} (คนที่มีบ้านหรือเมืองติดช่องโจร)`;
+  if(T.stage==='rb')return `ตาของ **${nm}**: วางถนนฟรีจากการ์ดสร้างถนนอีก ${T.rb} เส้น ตามกติกาสร้างถนนปกติ`;
+  const dp=ctDevPlayable(C,cur);
+  if(!T.rolled){L.push('ทอยเต๋า 2 ลูก');if(dp.length)L.push('เล่นการ์ดพัฒนาก่อนทอยได้ 1 ใบ: '+dp.map(k=>CT_DEV[k].n).join(', '));
+    return `ตาของ **${nm}** ยังไม่ทอย\n${L.map(x=>'- '+x).join('\n')}\n- ยังแลกหรือสร้างไม่ได้จนกว่าจะทอย`}
+  const canTr=C.opts.combine||!T.built;const pc=ctPieces(C,cur);
+  if(canTr){const rt=CT_RES.map(r=>CT_RN[r]+' '+ctRatio(C,cur,r)+':1').join(', ');L.push('แลกการ์ดกับคนอื่น (ทุกการแลกต้องมี '+nm+' อยู่ด้วย)');L.push('แลกกับธนาคาร: '+rt)}
+  else L.push('แลกไม่ได้แล้วในตานี้ เพราะสร้างหรือซื้อไปแล้ว (เปิด "รวมขั้นแลกกับสร้าง" ได้ในตั้งค่า)');
+  const bl=(k,lim,lab)=>{if(lim)return lab+': '+lim;return lab+' ใช้ '+Object.keys(CT_COST[k]).map(r=>CT_RN[r]+' '+CT_COST[k][r]).join(' + ')+(ctCan(p,CT_COST[k])?' (การ์ดในเครื่องพอ)':' (ในเครื่องขาด '+ctMiss(p,CT_COST[k])+')')};
+  L.push(bl('road',pc.r>=15?'ถนนหมด 15 เส้นแล้ว':'','สร้างถนน'));L.push(bl('set',pc.s>=5?'บ้านครบ 5 หลังแล้ว ต้องอัปเป็นเมืองก่อน':'','สร้างบ้าน'));L.push(bl('city',!pc.s?'ไม่มีบ้านให้อัป':pc.c>=4?'ครบ 4 เมืองแล้ว':'','อัปเป็นเมือง'));
+  L.push(bl('dev',CT_DEVK.some(k=>C.deck[k])?'':'กองการ์ดพัฒนาหมด','ซื้อการ์ดพัฒนา'));
+  if(dp.length)L.push('เล่นการ์ดพัฒนาได้ 1 ใบ: '+dp.map(k=>CT_DEV[k].n).join(', '));else if(T.dev)L.push('เล่นการ์ดพัฒนาไปแล้วตานี้');
+  L.push('กดจบตา ส่งเต๋าให้คนต่อไป');
+  return `ตาของ **${nm}** (ทอยได้ ${T.roll})\n${L.map(x=>'- '+x).join('\n')}\n\nคนที่ไม่ใช่ตา: เสนอแลกกับ ${nm} ได้ แต่แลกกันเองไม่ได้ และแลกกับธนาคารไม่ได้`;
+}
+function ctKBHit(q){const s=q.toLowerCase();return CT_KB.map(e=>({e,sc:e.k.reduce((a,k)=>a+(s.includes(k.toLowerCase())?k.length+2:0),0)})).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc).filter((x,k,arr)=>k<2&&x.sc*2>=arr[0].sc).map(x=>x.e)}
+function ctLocalAnswer(C,q){const adv=CT_ADV.test(q),now=CT_NOW.test(q);const hits=ctKBHit(q.replace(CT_ADV,' '));let out='';
+  if(adv)out+='🙅 ขอไม่ตอบว่าควรเล่นยังไงหรืออะไรดีกว่ากันนะ ตัวช่วยนี้ตอบได้แค่กติกา ให้คิดเองจะสนุกกว่า\n\nนี่คือกติกาที่เกี่ยวข้อง:\n\n';
+  if(now||(adv&&!hits.length))out+=ctCanDo(C)+'\n\n';
+  hits.forEach(h=>{out+='**'+h.t+'**\n'+h.a+'\n\n'});
+  if(!out.trim())out='ยังไม่แน่ใจว่าถามเรื่องไหน ลองใช้คำอย่าง "ทอยได้ 7" "ทิ้งการ์ด" "สร้างเมือง" "ท่าเรือ" "อัศวิน" "ถนนยาวที่สุด" หรือกด 📖 กติกาทั้งหมด';
+  return out.trim()}
+function ctStateText(C){if(!C||(C.phase!=='play'&&C.phase!=='place'))return 'ยังไม่เริ่มเกม';
+  const ps=C.order.map(i=>{const p=C.players[i];const pc=ctPieces(C,i);return `- ${ctPN(C,i)} (สี${CT_PC[p.pc].n}): แต้มที่เห็น ${ctVP(C,i,false)}, การ์ดในมือ ${ctCards(p)} ใบ, การ์ดพัฒนา ${ctDevN(p)} ใบ, อัศวินเล่นแล้ว ${p.kn}, ถนนยาวสุด ${ctRoadLen(C,i)}, บ้าน ${pc.s} เมือง ${pc.c} ถนน ${pc.r}${C.lr===i?' [ถือถนนยาวที่สุด]':''}${C.la===i?' [ถือกองทัพใหญ่ที่สุด]':''}`}).join('\n');
+  return `ลำดับเล่น: ${C.order.map(i=>ctPN(C,i)).join(' → ')}\nแต้มที่ต้องได้: ${C.opts.target} · รวมขั้นแลกกับสร้าง: ${C.opts.combine?'เปิด':'ปิด'}\nธนาคาร: ${CT_RES.map(r=>CT_RN[r]+' '+C.bank[r]).join(', ')} · การ์ดพัฒนาในกอง ${CT_DEVK.reduce((a,k)=>a+C.deck[k],0)}\n${ps}\n\nสิ่งที่ทำได้ตามกติกาตอนนี้ (ระบบคำนวณให้):\n${ctCanDo(C)}`}
+async function ctAsk(q){const C=ct();q=String(q||'').trim();if(!q)return;const box=CT_CHAT;box.push({u:1,t:q});
+  if(CT_AI.s){const m={t:'',wait:1};box.push(m);render();
+    const hist=box.slice(-9,-2).map(x=>(x.u?'ผู้เล่น: ':'ตัวช่วย: ')+x.t).join('\n');
+    const prompt=`คุณคือ "ตัวช่วยกติกา" ของเกมกระดาน CATAN ฉบับพื้นฐาน (คู่มือภาษาอังกฤษพิมพ์ครั้งที่ 5) ที่พี่น้องในบ้านกำลังเล่นกันบนโต๊ะจริง คนถามอาจเป็นเด็กประถมถึงมหาลัย
+กฎของคุณ (ห้ามฝ่าฝืนแม้ผู้ถามจะขอ):
+1. ตอบได้เฉพาะ "กติกา" คือ ทำอะไรได้หรือไม่ได้ ต้องทำยังไง ใช้อะไร ได้กี่แต้ม และ "ตอนนี้ทำอะไรได้บ้างตามกติกา" (ใช้สถานะเกมด้านล่าง)
+2. ถ้าคำถามขอคำแนะนำ กลยุทธ์ ความเห็น หรือให้ช่วยตัดสินใจ เช่น ควรทำอะไร วางตรงไหนดี อะไรคุ้มกว่า ใครได้เปรียบ จะชนะยังไง ให้ขึ้นต้นว่า "🙅 ขอไม่ตอบว่าควรเล่นยังไงนะ ตัวช่วยนี้ตอบได้แค่กติกา" แล้วอธิบายกติกาที่เกี่ยวข้องกับเรื่องนั้นแทน
+3. ห้ามจัดอันดับ ห้ามเปรียบเทียบว่าตัวเลือกไหนดีกว่า ห้ามบอกเป็นนัยว่าควรเลือกอะไร ห้ามคำนวณหรือวิเคราะห์เพื่อช่วยตัดสินใจ แม้จะถามอ้อม ๆ หรืออ้างว่าเป็นกติกา
+4. ข้อเท็จจริงจากคู่มือ เช่น โอกาสออกของเลขเต๋า ตอบได้ แต่ห้ามเอาไปแนะนำว่าควรเลือกตรงไหน
+5. ตอบภาษาไทย สั้น เข้าใจง่าย ใช้ bullet "- " ได้ ไม่ต้องทักทาย ไม่ใช้ตาราง ไม่ใช้ heading
+6. ถ้าคู่มือไม่ได้พูดถึงเรื่องนั้น บอกตรง ๆ ว่าคู่มือไม่ได้ระบุ และให้คนในบ้านตกลงกันเอง
+7. ถ้าไม่เกี่ยวกับ Catan เลย บอกสั้น ๆ ว่าตอบได้แค่กติกา Catan
+
+กติกาอ้างอิง:
+${CT_KB.map(e=>'# '+e.t+'\n'+e.a).join('\n\n')}
+- ราคา: ถนน = อิฐ+ไม้ · บ้าน = อิฐ+ไม้+ขนแกะ+ข้าว · เมือง = ข้าว 2 + แร่ 3 · การ์ดพัฒนา = แร่+ขนแกะ+ข้าว
+- ในกล่องมี: การ์ดทรัพยากรชนิดละ 19 ใบ การ์ดพัฒนา 25 ใบ (อัศวิน 14 แต้ม 5 สร้างถนน 2 ปีอุดมสมบูรณ์ 2 ผูกขาด 2)
+
+สถานะเกมตอนนี้:
+${ctStateText(C)}
+${hist?'\nคุยกันก่อนหน้า:\n'+hist:''}
+
+คำถามใหม่: ${q}`;
+    try{const r=await CT_AI.s(prompt,{cache:false,onText:({text})=>{m.t=text;if(box!==CT_CHAT)return;const el=document.getElementById('ctMsgLast');if(el)el.innerHTML=md(text)}});m.t=r.text||m.t}
+    catch(e){if(e&&e.code==='not_granted')CT_AI.s=null;m.t=ctLocalAnswer(C,q)+'\n\n(ตอบจากคู่มือในเครื่อง เพราะเรียก AI ไม่ได้)'}
+    delete m.wait;}
+  else box.push({t:ctLocalAnswer(C,q)});
+  if(box===CT_CHAT&&C.view.chat)render()}
+
+/* ---------- end ---------- */
+function ctEndView(C){
+  const rk=C.players.map((p,i)=>({i,v:ctVP(C,i,true)})).sort((a,b)=>b.v-a.v);const best=rk.length?rk[0].v:0;
+  const winners=C.win!=null?[C.win]:rk.filter(x=>x.v===best).map(x=>x.i);
+  return `<div class="stage"><div><h3>${C.win!=null?'🏆 '+esc(ctPN(C,C.win))+' ชนะ!':'สรุปแต้ม'}</h3><p class="muted small">แต้มรวมการ์ดแต้มที่ซ่อนอยู่แล้ว</p></div>
+    <div class="rank">${rk.map(x=>{const p=C.players[x.i],pc=ctPieces(C,x.i);return `<div class="ct-rk${winners.includes(x.i)?' win':''}" style="--pc:${ctCol(p)}">${playerPawn(p,'sm')}<b>${esc(ctName(p))}</b><span class="ct-vp"><b>${x.v}</b> แต้ม</span>
+      <small>บ้าน ${pc.s}${pc.c?' · เมือง '+pc.c+'×2':''}${C.lr===x.i?' · ถนนยาว 2':''}${C.la===x.i?' · กองทัพ 2':''}${p.dev.v+p.nd.v?' · การ์ดแต้ม '+(p.dev.v+p.nd.v):''}</small></div>`}).join('')}</div>
+    ${C.saved?'<p class="muted">บันทึกผลเข้าบ้านแล้ว</p>':`<label class="check"><input type="checkbox" id="ctAward" checked> ให้แต้มบ้านกับผู้ชนะ</label><label class="field" style="max-width:180px"><span>กี่แต้ม</span><input type="number" id="ctAwardN" value="${esc(C.award)}" min="0" max="50"></label><button class="btn primary big" data-act="ctSaveRes">บันทึกผลเข้าบ้าน</button>`}
+    <details class="rules"><summary>📊 สถิติลูกเต๋าเกมนี้</summary>${ctStatsHTML(C)}</details>
+    <div class="btns"><button class="btn" data-act="ctBackTable">← กลับไปที่โต๊ะ</button><button class="btn" data-act="ctAgain">เล่นใหม่ คนเดิม กระดานเดิม</button><button class="btn ghost" data-act="ctNewGame">เริ่มใหม่ทั้งหมด</button></div></div>`;
+}
+function ctStatsHTML(C){const tot=Object.values(C.rolls).reduce((a,b)=>a+b,0);const mx=Math.max(1,...Object.values(C.rolls),...[2,3,4,5,6,7,8,9,10,11,12].map(n=>tot*(6-Math.abs(7-n))/36));
+  return `<div class="ct-stats">${[2,3,4,5,6,7,8,9,10,11,12].map(n=>{const c=C.rolls[n]||0,ex=tot*(6-Math.abs(7-n))/36;return `<div class="ct-sb"><div class="ct-sbar"><i style="height:${c/mx*100}%"></i><u style="bottom:${ex/mx*100}%"></u></div><b>${n}</b><small>${c}</small></div>`}).join('')}</div>
+    <p class="muted small" style="margin:0">ทอยไปแล้ว ${tot} ครั้ง · แท่ง = ออกจริง · ขีด = ที่ควรออกโดยเฉลี่ย</p>`}
+
+/* ---------- main view ---------- */
+function vCatan(){const C=ct();setTimeout(ctAIInit,0);
+  if(C.phase==='board'){if(!C.hex)C.hex=ctEmptyHex();return `<div class="stage"><div><h3>ตั้งกระดาน</h3><p class="muted small">กดเลือกทีละช่องให้ตรงกับกระดานจริง หรือสุ่ม หรือใช้กระดานผู้เริ่มต้น · หมุนกระดานบนจอให้ตรงกับที่วางบนโต๊ะได้</p></div>${ctBoardView(C)}</div>`}
+  if(C.phase==='place'||C.phase==='play'){if(!C.view.full)return `<div class="ct-inline"><div class="btns"><button class="btn primary big" data-act="ctFull">⤢ เปิดโต๊ะเต็มจอ</button></div>${ctTableView(C)}</div>`;return ctTableView(C)}
+  if(C.phase==='end')return ctEndView(C);
+  return ctSetupView(C);
+}
+function ctAfter(){const on=!!document.querySelector('.ct.full');document.body.classList.toggle('ct-lock',on);const m=document.getElementById('ctMsgs');if(m)m.scrollTop=m.scrollHeight;
+  const C=S.catan;if(C&&C.view&&Object.values(C.view.peek||{}).some(t=>Date.now()-t<8000)){clearTimeout(ctAfter.t);ctAfter.t=setTimeout(()=>{if(S.tab==='tools'&&S.tool==='catan')render()},8100)}}
+function ctEndInfo(){const C=S.catan;if(!C||(C.phase!=='play'&&C.phase!=='place'))return null;return {name:'Catan',note:'ไปหน้าสรุปแต้ม (รวมการ์ดแต้มที่ซ่อนอยู่)',go:()=>ACT.ctToEnd()}}
+
+/* ---------- actions ---------- */
+const ctGo=()=>{ctSave();render()};
+const ctNum=t=>+t.dataset.id;
+Object.assign(ACT,{
+  ctPick(t){const C=ct();const id=t.dataset.id;const k=C.players.findIndex(p=>p.id===id);if(k>=0)C.players.splice(k,1);else{if(C.players.length>=4){toast('Catan กล่องปกติเล่นได้ 4 คน');return}C.players.push(ctAddP(C,{id}))}ctGo()},
+  ctGuest(){const C=ct();const n=val('ctGuestIn');if(!n)return;if(C.players.length>=4){toast('Catan กล่องปกติเล่นได้ 4 คน');return}C.players.push(ctAddP(C,{name:n,code:n.slice(0,2),color:GUEST_COLORS[C.players.filter(p=>!p.id).length%GUEST_COLORS.length]}));ctGo()},
+  ctDrop(t){ct().players.splice(ctNum(t),1);ctGo()},
+  ctClear(){ct().players=[];ctGo()},
+  ctPc(t){const C=ct();const [i,c]=t.dataset.id.split(':');const o=C.players.find(p=>p.pc===c);if(o)o.pc=C.players[+i].pc;C.players[+i].pc=c;ctGo()},
+  ctSide(t){const C=ct();const [i,s]=t.dataset.id.split(':');const o=C.players.find(p=>p.side===s);if(o)o.side=C.players[+i].side;C.players[+i].side=s;ctGo()},
+  ctToBoard(){const C=ct();C.phase='board';if(!C.hex)C.hex=ctEmptyHex();if(C.first!=null&&C.first>=C.players.length)C.first=null;ctGo();window.scrollTo({top:0})},
+  ctToSetup(){ct().phase='setup';ctGo()},
+  ctEd(t){const C=ct();C.view.ed=t.dataset.id;C.view.psel=null;ctGo()},
+  ctEdHex(t){ct().view.sel=ctNum(t);ctGo()},
+  ctEdPort(t){ct().view.psel=ctNum(t);ctGo()},
+  ctSetT(t){const C=ct();const h=C.hex[C.view.sel];h.t=t.dataset.id;if(h.t==='D'){h.n=null;C.view.sel=Math.min(18,C.view.sel+1)}C.view.aiNote='';ctGo()},
+  ctSetN(t){const C=ct();const h=C.hex[C.view.sel];const n=ctNum(t);if(h.t==='D')return;h.n=n||null;if(n)C.view.sel=Math.min(18,C.view.sel+1);ctGo()},
+  ctSetP(t){const C=ct();const e=C.view.psel;if(e==null)return;const k=t.dataset.id;if(k==='x')delete C.ports[e];else C.ports[e]=k;ctGo()},
+  ctRot(){const C=ct();C.view.rot=((C.view.rot||0)+1)%6;ctGo()},
+  ctRand(){const C=ct();C.hex=ctRandBoard();const tys=shuffle(Object.values(C.ports));Object.keys(C.ports).forEach((e,k)=>C.ports[e]=tys[k]);C.view.aiNote='';toast('สุ่มกระดานใหม่แล้ว (เลขแดงไม่ติดกัน ท่าเรือสลับชนิด)');ctGo()},
+  ctBeginBoard(){const C=ct();C.hex=ctParseHexes(CT_BEGIN);C.ports=CT_STD_PORTS();C.view.aiNote='';ctGo()},
+  ctClearBoard(){const C=ct();C.hex=ctEmptyHex();C.view.sel=0;ctGo()},
+  ctCodeUse(){const C=ct();const r=ctParseCode(val('ctCodeIn'));if(!r){toast('อ่านรหัสไม่ได้ ต้องมี 19 ช่อง เช่น W5 P6 … ');return}C.hex=r.hex;if(r.ports)C.ports=r.ports;toast('ตั้งกระดานจากรหัสแล้ว');ctGo()},
+  ctCodeCopy(){const s=ctCode(ct());(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('คัดลอกรหัสแล้ว'),()=>{const el=document.getElementById('ctCodeIn');if(el){el.value=s;el.select()}toast('เลือกข้อความไว้แล้ว กดคัดลอกเอง')})},
+  ctPhotoDel(){LS.set('catanPhoto','');CT_TMP_PHOTO='';ctGo()},
+  ctAIRead(){ctAIRead()},
+  ctFirst(t){ct().first=ctNum(t);ctGo()},
+  ctFirstRoll(){const C=ct();let pool=C.players.map((p,i)=>i);const fr={};let guard=0;
+    while(pool.length>1&&guard++<20){const r=pool.map(i=>{const a=1+Math.floor(Math.random()*6),b=1+Math.floor(Math.random()*6);fr[i]=(fr[i]?fr[i]+' → ':'')+(a+b);return [i,a+b]});const mx=Math.max(...r.map(x=>x[1]));pool=r.filter(x=>x[1]===mx).map(x=>x[0])}
+    C.view.fr=fr;C.first=pool[0];toast(ctPN(C,pool[0])+' ได้สูงสุด เริ่มก่อน');ctGo()},
+  ctGoPlace(){const C=ct();if(C.first==null)return;ctStartPlace();ctGo();window.scrollTo({top:0})},
+  ctGoBegin(){const C=ct();if(C.first==null)return;ctStartBeginner();ctGo();window.scrollTo({top:0})},
+  ctBackPlay(){const C=ct();C.phase=C.back;C.back=null;const d=C.robber;if(d==null)C.robber=C.hex.findIndex(h=>h.t==='D');ctGo()},
+  ctNode(t){const C=ct();const n=ctNum(t);
+    if(C.view.fix)return ctFixNode(C,n);
+    if(C.phase==='place'){ctPlaceNode(C,n);return ctGo()}
+    const T=C.T;if(!T||!T.mode)return;const i=T.p,p=C.players[i];
+    if(T.mode==='set'){if(!ctSetOK(C,i,n,false))return;if(!ctCan(p,CT_COST.set)){toast('การ์ดในเครื่องไม่พอ ขาด '+ctMiss(p,CT_COST.set)+' · ถ้าในมือจริงมี กด ✎ แก้การ์ดก่อน');return}
+      ctSnap(C);ctPay(C,p,CT_COST.set);C.nodes[n]={p:i,c:0};T.built=true;T.mode=null;ctLog(C,'🏠 '+ctPN(C,i)+' สร้างบ้าน');ctUpdLR(C)}
+    else if(T.mode==='city'){if(!ctCityOK(C,i,n))return;if(!ctCan(p,CT_COST.city)){toast('การ์ดในเครื่องไม่พอ ขาด '+ctMiss(p,CT_COST.city));return}
+      ctSnap(C);ctPay(C,p,CT_COST.city);C.nodes[n].c=1;T.built=true;T.mode=null;ctLog(C,'🏛️ '+ctPN(C,i)+' อัปบ้านเป็นเมือง')}
+    ctGo()},
+  ctEdge(t){const C=ct();const e=ctNum(t);
+    if(C.view.fix)return ctFixEdge(C,e);
+    if(C.phase==='place'){ctPlaceEdge(C,e);return ctGo()}
+    const T=C.T;if(!T)return;const i=T.p,p=C.players[i];if(!ctRoadOK(C,i,e))return;
+    if(T.stage==='rb'){ctSnap(C);C.edges[e]=i;T.rb--;ctLog(C,'🛣️ '+ctPN(C,i)+' วางถนนฟรี');if(T.rb<=0||ctPieces(C,i).r>=15||!CTG.E.some((x,k)=>ctRoadOK(C,i,k))){T.stage=null;T.rb=0}ctUpdLR(C);return ctGo()}
+    if(T.mode!=='road')return;if(!ctCan(p,CT_COST.road)){toast('การ์ดในเครื่องไม่พอ ขาด '+ctMiss(p,CT_COST.road)+' · ถ้าในมือจริงมี กด ✎ แก้การ์ดก่อน');return}
+    ctSnap(C);ctPay(C,p,CT_COST.road);C.edges[e]=i;T.built=true;T.mode=null;ctLog(C,'▬ '+ctPN(C,i)+' สร้างถนน');ctUpdLR(C);ctGo()},
+  ctRob(t){const C=ct();const h=ctNum(t);if(C.view.fix){ctSnap(C);C.robber=h;return ctGo()}const T=C.T;if(!T||T.stage!=='robber'||h===C.robber)return;ctSnap(C);C.robber=h;
+    ctLog(C,'🦹 '+ctPN(C,T.p)+' ย้ายโจรไปช่อง '+(C.hex[h].t?CT_T[C.hex[h].t].n:'')+(C.hex[h].n?' '+C.hex[h].n:''));ctAfterRobber(C);ctGo()},
+  ctVic(t){ct().T.vic=ctNum(t);ctGo()},
+  ctVicBack(){ct().T.vic=null;ctGo()},
+  ctStealRand(){const C=ct();ctSnap(C);ctStealFrom(C,C.T.vic,null);ctGo()},
+  ctStealR(t){const C=ct();ctSnap(C);ctStealFrom(C,C.T.vic,t.dataset.id);ctGo()},
+  ctRollN(t){const C=ct();ctRoll(C,ctNum(t));ctGo()},
+  ctDice(){const C=ct();const T=C.T;if(!T||T.rolled||T.stage||ctAfter.rolling)return;ctAfter.rolling=true;const b=document.getElementById('ctDiceBtn');let k=0;
+    const iv=setInterval(()=>{if(b)b.textContent=CT_DICE[Math.floor(Math.random()*6)]+CT_DICE[Math.floor(Math.random()*6)];if(++k>=8){clearInterval(iv);ctAfter.rolling=false;const a=1+Math.floor(Math.random()*6),c=1+Math.floor(Math.random()*6);ctRoll(C,a+c,[a,c]);toast('🎲 ทอยได้ '+(a+c));ctGo()}},70)},
+  ctDisc(t){const C=ct();const [i,r,d]=t.dataset.id.split(':');const T=C.T;const s=T.dsel[i]||(T.dsel[i]={});const p=C.players[+i];const got=CT_RES.reduce((a,x)=>a+(s[x]||0),0);
+    const v=(s[r]||0)+(+d);if(v<0||v>(p.res[r]||0)||(+d>0&&got>=T.disc[i]))return;s[r]=v;ctGo()},
+  ctDiscRand(t){const C=ct();const i=ctNum(t);const T=C.T;const p=C.players[i];const bag=[];CT_RES.forEach(r=>{for(let k=0;k<(p.res[r]||0);k++)bag.push(r)});const pick=shuffle(bag).slice(0,T.disc[i]);const s={};pick.forEach(r=>s[r]=(s[r]||0)+1);T.dsel[i]=s;ctGo()},
+  ctDiscOK(t){const C=ct();const i=ctNum(t);const T=C.T;const s=T.dsel[i]||{};const got=CT_RES.reduce((a,r)=>a+(s[r]||0),0);if(got!==T.disc[i])return;ctSnap(C);
+    CT_RES.forEach(r=>{if(s[r]){C.players[i].res[r]-=s[r];C.bank[r]+=s[r]}});ctLog(C,ctPN(C,i)+' ทิ้งการ์ด '+got+' ใบ');delete T.disc[i];delete T.dsel[i];if(!Object.keys(T.disc).length)T.stage='robber';ctGo()},
+  ctMode(t){const C=ct();const T=C.T;const k=t.dataset.id;if(!k){T.mode=null;return ctGo()}const i=T.p,p=C.players[i];
+    if(!ctCan(p,CT_COST[k])){toast('การ์ดในเครื่องไม่พอ ขาด '+ctMiss(p,CT_COST[k])+' · ถ้าในมือจริงมี กด ✎ แก้การ์ดก่อน');return}
+    const L=ctLegal(Object.assign({},C,{T:Object.assign({},T,{mode:k})}));if(!(L.nodes.length||L.edges.length)){toast(k==='road'?'ไม่มีทางที่ต่อถนนได้':k==='set'?'ไม่มีจุดที่สร้างบ้านได้ (ต้องมีถนนมาถึงและห่างบ้านอื่น 2 จุด)':'ไม่มีบ้านให้อัป');return}
+    T.mode=k;T.panel=null;ctGo()},
+  ctPanel(t){const C=ct();const T=C.T;const k=t.dataset.id;T.mode=null;T.panel=T.panel===k?null:k||null;if(k==='trade')T.tr={w:null,g:{},t:{}};if(k==='bank')T.bk={};ctGo()},
+  ctTrW(t){const T=ct().T;T.tr.w=ctNum(t);ctGo()},
+  ctTrQ(t){const T=ct().T;const [k,r,d]=t.dataset.id.split(':');const o=T.tr[k];o[r]=Math.max(0,(o[r]||0)+(+d));ctGo()},
+  ctTrOK(){const C=ct();const T=C.T;const tr=T.tr;const a=C.players[T.p],b=C.players[tr.w];ctSnap(C);
+    CT_RES.forEach(r=>{const g=tr.g[r]||0,x=tr.t[r]||0;a.res[r]+=x-g;b.res[r]+=g-x});ctLog(C,'🤝 '+ctPN(C,T.p)+' ให้ '+ctResTxt(tr.g)+' แลก '+ctResTxt(tr.t)+' กับ '+ctPN(C,tr.w));toast('แลกแล้ว');T.tr={w:null,g:{},t:{}};ctGo()},
+  ctBkG(t){const T=ct().T;T.bk={g:t.dataset.id};ctGo()},
+  ctBkT(t){const T=ct().T;T.bk.t=t.dataset.id;ctGo()},
+  ctBkOK(){const C=ct();const T=C.T;const p=C.players[T.p];const {g,t:r}=T.bk;const k=ctRatio(C,T.p,g);if((p.res[g]||0)<k||!C.bank[r])return;ctSnap(C);p.res[g]-=k;C.bank[g]+=k;ctTake(C,p,r,1);
+    ctLog(C,'⚓ '+ctPN(C,T.p)+' แลกธนาคาร '+CT_RE[g].repeat(k)+' → '+CT_RE[r]);toast('แลกแล้ว '+k+':1');T.bk={g};ctGo()},
+  ctBuyDev(){const C=ct();const T=C.T;const p=C.players[T.p];if(!ctCan(p,CT_COST.dev)){toast('การ์ดในเครื่องไม่พอ ขาด '+ctMiss(p,CT_COST.dev)+' · ถ้าในมือจริงมี กด ✎ แก้การ์ดก่อน');return}T.mode=null;T.panel='buy';ctGo()},
+  ctBuyK(t){const C=ct();const T=C.T;const p=C.players[T.p];let k=t.dataset.id;if(!ctCan(p,CT_COST.dev))return;
+    if(k==='rand'){const bag=[];CT_DEVK.forEach(x=>{for(let j=0;j<C.deck[x];j++)bag.push(x)});if(!bag.length)return;k=bag[Math.floor(Math.random()*bag.length)]}
+    if(!C.deck[k])return;ctSnap(C);ctPay(C,p,CT_COST.dev);C.deck[k]--;p.nd[k]++;T.built=true;T.panel=null;ctLog(C,'📜 '+ctPN(C,T.p)+' ซื้อการ์ดพัฒนา 1 ใบ');
+    toast(t.dataset.id==='rand'?'ได้การ์ด '+CT_DEV[k].i+' '+CT_DEV[k].n+(k==='v'?' (เก็บไว้ ไม่ต้องเล่น)':' (เล่นได้ตาหน้า)'):'ซื้อแล้ว');ctGo()},
+  ctPlay(t){const C=ct();const T=C.T;const i=T.p,p=C.players[i];const k=t.dataset.id;if(!ctDevPlayable(C,i).includes(k))return;
+    if(k==='yp'){T.panel='yp';T.yp={};return ctGo()}if(k==='mo'){T.panel='mo';T.mo=null;return ctGo()}
+    ctSnap(C);p.dev[k]--;T.dev=true;T.panel=null;
+    if(k==='k'){p.kn++;T.knPre=!T.rolled;T.stage='robber';ctLog(C,'⚔️ '+ctPN(C,i)+' เล่นอัศวิน');ctUpdLA(C,i)}
+    if(k==='rb'){const left=15-ctPieces(C,i).r;T.rb=Math.min(2,left);T.stage=T.rb>0?'rb':null;ctLog(C,'🛣️ '+ctPN(C,i)+' เล่นการ์ดสร้างถนน')}
+    ctGo()},
+  ctYP(t){const C=ct();const T=C.T;const [,r,d]=t.dataset.id.split(':');const n=CT_RES.reduce((a,x)=>a+(T.yp[x]||0),0);const v=(T.yp[r]||0)+(+d);if(v<0||(+d>0&&(n>=2||v>C.bank[r])))return;T.yp[r]=v;ctGo()},
+  ctYPOK(){const C=ct();const T=C.T;const p=C.players[T.p];if(!ctDevPlayable(C,T.p).includes('yp'))return;ctSnap(C);p.dev.yp--;T.dev=true;CT_RES.forEach(r=>{if(T.yp[r])ctTake(C,p,r,T.yp[r])});
+    ctLog(C,'🎁 '+ctPN(C,T.p)+' เล่นปีอุดมสมบูรณ์ ได้ '+ctResTxt(T.yp));T.panel=null;T.yp={};ctGo()},
+  ctMoR(t){ct().T.mo=t.dataset.id;ctGo()},
+  ctMoOK(){const C=ct();const T=C.T;const r=T.mo;const p=C.players[T.p];if(!r||!ctDevPlayable(C,T.p).includes('mo'))return;ctSnap(C);p.dev.mo--;T.dev=true;let n=0;
+    C.players.forEach((q,j)=>{if(j===T.p)return;n+=q.res[r]||0;q.res[r]=0});p.res[r]+=n;ctLog(C,'💰 '+ctPN(C,T.p)+' เล่นผูกขาด '+CT_RN[r]+' ได้ '+n+' ใบ');toast('ได้ '+CT_RN[r]+' '+n+' ใบ (ตามที่จดในเครื่อง)');T.panel=null;T.mo=null;ctGo()},
+  ctRbSkip(){const C=ct();const T=C.T;T.stage=null;T.rb=0;ctGo()},
+  ctEndTurn(){const C=ct();const T=C.T;if(!T.rolled){toast('ยังไม่ได้ทอยเต๋า');return}if(T.stage)return;ctEndTurn(C);ctGo()},
+  ctUndo(){const C=ct();const s=C.hist.pop();if(!s){toast('ไม่มีอะไรให้ย้อน');return}const o=JSON.parse(s);Object.keys(o).forEach(k=>{if(k!=='_ln')C[k]=o[k]});if(o._ln!=null&&C.log.length>o._ln)C.log.length=o._ln;toast('ย้อนกลับแล้ว');ctGo()},
+  ctPeek(t){const C=ct();const i=ctNum(t);if(ctHandVisible(C,i)&&!C.opts.open)delete C.view.peek[i];else C.view.peek[i]=Date.now();ctGo()},
+  ctHandEd(t){ctHandSheet(ctNum(t))},
+  ctHandQ(t){const C=ct();const [i,r,d]=t.dataset.id.split(':');const p=C.players[+i];
+    if(r==='kn'){p.kn=Math.max(0,p.kn+(+d));ctUpdLA(C,+i)}
+    else if(CT_DEVK.includes(r)){if(+d>0&&!C.deck[r])return toast('กองไม่มีการ์ดนี้เหลือ');if(+d<0&&!p.dev[r])return;p.dev[r]+=+d;C.deck[r]-=+d}
+    else{if(+d>0&&!C.bank[r])return toast('ธนาคารไม่มี'+CT_RN[r]+'เหลือ');if(+d<0&&!p.res[r])return;p.res[r]+=+d;C.bank[r]-=+d}
+    ctSave();render();ctHandSheet(+i)},
+  ctChat(){const C=ct();C.view.chat=!C.view.chat;CT_CHAT=[];ctGo();if(C.view.chat)setTimeout(()=>{const el=document.getElementById('ctChatIn');if(el&&window.innerWidth>700)el.focus()},30)},
+  ctAsk(){const el=document.getElementById('ctChatIn');const q=el?el.value:'';if(el)el.value='';ctAsk(q)},
+  ctAskQ(t){ctAsk(t.dataset.id)},
+  ctKB(){openSheet('📖 กติกา Catan',CT_KB.map(e=>`<details class="rules"><summary>${esc(e.t)}</summary>${md(e.a)}</details>`).join('')+'<p class="muted small">สรุปจากคู่มือ Catan ฉบับภาษาอังกฤษพิมพ์ครั้งที่ 5</p>','<button class="btn primary" data-act="closeSheet">ปิด</button>')},
+  ctLogS(){const C=ct();openSheet('📜 บันทึกเกม',C.log.length?`<ol class="ct-log" reversed>${C.log.slice().reverse().map(l=>`<li>${esc(l.t)}</li>`).join('')}</ol>`:'<p class="muted">ยังไม่มีอะไร</p>','<button class="btn primary" data-act="closeSheet">ปิด</button>')},
+  ctStats(){openSheet('📊 สถิติลูกเต๋า',ctStatsHTML(ct()),'<button class="btn primary" data-act="closeSheet">ปิด</button>')},
+  ctPhotoS(){const u=CT_TMP_PHOTO||ctPhoto();openSheet('📷 รูปกระดาน',u?`<img src="${u}" alt="รูปกระดาน" style="width:100%;border-radius:12px">`:'<p class="muted">ไม่มีรูป</p>','<button class="btn primary" data-act="closeSheet">ปิด</button>')},
+  ctSet(){ctSetSheet()},
+  ctFull(){const C=ct();C.view.full=!C.view.full;ctGo();window.scrollTo({top:0})},
+  ctFix(){const C=ct();closeSheet();C.view.fix={k:'set',p:ctCur(C)||0};if(C.T){C.T.mode=null}ctGo()},
+  ctFixK(t){ct().view.fix.k=t.dataset.id;ctGo()},
+  ctFixP(t){ct().view.fix.p=ctNum(t);ctGo()},
+  ctFixOff(){const C=ct();C.view.fix=null;ctUpdLR(C);ctGo()},
+  ctEditBoard(){const C=ct();closeSheet();C.back=C.phase;C.phase='board';C.view.ed='hex';ctGo();window.scrollTo({top:0})},
+  ctToEnd(){const C=ct();closeSheet();C.phase='end';ctGo();window.scrollTo({top:0})},
+  ctWin(t){const C=ct();C.win=ctNum(t);ctLog(C,'🏆 '+ctPN(C,C.win)+' ชนะด้วย '+ctVP(C,C.win,true)+' แต้ม');C.phase='end';ctGo();window.scrollTo({top:0})},
+  ctBackTable(){const C=ct();C.phase=C.place&&!C.T?'place':'play';C.win=null;ctGo()},
+  async ctSaveRes(){const C=ct();if(C.saved)return;const aw=checked('ctAward');const n=Math.max(0,Math.min(50,Math.floor(+val('ctAwardN')||0)));C.award=n;C.saved=true;ctSave();
+    const rk=C.players.map((p,i)=>({p,v:ctVP(C,i,true),i}));const best=Math.max(...rk.map(x=>x.v));const winners=(C.win!=null?[rk[C.win]]:rk.filter(x=>x.v===best)).map(x=>x.p);
+    const pts={};if(aw)winners.forEach(p=>{if(p.id)pts[p.id]=n});await saveGameSession({game:'Catan',players:C.players,winners,pts});toast('บันทึกผลเข้าบ้านแล้ว');render()},
+  ctAgain(){const C=ct();S.catan=ctNew(C);S.catan.phase='board';ctGo();window.scrollTo({top:0})},
+  ctNewGame(){S.catan=ctNew();LS.set('catanPhoto','');CT_TMP_PHOTO='';ctGo();window.scrollTo({top:0})}
+});
+function ctAddP(C,p){p.pc=CT_PCK.find(c=>!C.players.some(x=>x.pc===c));p.side='bltr'.split('').find(s=>!C.players.some(x=>x.side===s));return p}
+function ctFixNode(C,n){const F=C.view.fix;ctSnap(C);if(F.k==='del')delete C.nodes[n];else if(F.k==='set')C.nodes[n]={p:F.p,c:0};else if(F.k==='city')C.nodes[n]={p:F.p,c:1};ctUpdLR(C);ctGo()}
+function ctFixEdge(C,e){const F=C.view.fix;ctSnap(C);if(F.k==='del')delete C.edges[e];else if(F.k==='road')C.edges[e]=F.p;ctUpdLR(C);ctGo()}
+function ctHandSheet(i){const C=ct();const p=C.players[i];if(!p)return;
+  openSheet('✎ การ์ดของ '+esc(ctName(p)),`<p class="muted small" style="margin:0">ใช้แก้ให้ตรงกับการ์ดในมือจริง · ธนาคารปรับตามให้เอง</p>
+    <div class="ct-stps">${CT_RES.map(r=>ctStep('ctHandQ',i,r,p.res[r]||0)).join('')}</div>
+    <div class="label">การ์ดพัฒนาในมือ (ไม่รวมที่เพิ่งซื้อตานี้ ${ctDevN(p)-CT_DEVK.reduce((a,k)=>a+p.dev[k],0)} ใบ)</div>
+    <div class="ct-stps">${CT_DEVK.map(k=>`<div class="ct-stp"><span>${CT_DEV[k].i} ${CT_DEV[k].n}</span><button type="button" data-act="ctHandQ" data-id="${i}:${k}:-1">−</button><b>${p.dev[k]}</b><button type="button" data-act="ctHandQ" data-id="${i}:${k}:1">+</button></div>`).join('')}
+    <div class="ct-stp"><span>⚔️ อัศวินที่เล่นแล้ว</span><button type="button" data-act="ctHandQ" data-id="${i}:kn:-1">−</button><b>${p.kn}</b><button type="button" data-act="ctHandQ" data-id="${i}:kn:1">+</button></div></div>`,
+    '<button class="btn primary" data-act="closeSheet">เสร็จ</button>')}
+function ctSetSheet(){const C=ct();
+  openSheet('⚙ ตั้งค่าและแก้ไข',`<label class="check"><input type="checkbox" data-ct="combine" ${C.opts.combine?'checked':''}> รวมขั้นแลกกับสร้าง</label>
+    <label class="check"><input type="checkbox" data-ct="open" ${C.opts.open?'checked':''}> เปิดการ์ดในมือทุกคนบนจอ</label>
+    <label class="check"><input type="checkbox" data-ct="seats" ${C.opts.seats?'checked':''}> จอแบบนั่งล้อมกระดาน (หมุนแผงหาคนนั่ง)</label>
+    <label class="field" style="max-width:180px"><span>แต้มที่ต้องได้</span><input type="number" min="3" max="20" value="${C.opts.target}" data-ct="target"></label>
+    <div class="label">แก้ไขระหว่างเกม</div>
+    <div class="btns"><button class="btn sm" data-act="ctFix">🏠 ย้าย/เพิ่ม/ลบ บ้าน ถนน โจร</button><button class="btn sm" data-act="ctEditBoard">🗺 แก้ช่อง เลข ท่าเรือ</button></div>
+    <div class="label">ที่นั่ง</div><div class="ct-plist">${C.players.map((p,i)=>`<div class="ct-pcs">${playerPawn(p,'sm')} ${CT_SIDES.map(([s,n])=>`<button type="button" class="chip" data-act="ctSeatSide" data-id="${i}:${s}" aria-pressed="${p.side===s}">${n}</button>`).join('')}</div>`).join('')}</div>`,
+    '<button class="btn" data-act="ctToEnd">จบเกม ไปหน้าสรุป</button><button class="btn primary" data-act="closeSheet">ปิด</button>')}
+ACT.ctSeatSide=t=>{const C=ct();const [i,s]=t.dataset.id.split(':');const o=C.players.find(p=>p.side===s);if(o)o.side=C.players[+i].side;C.players[+i].side=s;ctSave();render();ctSetSheet()};
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.ct;if(!k||!S.catan)return;const C=ct();
+  if(k==='photo'){ctLoadPhoto(e.target.files&&e.target.files[0]);return}
+  if(k==='target'){const v=parseInt(e.target.value,10);if(v>=3&&v<=20)C.opts.target=v}else C.opts[k]=e.target.checked;ctSave();render()});
+document.addEventListener('keydown',e=>{
+  if(!(S.tab==='tools'&&S.tool==='catan'&&S.catan)||!$('#sheet').hidden||e.isComposing)return;const C=S.catan;
+  if(e.target&&e.target.id==='ctChatIn'){if(e.key==='Enter'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();ACT.ctAsk()}return}
+  if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
+  if((e.metaKey||e.ctrlKey)&&(e.key==='z'||e.key==='Z')&&(C.phase==='play'||C.phase==='place')){e.preventDefault();ACT.ctUndo();return}
+  if(C.phase!=='play'||!C.T||e.metaKey||e.ctrlKey||e.altKey)return;const T=C.T;
+  if(e.key==='Escape'){if(C.view.chat){C.view.chat=false;CT_CHAT=[];ctGo()}else if(T.mode||T.panel){T.mode=null;T.panel=null;ctGo()}return}
+  if(e.key===' '&&!T.rolled&&!T.stage){e.preventDefault();ACT.ctDice();return}
+  if(e.key==='Enter'&&T.rolled&&!T.stage&&!T.mode){e.preventDefault();ACT.ctEndTurn()}
+});
+window.addEventListener('resize',()=>{if(S.tab==='tools'&&S.tool==='catan'&&S.catan&&(S.catan.phase==='play'||S.catan.phase==='place')){clearTimeout(ctAfter.rs);ctAfter.rs=setTimeout(()=>{if(!typing())render()},150)}});
+
 /* hook for future games: House.registerTool({id,name,desc,view:()=>html}) */
 window.House={registerTool(def){if(def&&def.id&&typeof def.view==='function'){TOOLS[def.id]={view:def.view,name:def.name,desc:def.desc};render()}},store:Store,kids,act:ACT,render,
   x:{S,Store,EXT,ACT,LS,esc,md,toast,openSheet,closeSheet,render,beep,kids,kidById,pawn,shuffle,okColor,uid,seal:xbSeal,open:xbOpen,askEnd:()=>askEndGame()}};
