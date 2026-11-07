@@ -4475,7 +4475,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-07T13:44:00+07:00';
+const SITE_UPDATED='2026-11-07T13:58:00+07:00';
 (function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
   let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
   el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
@@ -4803,6 +4803,10 @@ function ctSVG(C,mode){
   return `<svg class="ct-svg" viewBox="-5.75 -5.0 11.5 10.0" preserveAspectRatio="xMidYMid meet" role="img" aria-label="กระดาน Catan">${s}</svg>`;
 }
 
+/* กล่องพับ (details) จำว่าเปิดอยู่ไหม เพราะจอวาดใหม่ทุกครั้งที่กด */
+const ctDD=(C,k,def)=>{const v=C.view.dd&&C.view.dd[k];return (v==null?def:v)?'open':''};
+document.addEventListener('toggle',e=>{const k=e.target&&e.target.dataset&&e.target.dataset.ctd;if(!k||!S.catan)return;const C=ct();C.view.dd=C.view.dd||{};C.view.dd[k]=e.target.open;ctSave()},true);
+
 /* ---------- setup view ---------- */
 function ctSetupView(C){
   const o=C.players;
@@ -4814,7 +4818,7 @@ function ctSetupView(C){
       <div class="ct-pwho">${playerPawn(p,'sm')}<b>${esc(ctName(p))}</b><button type="button" class="btn sm ghost" data-act="ctDrop" data-id="${i}" aria-label="เอาออก">×</button></div>
       <div class="ct-pcs"><span class="label">สีชิ้นส่วน</span>${CT_PCK.map(c=>`<button type="button" class="ct-pcb" style="--c:${CT_PC[c].c}" data-act="ctPc" data-id="${i}:${c}" aria-pressed="${p.pc===c}" aria-label="${CT_PC[c].n}">${p.pc===c?'✓':''}</button>`).join('')}</div>
       <div class="ct-pcs"><span class="label">นั่งด้าน</span>${CT_SIDES.map(([s,n])=>`<button type="button" class="chip" data-act="ctSide" data-id="${i}:${s}" aria-pressed="${p.side===s}">${n}</button>`).join('')}</div></div>`).join('')}</div>`:'<p class="muted small">ยังไม่มีคนเล่น</p>'}
-    <details class="rules"><summary>ตั้งค่ากติกา</summary><div class="ct-opts">
+    <details class="rules" data-ctd="opts" ${ctDD(C,'opts',false)}><summary>ตั้งค่ากติกา</summary><div class="ct-opts">
       <label class="check"><input type="checkbox" data-ct="combine" ${C.opts.combine?'checked':''}> รวมขั้นแลกกับสร้าง (แลกและสร้างสลับกันได้ คู่มือแนะนำสำหรับคนเล่นเป็นแล้ว)</label>
       <label class="check"><input type="checkbox" data-ct="open" ${C.opts.open?'checked':''}> เปิดการ์ดในมือทุกคนบนจอ (เหมาะกับตอนสอนเล่น)</label>
       <label class="check"><input type="checkbox" data-ct="seats" ${C.opts.seats?'checked':''}> จอแบบนั่งล้อมกระดาน หมุนแผงให้หันหาคนนั่งแต่ละด้าน (จอกว้าง)</label>
@@ -4841,14 +4845,14 @@ function ctBoardView(C){
       <div class="seg2"><button type="button" class="chip" data-act="ctEd" data-id="hex" aria-pressed="${ed==='hex'}">ช่องและเลข</button><button type="button" class="chip" data-act="ctEd" data-id="port" aria-pressed="${ed==='port'}">ท่าเรือ</button><button type="button" class="chip" data-act="ctRot">⟳ หมุนกระดาน</button></div>
       ${pal}
       <div class="ct-chk">${chk.errs.map(x=>`<div class="ct-err">• ${esc(x)}</div>`).join('')}${chk.warns.map(x=>`<div class="ct-warn">• ${esc(x)}</div>`).join('')}${chk.ok&&!chk.warns.length?'<div class="ct-okk">✓ กระดานครบตามกล่อง</div>':''}</div>
-      <details class="rules" ${ph?'open':''}><summary>📷 รูปกระดาน</summary><div class="ct-photo">
+      <details class="rules" data-ctd="photo" ${ctDD(C,'photo',!!ph)}><summary>📷 รูปกระดาน</summary><div class="ct-photo">
         ${ph?`<img src="${ph}" alt="รูปกระดานที่ถ่ายไว้">`:''}
         <label class="btn sm"><input type="file" accept="image/*" capture="environment" data-ct="photo" hidden>${ph?'ถ่าย/เลือกรูปใหม่':'ถ่ายหรือเลือกรูปกระดาน'}</label>
         ${ph&&CT_AI.s&&CT_AI.img?`<button class="btn sm primary" data-act="ctAIRead" ${CT_AI.busy?'disabled':''}>${CT_AI.busy?'AI กำลังอ่านรูป…':'🤖 ให้ AI ตั้งกระดานจากรูป'}</button>`:''}
         ${ph?'<button class="btn sm ghost" data-act="ctPhotoDel">ลบรูป</button>':''}
         ${C.view.aiNote?`<p class="ct-warn small">${esc(C.view.aiNote)}</p>`:''}
         ${CT_AI.s?'':'<p class="muted small" style="margin:0">ในเว็บนี้รูปใช้ดูเทียบตอนกดเลือกช่อง · อยากให้ตั้งอัตโนมัติ ส่งรูปให้ Claude ในแชท แล้วเอารหัสกระดานมาวางข้างล่าง (หรือเปิดเวอร์ชัน Claude ที่มีปุ่ม AI อ่านรูป)</p>'}</div></details>
-      <details class="rules"><summary>🔤 รหัสกระดาน</summary><div class="ct-photo">
+      <details class="rules" data-ctd="code" ${ctDD(C,'code',false)}><summary>🔤 รหัสกระดาน</summary><div class="ct-photo">
         <textarea id="ctCodeIn" rows="3" placeholder="วางรหัส เช่น CATAN1 M10 P2 F9 / …"></textarea>
         <div class="btns"><button class="btn sm" data-act="ctCodeUse">ใช้รหัสนี้</button><button class="btn sm ghost" data-act="ctCodeCopy">คัดลอกรหัสกระดานนี้</button></div>
         <p class="muted small" style="margin:0">ตัวอักษร: H เนินดิน F ป่า P ทุ่งหญ้า W ไร่ข้าว M ภูเขา D ทะเลทราย ตามด้วยเลข เรียงแถว 3-4-5-4-3 · ท่าเรือหลัง | เช่น 1NW3 = ช่อง 1 ด้านบนซ้าย 3:1</p></div></details>
@@ -5073,7 +5077,7 @@ function ctEndView(C){
     <div class="rank">${rk.map(x=>{const p=C.players[x.i],pc=ctPieces(C,x.i);return `<div class="ct-rk${winners.includes(x.i)?' win':''}" style="--pc:${ctCol(p)}">${playerPawn(p,'sm')}<b>${esc(ctName(p))}</b><span class="ct-vp"><b>${x.v}</b> แต้ม</span>
       <small>บ้าน ${pc.s}${pc.c?' · เมือง '+pc.c+'×2':''}${C.lr===x.i?' · ถนนยาว 2':''}${C.la===x.i?' · กองทัพ 2':''}${p.dev.v+p.nd.v?' · การ์ดแต้ม '+(p.dev.v+p.nd.v):''}</small></div>`}).join('')}</div>
     ${C.saved?'<p class="muted">บันทึกผลเข้าบ้านแล้ว</p>':`<label class="check"><input type="checkbox" id="ctAward" checked> ให้แต้มบ้านกับผู้ชนะ</label><label class="field" style="max-width:180px"><span>กี่แต้ม</span><input type="number" id="ctAwardN" value="${esc(C.award)}" min="0" max="50"></label><button class="btn primary big" data-act="ctSaveRes">บันทึกผลเข้าบ้าน</button>`}
-    <details class="rules"><summary>📊 สถิติลูกเต๋าเกมนี้</summary>${ctStatsHTML(C)}</details>
+    <details class="rules" data-ctd="stats" ${ctDD(C,'stats',false)}><summary>📊 สถิติลูกเต๋าเกมนี้</summary>${ctStatsHTML(C)}</details>
     <div class="btns"><button class="btn" data-act="ctBackTable">← กลับไปที่โต๊ะ</button><button class="btn" data-act="ctAgain">เล่นใหม่ คนเดิม กระดานเดิม</button><button class="btn ghost" data-act="ctNewGame">เริ่มใหม่ทั้งหมด</button></div></div>`;
 }
 function ctStatsHTML(C){const tot=Object.values(C.rolls).reduce((a,b)=>a+b,0);const mx=Math.max(1,...Object.values(C.rolls),...[2,3,4,5,6,7,8,9,10,11,12].map(n=>tot*(6-Math.abs(7-n))/36));
