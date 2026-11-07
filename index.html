@@ -562,7 +562,13 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-prev{flex-basis:100%;font-size:.86rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .f7-prev:empty{display:none}
 .f7-prev b{font-family:var(--f-head);font-weight:600;color:var(--ink)}
-.f7-keys{font-size:.84rem;color:var(--muted);display:flex;gap:6px 14px;flex-wrap:wrap}
+.f7-keys{font-size:.84rem;color:var(--muted);display:flex;gap:10px 14px;flex-wrap:wrap;align-items:center;line-height:1.6}
+.f7-sc{font-size:.84rem;color:var(--muted);display:grid;gap:8px}
+.f7-sc p{margin:0;line-height:1.5}.f7-sc p b{font:600 .86rem var(--f-head);color:var(--ink)}
+.f7-sc ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.f7-sc li{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding:5px 9px;border-radius:9px;background:var(--sunk);line-height:1}
+.f7-sc kbd+kbd{margin-left:3px}
+@media (hover:none){.f7-sc{display:none}}
 .f7-keys span{white-space:nowrap}
 .f7-keys span.w{white-space:normal}
 .f7-erow{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
@@ -2939,9 +2945,16 @@ function f7PlayView(f){
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys">${f.ver==='v'?'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>1</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> = 10 11 12 13 · <kbd>Z</kbd> หรือ <kbd>0</kbd> Zero · <kbd>X</kbd> ÷2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = −2 ถึง −10 · <kbd>B</kbd> +15'+(f.brutal?' · <kbd>H</kbd> −15 โดน':'')+' · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Enter</kbd> บวกแต้มแล้วยังเลือกคนเดิมอยู่ · <kbd>Tab</kbd> กล่องถัดไป (<kbd>⇧</kbd><kbd>Tab</kbd> ย้อน) · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span class="w">คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องผู้เล่น = ใช้ปุ่มลัด <kbd>0</kbd>–<kbd>9</kbd> <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> = 10 11 12 · <kbd>X</kbd> ×2 · <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> = +2 ถึง +10 · <kbd>B</kbd> +15 · <kbd>⌫</kbd> ลบเลขท้าย · <kbd>Enter</kbd> บวกแต้มแล้วยังเลือกคนเดิมอยู่ · <kbd>Tab</kbd> กล่องถัดไป (<kbd>⇧</kbd><kbd>Tab</kbd> ย้อน) · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</span><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    ${f7KbHelp(f)}
+    <div class="f7-keys">${f.ver==='v'?'<span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
+/* ปุ่มลัดเมื่อคลิกกล่องผู้เล่น: แยกเป็นชิปทีละอัน ขึ้นบรรทัดใหม่ได้โดยไม่ทับกัน */
+function f7KbHelp(f){const V=f.ver==='v';const K=a=>a.map(x=>'<kbd>'+x+'</kbd>').join('');
+  const it=[[K([V?'1':'0'])+'–'+K(['9']),V?'เลข 1–9':'เลข 0–9'],[K(V?['Q','W','E','R']:['Q','W','E']),V?'10 11 12 13':'10 11 12'],
+    V?[K(['Z'])+' หรือ '+K(['0']),'Zero']:null,[K(['X']),V?'÷2':'×2'],[K(['A','S','D','F','G']),V?'−2 ถึง −10':'+2 ถึง +10'],[K(['B']),'+15'],
+    V&&f.brutal?[K(['H']),'−15 โดน']:null,[K(['⌫']),'ลบเลขท้าย'],[K(['Enter']),'บวกแต้ม (ยังเลือกคนเดิม)'],[K(['Tab']),'กล่องถัดไป'],[K(['⇧','Tab']),'กล่องก่อนหน้า']].filter(Boolean);
+  return `<div class="f7-sc"><p><b>ปุ่มลัด</b> คลิกกล่องผู้เล่น (ไม่ใช่ช่องพิมพ์) ก่อน · คลิกช่องพิมพ์ = พิมพ์เลขเอง · คลิกกล่องเดิมซ้ำหรือคลิกที่อื่น = เลิกเลือก</p><ul>${it.map(([k,t])=>`<li>${k}<span>${t}</span></li>`).join('')}</ul></div>`}
 function f7EndView(f){
   const r=f.players.map(p=>Object.assign({},p,{pts:f7Tot(p)})).sort((a,b)=>b.pts-a.pts);const best=r.length?r[0].pts:0;const win=r.filter(p=>p.pts===best);
   return `<div class="stage center"><span class="label">${esc(f7VerName(f))} · เป้าหมาย ${f.target}</span>
@@ -4548,10 +4561,15 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-07T14:01:00+07:00';
-(function(){const el=document.getElementById('siteFoot');if(!el)return;const d=new Date(SITE_UPDATED);
-  let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=SITE_UPDATED}
-  el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+SITE_UPDATED+'">'+t+'</time>'})();
+const SITE_UPDATED='2026-11-07T21:52:00+07:00';
+/* the stamp is a fallback: the live site asks GitHub when index.html was last committed, so the time is always real */
+(function(){const el=document.getElementById('siteFoot');if(!el)return;
+  const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
+    el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+iso+'">'+t+'</time>'};
+  show(SITE_UPDATED);
+  if(!/github\.io$/.test(location.hostname))return;
+  try{fetch('https://api.github.com/repos/BankyPP/baan-suay/commits?path=index.html&per_page=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
+    const iso=j&&j[0]&&j[0].commit&&(j[0].commit.committer||j[0].commit.author||{}).date;if(iso&&new Date(iso)>new Date(SITE_UPDATED))show(iso)}).catch(()=>{})}catch(e){}})();
 /* ---------- CATAN: คู่มือกติกาในเครื่อง (ใช้ตอบแชทเมื่อไม่มี AI และส่งให้ AI เป็นแหล่งอ้างอิง) ----------
    ที่มา: คู่มือ Catan ฉบับภาษาอังกฤษพิมพ์ครั้งที่ 5 (Game Rules หน้า 2-5, Almanac หน้า 6-14, Game Overview หน้า 16) */
 const CT_KB=[
