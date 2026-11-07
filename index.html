@@ -1636,7 +1636,8 @@ const fmtDur=s=>{s=Math.round(s);if(s<60)return s+' วินาที';const m=
 const lv=l=>(l.levels&&l.levels.length)?l.levels.map(bandName).join(' · '):'ทุกระดับ';
 
 function vLearn(){
-  if(S.quiz)return vQuiz();
+  if(S.story&&S.story.inQuiz&&!sxInQuiz())S.story=null;
+  if(S.quiz)return vQuiz()+(S.story&&S.story.inQuiz?vStory(Store.d.lessons[S.quiz.lessonId]):'');
   if(S.learn.open&&Store.d.lessons[S.learn.open])return vLesson(Store.d.lessons[S.learn.open]);
   const all=lessons();const fk=S.learn.kid!=='all'&&kidById(S.learn.kid);
   const list=all.filter(l=>(S.learn.subj==='all'||l.subject===S.learn.subj)&&(!fk||bandFits(l.levels,fk.band)));
@@ -1777,6 +1778,9 @@ function sxMark(text,vocab){
     if(re)h=h.replace(re,(...a)=>{const pre=a[1];let k=-1;for(let j=0;j<fs.length;j++){if(a[3+j]!=null){k=j;break}}const suf=a[3+fs.length]||'';
       return k<0?a[0]:`${pre}<span class="vw" data-act="sxWord" data-id="${fs[k].i}" role="button" tabindex="0">${a[2]}${suf}</span>`});
     return `<p>${inline(h).replace(/\n/g,'<br>')}</p>`}).join('')}
+/* a story quiz can open its story on top (timer keeps running); closing returns to the same question */
+const sxInQuiz=()=>{const q=S.quiz;return !!(q&&!q.done&&q.phase==='answer'&&isStory(Store.d.lessons[q.lessonId]))};
+const sxScopeTid=sc=>isCk(sc)?sc.slice(CK.length):String(sc||'').endsWith(VS)?sc.slice(0,-VS.length):sc;
 function vStory(l){
   const st=S.story;const tp=l.topics||[];const ti=tp.findIndex(t=>t.tid===st.tid);const t=tp[ti];if(!t){S.story=null;return ''}
   const ps=sxParts(t.story);if(!ps.length){S.story=null;return ''}
@@ -1787,12 +1791,16 @@ function vStory(l){
   const tab=(i,sd)=>`<button type="button" class="sx-tab ${sd}" data-act="sxTab" data-id="${i}" aria-expanded="false"><b>${esc(V[i].w)}</b><span class="m">${V[i].m?esc(V[i].m):'<i class="muted">ยังไม่ได้ใส่ความหมาย</i>'}</span></button>`;
   const rail=(arr,sd)=>`<div class="sx-rail sx-${sd}">${arr.map(i=>tab(i,sd)).join('')}</div>`;
   const sets=topicSets(l,t).filter(x=>setOpen(l,x)&&scopeCount(l,x));
-  const name=t.name||'Story '+(ti+1);
+  const name=t.name||'Story '+(ti+1);const qz=!!st.inQuiz;
+  const ckTs=qz&&st.ck?(()=>{const o=[];for(const x of tp){o.push(x);if(x.tid===st.ck)break}return o.filter(x=>sxParts(x.story).some(pp=>pp.text.trim()))})():[];
+  const q=S.quiz;const qEnd=qz&&q?(q.timer==='q'?(q.ans[q.i].locked?null:q.qEnd):q.timer==='set'?q.setEnd:null):null;
+  const qClk=qz&&q&&q.timer!=='none'?`<span class="clock" id="sxClock" aria-label="เวลาที่เหลือในควิซ">${qEnd?fmtTime((qEnd-(q.pauseAt!=null?q.pauseAt:quizNow()))/1000):'—'}</span>`:'';
   return `<div class="storyx ${st.all?'all':''}" role="dialog" aria-modal="true" aria-label="${esc(name)}">
-    <div class="sx-bar"><button type="button" class="btn sm" data-act="sxClose">← กลับ</button>
+    <div class="sx-bar"><button type="button" class="btn sm ${qz?'primary':''}" data-act="sxClose">${qz?'← กลับไปทำควิซ':'← กลับ'}</button>${qClk}
+      ${ckTs.length>1?`<div class="sx-parts">${ckTs.map((x,j)=>`<button type="button" class="chip" data-act="sxPick" data-id="${esc(x.tid)}" aria-pressed="${x.tid===t.tid}">${esc(x.name||'Story '+(tp.indexOf(x)+1))}</button>`).join('')}</div>`:''}
       <div class="sx-ttl"><b>${esc(name)}</b>${p.title?`<span>${esc(p.title)}</span>`:''}</div>
       ${ps.length>1?`<div class="sx-parts">${ps.map((x,j)=>`<button type="button" class="chip" data-act="sxPart" data-id="${j}" aria-pressed="${j===pi}">Part ${j+1}</button>`).join('')}</div>`:''}
-      <div class="btns">${n?`<button type="button" class="btn sm ${st.all?'primary':''}" data-act="sxAll" aria-pressed="${!!st.all}">${st.all?'ซ่อนความหมาย':'โชว์ความหมายทุกคำ'}</button>`:''}${S.bro?`<button type="button" class="btn sm ghost" data-act="lessonForm" data-id="${esc(l.id)}">แก้เรื่องนี้</button>`:''}</div></div>
+      <div class="btns">${n?`<button type="button" class="btn sm ${st.all?'primary':''}" data-act="sxAll" aria-pressed="${!!st.all}">${st.all?'ซ่อนความหมาย':'โชว์ความหมายทุกคำ'}</button>`:''}${S.bro&&!qz?`<button type="button" class="btn sm ghost" data-act="lessonForm" data-id="${esc(l.id)}">แก้เรื่องนี้</button>`:''}</div></div>
     <div class="sx-stage ${n?'':'novocab'}">
       ${rail(top,'top')}${rail(left,'left')}
       <article class="sx-story" id="sxStory" lang="en">
@@ -1800,6 +1808,7 @@ function vStory(l){
         ${sxMark(p.text,V)||'<p class="muted">ยังไม่มีเนื้อเรื่องใน part นี้</p>'}
         <div class="sx-end">${pi>0?`<button type="button" class="btn" data-act="sxPart" data-id="${pi-1}">← Part ${pi}</button>`:''}
           ${pi<ps.length-1?`<button type="button" class="btn primary" data-act="sxPart" data-id="${pi+1}">Part ${pi+2} →</button>`
+          :qz?'<button type="button" class="btn primary" data-act="sxClose">กลับไปทำควิซ</button>'
           :sets.map(x=>`<button type="button" class="btn primary" data-act="sxQuiz" data-id="${esc(x)}">ทำควิซ ${x.endsWith(VS)?SX_V:SX_R}</button>`).join('')}</div>
       </article>
       ${rail(right,'right')}${rail(bot,'bot')}
@@ -1878,7 +1887,7 @@ function vQuiz(){
   const sub=prac&&nRev===n?'':`<div class="qsubmit">${q.confirm?`<div class="banner">ยังไม่ได้ตอบ ${left} ข้อ ${prac?'จบเลยไหม':'ส่งเลยไหม'} ข้อที่ไม่ได้ตอบจะนับเป็น 0</div><div class="btns"><button class="btn primary" data-act="qSubmit">ยืนยัน${endWord}</button><button class="btn ghost" data-act="qSubmitCancel">กลับไปทำต่อ</button></div>`
       :`<button class="btn ${!prac&&q.i+1===n?'primary big':''}" data-act="qSubmitAsk">${endWord}${prac?' ดูผล':''}</button><span class="muted small">${left?'ยังไม่ได้ตอบ '+left+' ข้อ':'ตอบครบทุกข้อแล้ว'}</span>`}</div>`;
   return `<section class="quiz">
-    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}<button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
+    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}${isStory(l)?'<button class="btn sm" data-act="sxQuizOpen" style="white-space:nowrap">อ่านเรื่อง</button>':''}<button class="btn sm ghost" data-act="endQuiz">ออก</button></div>
     <nav class="qmap" aria-label="เลือกข้อ">${q.order.map((_,p)=>`<button type="button" class="${p===q.i?'cur':''} ${isAnswered(q,p)?'done':''} ${q.ans[p].locked?'lock':''} ${mark(p)}" data-act="qGo" data-id="${p}" aria-label="ข้อ ${p+1}${isAnswered(q,p)?' ตอบแล้ว':''}" ${p===q.i?'aria-current="true"':''}>${p+1}</button>`).join('')}</nav>
     <div class="chips"><span class="tag">ข้อ ${q.i+1}/${n}</span>${isE?`<span class="tag">MEQ · เต็ม ${qMax(it)} คะแนน</span>`:`<span class="tag">MCQ · 1 คะแนน</span>`}${lock?`<span class="tag">${a.timeout?'หมดเวลาข้อนี้':rev?'ตรวจแล้ว':'ล็อกแล้ว'}</span>`:''}${rev&&q.timer==='set'&&nx>=0?'<span class="tag">เวลาหยุดระหว่างอ่านเฉลย</span>':''}</div>
     <div class="qtext">${md(it.q)}</div>${body}
@@ -1929,7 +1938,7 @@ function quizLoop(){clearInterval(qTick);if(S.quiz&&S.quiz.timer==='none')return
   const q=S.quiz;if(!q||q.done||q.phase!=='answer'){clearInterval(qTick);return}
   quizPause(q);const now=quizNow();const ref=q.pauseAt!=null?q.pauseAt:now;const el=document.getElementById('qClock');
   const end=q.timer==='q'?(q.ans[q.i].locked?null:q.qEnd):q.timer==='set'?q.setEnd:null;
-  if(el){if(end){const left=(end-ref)/1000;el.textContent=fmtTime(left);el.classList.toggle('warn',left<=10)}else{el.textContent='—';el.classList.remove('warn')}}
+  [el,document.getElementById('sxClock')].forEach(el=>{if(!el)return;if(end){const left=(end-ref)/1000;el.textContent=fmtTime(left);el.classList.toggle('warn',left<=10)}else{el.textContent='—';el.classList.remove('warn')}});
   if(end&&q.pauseAt==null&&now>=end)quizTimeout();
 },250)}
 function quizTimeout(){
@@ -2847,7 +2856,10 @@ const ACT={
     else{c.add(tid);const h=new Set(l.hidden||[]);h.add(CK+tid);const nl=Object.assign({},l,{checks:[...c],hidden:[...h]});await Store.put('lessons',l.id,nl);toast('เพิ่ม '+scopeName(nl,CK+tid)+' แล้ว · ยังซ่อนจากน้องอยู่')}
     render()},
   sxOpen(t){if(!S.learn.open)return;S.story={lid:S.learn.open,tid:t.dataset.id,part:0,all:S.story&&S.story.all};render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
-  sxClose(){S.story=null;render()},
+  sxClose(){const back=S.story&&S.story.inQuiz;S.story=null;render();if(back)window.scrollTo({top:0})},
+  sxQuizOpen(){const q=S.quiz;if(!sxInQuiz())return;const b=document.getElementById('meqAns');if(b&&q.ans[q.i])q.ans[q.i].text=b.value;
+    const tid=sxScopeTid(q.scope);S.story={lid:q.lessonId,tid,part:0,all:false,inQuiz:true,ck:isCk(q.scope)?tid:null};render();const x=document.getElementById('sxStory');if(x)x.scrollTop=0},
+  sxPick(t){if(!S.story)return;S.story.tid=t.dataset.id;S.story.part=0;render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxPart(t){if(!S.story)return;S.story.part=+t.dataset.id;render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxAll(){if(!S.story)return;S.story.all=!S.story.all;const x=document.querySelector('.storyx');if(x)x.classList.toggle('all',S.story.all);const b=document.querySelector('.storyx [data-act="sxAll"]');
     if(b){b.classList.toggle('primary',S.story.all);b.setAttribute('aria-pressed',S.story.all);b.textContent=S.story.all?'ซ่อนความหมาย':'โชว์ความหมายทุกคำ'}},
@@ -4795,7 +4807,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-08T00:15:00+07:00';
+const SITE_UPDATED='2026-11-08T00:21:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
