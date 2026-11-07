@@ -289,10 +289,87 @@ textarea.grow{min-height:46px;resize:vertical;overflow:hidden}
 .dir{display:inline-flex;align-items:center;gap:8px;font:500 1rem var(--f-head);color:var(--muted)}
 .dir svg{width:26px;height:26px}
 .pending{font:600 1.15rem var(--f-head);background:var(--bad-bg);color:var(--bad);padding:8px 16px;border-radius:999px}
-.unocolors{display:flex;gap:8px;justify-content:center}
-.unocolors button{width:40px;height:40px;border-radius:10px;border:3px solid transparent;cursor:pointer}
-.unocolors button[aria-pressed="true"]{border-color:var(--ink)}
-.unogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+/* UNO: version picker + full-screen play (whole screen = current colour) */
+.uno-vers{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.uno-v{display:grid;gap:6px;align-content:start;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-width:0}
+.uno-v b{font:600 1.15rem var(--f-head)}
+.uno-v span{font:400 .92rem/1.45 var(--f-body);color:var(--muted)}
+.uno-v:hover{border-color:var(--ink)}
+.uno-v[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.uno-v .uno-dots{display:flex;gap:4px;flex-wrap:wrap}
+.uno-dots i{width:14px;height:14px;border-radius:4px;background:var(--k)}
+.uno-vhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.uno-vhead h3{margin:2px 0}
+.uno-wc{display:flex;gap:14px;flex-wrap:wrap}
+.uno-wcl{display:grid;justify-items:center;gap:4px;font:500 .85rem var(--f-head);cursor:pointer}
+.uno-wcl input{width:60px;height:60px;border:1px solid var(--line);border-radius:14px;padding:3px;background:var(--surface);cursor:pointer}
+.uno-teams{display:grid;gap:6px}
+.uno-teams span{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:400 .95rem var(--f-body)}
+.uno-teams b{font:600 .9rem var(--f-head);min-width:48px}
+.uno-teamwin{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;width:100%}
+.uno-tw{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:center;gap:6px 8px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.uno-tw b{grid-column:1/-1;font:600 1.1rem var(--f-head)}
+.uno-tw span{grid-column:1/-1;font:400 .9rem var(--f-body);color:var(--muted)}
+ul.unor{margin:0;padding-left:1.2em;display:grid;gap:8px;line-height:1.55}
+html:has(.unox){overflow:hidden}
+.unox{--bg:#26313D;--fg:#FFFFFF;position:fixed;inset:0;z-index:30;background:var(--bg);color:var(--fg);display:grid;grid-template-rows:auto minmax(0,1fr);overflow:auto;overscroll-behavior:contain;
+  padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(14px + env(safe-area-inset-bottom,0px));transition:background-color .25s}
+.unox-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px}
+.unox-name{min-width:0;display:grid;justify-items:center;gap:2px;text-align:center;font:600 1rem/1.15 var(--f-head)}
+.unox-name>span:first-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unox-side{font:500 .75rem/1.3 var(--f-head);padding:1px 9px;border-radius:999px;background:color-mix(in srgb,var(--fg) 16%,transparent)}
+.unox-tools{display:flex;gap:5px}
+.ubtn{min-height:40px;min-width:40px;padding:0 12px;border-radius:999px;border:2px solid color-mix(in srgb,var(--fg) 45%,transparent);background:transparent;color:inherit;font:500 .95rem var(--f-head);cursor:pointer}
+.ubtn:disabled{opacity:.35;cursor:default}
+.unox-mid{display:grid;justify-items:center;align-content:center;gap:10px;padding:10px 0}
+.unox-count{display:grid;justify-items:center;gap:2px;min-height:78px;padding:6px 24px;border:0;border-radius:20px;background:color-mix(in srgb,var(--fg) 16%,transparent);color:inherit;cursor:pointer}
+.unox-count b{font:700 clamp(2.4rem,9vw,3.4rem)/1 var(--f-head);font-variant-numeric:tabular-nums}
+.unox-count>span{font:400 .85rem var(--f-body);opacity:.9}
+.unox-count.off{visibility:hidden}
+.unox-ring{--ri:14px;position:relative;width:min(100%,480px);padding:clamp(32px,8vw,44px)}
+.unox-ring::before{content:"";position:absolute;inset:var(--ri);border:6px solid color-mix(in srgb,var(--fg) 60%,transparent);border-radius:40px;pointer-events:none}
+.ah{--r:0deg;position:absolute;z-index:1;width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:var(--bg);color:var(--fg);pointer-events:none;
+  transform:translate(-50%,-50%) rotate(var(--r));transition:transform .45s ease,background-color .25s}
+.ah svg{width:36px;height:36px;animation:unoNudge 1.4s ease-in-out infinite}
+.ah-t{left:50%;top:calc(var(--ri) + 3px)}
+.ah-r{left:calc(100% - var(--ri) - 3px);top:50%;--r:90deg}
+.ah-b{left:50%;top:calc(100% - var(--ri) - 3px);--r:180deg}
+.ah-l{left:calc(var(--ri) + 3px);top:50%;--r:270deg}
+.ccw .ah{transform:translate(-50%,-50%) rotate(calc(var(--r) + 180deg))}
+@keyframes unoNudge{0%,100%{transform:translateX(-3px)}50%{transform:translateX(4px)}}
+.unox-grid{display:grid;gap:clamp(8px,2.2vw,12px)}
+.unox-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:inherit}
+.unox-cols.pick4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ucol{aspect-ratio:1;border-radius:18px;background:var(--k);border:4px solid color-mix(in srgb,var(--fg) 85%,transparent);cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.unox-keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:inherit}
+.ukey{min-height:clamp(66px,18vw,96px);display:grid;place-items:center;gap:2px;padding:4px;border-radius:18px;border:3px solid color-mix(in srgb,var(--fg) 55%,transparent);
+  background:color-mix(in srgb,var(--fg) 14%,transparent);color:inherit;font:700 clamp(1.5rem,6vw,2.1rem)/1 var(--f-head);cursor:pointer}
+.ukey.txt{font:600 clamp(.95rem,3.6vw,1.15rem)/1.2 var(--f-head)}
+.ukey.w3{grid-column:1/-1;min-height:58px;font:600 1.25rem/1 var(--f-head)}
+.ukey.flip{letter-spacing:.12em;font-weight:700}
+.ukey small{font:600 .9rem/1 var(--f-head)}
+.ukey:disabled{opacity:.35;cursor:default}
+.uk-rev{width:1.5em;height:1.5em}
+.ukey:not(:disabled):active,.ucol:active,.dcard:active{transform:scale(.96)}
+.unox :focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+.unox-wild{height:clamp(64px,16vw,84px);display:grid;place-items:center;border-radius:18px;background:linear-gradient(90deg,#D63A2F,#EDB90F,#2E9B4E,#2B67C9);color:#fff;font:700 clamp(1.3rem,5vw,1.7rem) var(--f-head);letter-spacing:.1em;text-shadow:0 1px 3px rgba(0,0,0,.45);border:4px solid color-mix(in srgb,var(--fg) 85%,transparent)}
+.unox-dir{margin:0;font:500 .92rem var(--f-head);opacity:.9}
+.unox-msg{margin:0;min-height:1.5em;max-width:480px;text-align:center;font:500 1rem/1.5 var(--f-body)}
+.dos-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.dcard{width:clamp(62px,17vw,82px);aspect-ratio:3/4;border-radius:14px;background:var(--k);color:var(--kc,#fff);border:3px solid color-mix(in srgb,var(--fg) 70%,transparent);font:700 clamp(1.3rem,5vw,1.9rem) var(--f-head);cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.dcard.sel{outline:4px solid var(--fg);outline-offset:3px}
+.dcard.add{background:transparent;color:var(--fg);border-style:dashed;box-shadow:none}
+.dos-info{min-height:78px;display:grid;place-items:center;max-width:480px;text-align:center;padding:10px 16px;border-radius:16px;background:color-mix(in srgb,var(--fg) 12%,transparent);font:400 1rem/1.55 var(--f-body)}
+.dos-info b{font:600 1rem var(--f-head)}
+.dos-info span{font-size:.88rem;opacity:.85}
+.dos-add{display:grid;gap:10px;width:min(100%,480px);padding:12px;border-radius:16px;background:color-mix(in srgb,var(--fg) 10%,transparent)}
+.dos-cs{display:flex;gap:10px;justify-content:center}
+.dos-cs button{width:46px;height:46px;border-radius:12px;background:var(--k);border:3px solid transparent;cursor:pointer}
+.dos-cs button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 2px var(--bg) inset}
+.dos-ns{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.dos-ns .ubtn{padding:0;font:600 1.05rem var(--f-head)}
+@media (hover:none){.unox .kb{display:none}}
+@media (prefers-reduced-motion:reduce){.ah svg{animation:none}.ah,.unox{transition:none}}
 .nextup{display:flex;gap:6px;align-items:center;justify-content:center;color:var(--muted);font-size:.9rem}
 .order{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-height:46px;padding:8px;border-radius:12px;background:var(--sunk)}
 .order .item{display:inline-flex;align-items:center;gap:4px;font:500 .8rem var(--f-head);color:var(--muted)}
@@ -461,6 +538,11 @@ kbd{font:500 .7rem/1 var(--f-head);padding:3px 6px;border-radius:5px;border:1px 
 .f7-special .f7-key{font-size:.95rem}
 .f7-add .f7-go{order:1}.f7-add .f7-pad{order:2}.f7-add .f7-special{order:3}.f7-add .f7-prev{order:4}
 .f7-b15[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.f7-v .f7-lbl{flex-direction:column;gap:1px;line-height:1}
+.f7-v .f7-lbl small{font:500 .62rem/1 var(--f-head);opacity:.75}
+.f7-v .f7-wide{grid-column:span 2}
+.f7-hit{font-weight:600}
+.f7-hit[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
 .f7-chip em.b{color:var(--good)}
 .f7-rk{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--sunk);font:600 .78rem/1 var(--f-head);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:7px;vertical-align:2px}
 .f7-rk.top{background:var(--star);color:#fff}
@@ -1694,8 +1776,8 @@ function vGames(){
 const TOOL_LIST=[
   {id:'catan',name:'ตัวช่วย Catan',desc:'กระดานบนจอตรงกับของจริง กดสร้างบ้าน ถนน เมือง ทอยเต๋า แจกการ์ด โจร แลก การ์ดพัฒนา นับแต้มให้ทุกอย่าง มีแชทถามกติกา'},
   {id:'bsgs',name:'Baan Suay Game Show',desc:'กระดานเกมโชว์แบบ Jeopardy เลือกหัวข้อและคะแนน มี Final Question'},
-  {id:'uno',name:'ตัวช่วย UNO',desc:'บอกว่าตาใคร หมุนทางไหน ต้องจั่วกี่ใบ'},
-  {id:'flip7',name:'Flip 7',desc:'นับแต้มแยกคน เรียงตามคะแนน ใส่หลายเลขแล้ว Enter ทีเดียว มีปุ่มเลข ×2 และ +15 ตั้งเป้าได้'},
+  {id:'uno',name:'ตัวช่วย UNO',desc:'เลือกได้ 9 เวอร์ชัน เล่นเต็มจอ ทั้งจอเป็นสีที่เล่นอยู่ ลูกศรบอกทิศ ช่วยนับจั่ว'},
+  {id:'flip7',name:'Flip 7',desc:'Flip 7 กับ Flip 7 vengeance นับแต้มแยกคน เรียงตามคะแนน ใส่หลายเลขแล้ว Enter ทีเดียว มีปุ่มการ์ดครบ ตั้งเป้าได้'},
   {id:'poker',name:'โป๊กเกอร์',desc:'นับชิปและเดิมพัน Texas Hold\'em บอกตาใคร ต้อง Call เท่าไร แบ่งกองย่อยตอน All-in ให้เอง'},
   {id:'taboo',name:'คำต้องห้าม',desc:'ทุกคนใช้มือถือของตัวเอง เข้าห้องด้วยรหัส 6 หลัก ได้คำต้องห้ามคนละคำ ใครเผลอพูดตกรอบ'},
   {id:'score',name:'กระดานคะแนน',desc:'เก็บแต้มบอร์ดเกม แบบแข่งกันหรือช่วยกัน'},
@@ -1903,62 +1985,200 @@ function bsSettingsForm(){const b=bsBoardNow();const ck='bsdel:'+b.id;
   `<button class="btn primary" data-act="bsSettingsSave">บันทึก</button><button class="btn" data-act="bsNewBoard">สร้างกระดานใหม่</button>${boards().length>1?(S.confirm===ck?`<button class="btn dangerfill" data-act="bsDelBoard">ยืนยันลบกระดานนี้</button>`:`<button class="btn danger" data-act="bsDelAsk">ลบกระดานนี้</button>`):''}`)}
 async function bsMutate(fn){const b=bsBoardNow();if(!b)return;fn(b);await saveBoard(b);render()}
 
-/* UNO */
-const UNO_COLORS=[['red','#D63A2F'],['yellow','#E6B416'],['green','#2E9B4E'],['blue','#2B67C9']];
+/* UNO: เลือกเวอร์ชันก่อน → ตั้งค่า → เล่นเต็มจอ
+   ทั้งจอเป็นสีที่กำลังเล่น ตรงกลางเป็นกล่องสีที่เหลือ (แตะ = เปลี่ยนสีทั้งจอ) ปุ่มช่วยนับจั่ว (แตะเลขหรือ Enter = ล้าง) และกลับทาง
+   ลูกศรใหญ่วนรอบกล่องตรงกลางบอกทิศ เริ่มวนไปทางซ้ายมือ (ตามเข็ม) เสมอ · จอไม่บอกว่าตาใคร */
+const UNO_C4=[['red','แดง','#D63A2F'],['yellow','เหลือง','#EDB90F'],['green','เขียว','#2E9B4E'],['blue','น้ำเงิน','#2B67C9']];
+const UNO_DARK=[['pink','ชมพู','#E0428F'],['teal','ฟ้าอมเขียว','#11A0A6'],['orange','ส้ม','#F07A1A'],['purple','ม่วง','#7440B8']];
+const UNO_WEIRD=['#FF7EB6','#7ED9C3','#9B6BF2','#8A5A2B'];
+const UNO_VERS=[
+  {id:'classic',name:'UNO',desc:'แบบดั้งเดิม 4 สี มี +2 +4 กลับทาง'},
+  {id:'weird',name:'UNO weird',desc:'เหมือน UNO ปกติทุกอย่าง แต่เลือก 4 สีเอง'},
+  {id:'nomercy',name:'UNO no mercy',desc:'Show ’Em No Mercy ซ้อนจั่วได้ +2 ถึง +10 มือถึง 25 ใบตกรอบ'},
+  {id:'flip',name:'UNO flip',desc:'ไพ่ 2 ด้าน สว่างกับมืด กด FLIP แล้วชุดสีเปลี่ยน'},
+  {id:'flex',name:'UNO flex',desc:'การ์ด Flex 2 ฝั่ง ใช้ฝั่ง flex ได้ตอน Power Card เขียว'},
+  {id:'allwild',name:'UNO all wild',desc:'ไม่มีสี ไม่มีเลข ทุกใบเป็น Wild'},
+  {id:'teams',name:'UNO teams',desc:'เล่นเป็นคู่ นั่งตรงข้ามคู่หู ต้องหมดมือทั้งคู่ถึงชนะ'},
+  {id:'dos',name:'UNO dos',desc:'DOS วางไพ่กลางโต๊ะหลายใบ จับคู่ 2 ใบที่บวกกันได้เท่าใบกลาง'},
+  {id:'liar',name:'UNO liar',desc:'Liar’s UNO คว่ำไพ่แล้วบอกว่าเป็นใบอะไร จะจริงหรือโกหกก็ได้'}
+];
+const unoVer=id=>UNO_VERS.find(v=>v.id===id)||UNO_VERS[0];
+const UNO_REV='<svg class="uk-rev" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h13.5L14 5M20 15.5H6.5L10 19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+/* ปุ่มตรงกลาง: add = นับเพิ่มในเลขจั่ว · rev = กลับทาง · msg = บอกกฎของการ์ดใบนั้นสั้นๆ */
+const UK={
+  d1:{l:'+1',add:1},d2:{l:'+2',add:2},d4:{l:'+4',add:4},d5:{l:'+5',add:5},d6:{l:'+6',add:6},d10:{l:'+10',add:10},
+  rev:{l:UNO_REV,rev:true,aria:'กลับทาง'},
+  rd4:{l:UNO_REV+'<small>+4</small>',rev:true,add:4,aria:'Wild Reverse Draw 4',msg:'Wild Reverse +4: กลับทาง แล้วคนถัดไปในทิศใหม่จั่ว 4'},
+  flip:{l:'FLIP',flip:true,w:3},
+  dcol:{l:'จั่วจนได้สี',t:1,msg:'Wild Draw Color: คนถัดไปจั่วไปเรื่อยๆ จนได้สีที่เลือก เอาเข้ามือทั้งหมด แล้วข้าม'},
+  frev:{l:UNO_REV+'<small>ข้าม</small>',rev:true,aria:'Flex Reverse',msg:'Flex Reverse (ฝั่ง flex): กลับทาง แล้วข้ามคนแรกในทิศใหม่'},
+  all1:{l:'ทุกคน +1',t:1,msg:'Flex Draw Two (ฝั่ง flex): ทุกคนยกเว้นคนลงจั่ว 1 คนถัดไปยังได้เล่น'},
+  all2:{l:'ทุกคน +2',t:1,msg:'Flex Wild All Draw (ฝั่ง flex): ทุกคนยกเว้นคนลงจั่ว 2 คนถัดไปยังได้เล่น'},
+  tg2:{l:'เลือกคน +2',t:1,add:2,msg:'Wild Targeted Draw Two: คนที่ถูกเลือกจั่ว 2 แล้วเล่นต่อจากคนถัดไปตามปกติ'},
+  sk2:{l:'ข้าม 2',t:1,msg:'Wild Skip Two: 2 คนถัดไปโดนข้าม'},
+  swap:{l:'สลับมือ',t:1,msg:'Wild Forced Swap: เลือกคนมาแลกไพ่ทั้งมือกัน'},
+  td4:{l:'ทีม +4',t:1,add:2,msg:'Wild Team Draw Four: คนถัดไปจั่ว 2 แล้วข้าม คู่หูของเขาก็จั่ว 2 ด้วย'},
+  tplay:{l:'Team Play',w:3,msg:'Wild Team Play: ข้ามไปตาคู่หูของคนลง ถ้าคู่หูลงไม่ได้ คนลงการ์ดจั่ว 2 แล้วเล่นต่อจากคู่หู'},
+  liar:{l:'จับโกหก!',w:3,liar:true},
+  dosDel:{l:'ลบใบที่เลือก',t:1,dos:'del'},
+  dosB1:{l:'สีตรง 1 ใบ',t:1,msg:'ลงใบเดียวแล้วสีตรงด้วย: จบตาวางไพ่ในมือเพิ่มกลางโต๊ะ 1 ใบ'},
+  dosB2:{l:'สีตรง 2 ใบ',t:1,msg:'ลง 2 ใบแล้วสีตรงทั้งคู่: จบตาวางไพ่เพิ่มกลางโต๊ะ 1 ใบ และทุกคนจั่ว 1'}
+};
+function unoKeys(u){switch(u.ver){
+  case 'nomercy':return ['d2','d4','rev','d6','d10','rd4'];
+  case 'flip':return u.side==='D'?['d5','dcol','rev','flip']:['d1','d2','rev','flip'];
+  case 'flex':return ['d2','d4','rev','frev','all1','all2'];
+  case 'allwild':return ['d2','d4','rev','tg2','sk2','swap'];
+  case 'teams':return ['d2','td4','rev','tplay'];
+  case 'liar':return ['d2','d4','rev','liar'];
+  case 'dos':return ['dosDel','dosB1','dosB2'];
+  default:return ['d2','d4','rev'];
+}}
+function unoPal(u){
+  if(u.ver==='allwild'||u.ver==='dos')return [];
+  if(u.ver==='flip'&&u.side==='D')return UNO_DARK;
+  if(u.ver==='weird')return (u.wc||UNO_WEIRD).map((c,i)=>['w'+i,'ที่ '+(i+1),c]);
+  return UNO_C4;
+}
+/* ตัวหนังสือบนพื้นสี: เลือกขาวหรือเข้มตามความสว่างของสีพื้น */
+function unoInk(hex){const m=/^#?([0-9a-f]{6})$/i.exec(hex||'');if(!m)return '#FFFFFF';const n=parseInt(m[1],16);
+  const ch=[n>>16,n>>8&255,n&255].map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});
+  return .2126*ch[0]+.7152*ch[1]+.0722*ch[2]>.21?'#17212B':'#FFFFFF'}
+function unoRound(u){Object.assign(u,{color:null,dir:1,draw:0,log:[],last:0,side:'L',msg:'',dos:{row:[],sel:null,add:true,addC:'red'}})}
+function unoSnap(u){u.hist=u.hist||[];u.hist.push({color:u.color,dir:u.dir,draw:u.draw,log:clone(u.log||[]),last:u.last,side:u.side,msg:u.msg,dos:clone(u.dos||null)});if(u.hist.length>60)u.hist.shift()}
+const unoTeams=o=>{const h=o.length/2;return Array.from({length:h},(_,i)=>[o[i],o[i+h]])};
+const unoPk=(u,p)=>p.id||('g'+u.order.indexOf(p));
+function unoDots(v,u){const cs=v.id==='weird'?(u.wc||UNO_WEIRD):v.id==='flip'?UNO_C4.concat(UNO_DARK).map(c=>c[2]):v.id==='allwild'?['#26313D']:UNO_C4.map(c=>c[2]);
+  return `<span class="uno-dots" aria-hidden="true">${cs.map(c=>`<i style="--k:${c}"></i>`).join('')}</span>`}
 function vUno(){
-  const u=S.uno;
-  if(!u||u.phase==='setup'){
-    if(!u)S.uno={phase:'setup',order:[],stack:false,award:2};
-    const o=S.uno.order;
-    return `<div class="stage">
-      <div><h3>เรียงคนเล่นตามที่นั่ง</h3><p class="muted small">แตะตามลำดับวนรอบโต๊ะ แตะซ้ำเพื่อเอาออก</p></div>
-      <div class="pawns">${kids().map(k=>pawnBtn(k,'unoAdd',o.some(p=>p.id===k.id),'lg')).join('')}</div>
-      <div class="row2"><label class="field"><span>เพื่อนหรือแขกที่มาเล่นด้วย</span><input type="text" id="unoGuest" placeholder="ชื่อ เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="unoGuest">เพิ่มแขก</button></div></div>
-      <div class="order" aria-label="ลำดับที่นั่ง">${o.length?o.map((p,i)=>`<span class="item">${i+1}${playerPawn(p,'sm')}</span>`).join('<span class="muted">→</span>'):'<span class="muted small">ยังไม่มีคนเล่น</span>'}</div>
-      <label class="check"><input type="checkbox" id="unoStack" ${S.uno.stack?'checked':''} data-change="unoStack"> ให้ซ้อน +2 / +4 ได้</label>
-      <div class="btns"><button class="btn primary big" data-act="unoStart" ${o.length>=2?'':'disabled'}>${o.length>=2?'เริ่มเล่น':'ต้องมีอย่างน้อย 2 คน'}</button>${o.length?'<button class="btn ghost" data-act="unoClear">ล้างลำดับ</button>':''}</div>
-    </div>`;
-  }
-  const n=u.order.length;const cur=u.order[u.cur];const nx=i=>u.order[((u.cur+u.dir*i)%n+n)%n];
-  if(u.phase==='win'){
-    return `<div class="stage center"><h3>ใครลงไพ่ใบสุดท้าย</h3><div class="pawns" style="justify-content:center">${u.order.map((p,i)=>p.id?pawnBtn(kidById(p.id)||{id:p.id,code:'?'},'unoWin',false,'lg'):`<button type="button" class="pawn lg" style="--c:${okColor(p.color)}" data-act="unoWin" data-guest="${i}" aria-pressed="false">${esc(p.code)}</button>`).join('')}</div><button class="btn ghost" data-act="unoBack">กลับไปเล่นต่อ</button></div>`;
-  }
-  const arrow=u.dir===1?'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const wins=u.wins||{};
-  return `<div class="stage center">
-    <span class="dir">${arrow}${u.dir===1?'วนตามเข็ม':'วนทวนเข็ม'}</span>
-    ${playerPawn(cur,'xl')}
-    <div class="turnname">ตา ${esc(playerName(cur))}</div>
-    ${u.pending?`<div class="pending">โดน +${u.pending} ซ้อนได้ หรือจั่วแล้วข้าม</div>`:''}
-    ${u.msg?`<p class="muted">${esc(u.msg)}</p>`:''}
-    <div class="nextup">ต่อไป ${[1,2,3].slice(0,Math.min(3,n-1)).map(i=>playerPawn(nx(i),'sm')).join('')}</div>
-    <div class="unocolors" aria-label="สีปัจจุบัน">${UNO_COLORS.map(([id,c])=>`<button type="button" style="background:${c}" data-act="unoColor" data-id="${id}" aria-pressed="${u.color===id}" aria-label="สี ${id}"></button>`).join('')}</div>
-  </div>
-  <div class="unogrid" style="margin-top:12px">
-    ${u.pending?`<button class="btn big primary" data-act="uno" data-id="take">จั่ว +${u.pending} แล้วข้าม</button>${u.stack?'<button class="btn big" data-act="uno" data-id="d2">ซ้อน +2</button><button class="btn big" data-act="uno" data-id="d4">ซ้อน +4</button>':''}`
-    :`<button class="btn big primary" data-act="uno" data-id="next">ลงไพ่ / จั่วแล้ว</button>
-      <button class="btn big" data-act="uno" data-id="skip">ข้าม</button>
-      <button class="btn big" data-act="uno" data-id="rev">กลับทาง</button>
-      <button class="btn big" data-act="uno" data-id="d2">+2</button>
-      <button class="btn big" data-act="uno" data-id="d4">+4 เปลี่ยนสี</button>`}
-  </div>
-  <div class="btns" style="margin-top:12px"><button class="btn" data-act="uno" data-id="undo" ${(u.hist||[]).length?'':'disabled'}>ย้อนกลับ</button><button class="btn" data-act="unoEnd">จบรอบ: มีคนชนะ</button><button class="btn ghost" data-act="unoReset">ตั้งค่าใหม่</button></div>
-  ${Object.keys(wins).length?`<div class="panel" style="margin-top:12px"><span class="label">ชนะในวันนี้</span><div class="scoreline" style="margin-top:8px">${u.order.map((p,i)=>`<span>${playerPawn(p,'sm')}${wins[p.id||('g'+i)]||0}</span>`).join('')}</div></div>`:''}`;
+  if(!S.uno)S.uno={phase:'pick',ver:null,order:[],award:2,wins:{}};
+  const u=S.uno;u.order=u.order||[];u.wins=u.wins||{};
+  if(!u.ver||u.phase==='pick')return unoPickView(u);
+  if(u.phase==='play')return unoPlayView(u);
+  if(u.phase==='win')return unoWinView(u);
+  return unoSetupView(u);
 }
+function unoPickView(u){
+  return `<div class="stage"><div><h3>เล่น UNO เวอร์ชันไหน</h3><p class="muted small">แต่ละเวอร์ชันมีปุ่มช่วยเล่นตามกฎของมันเอง</p></div>
+    <div class="uno-vers">${UNO_VERS.map(v=>`<button type="button" class="uno-v" data-act="unoVer" data-id="${v.id}" aria-pressed="${u.ver===v.id}">${unoDots(v,u)}<b>${esc(v.name)}</b><span>${esc(v.desc)}</span></button>`).join('')}</div></div>`;
+}
+function unoSetupView(u){
+  const v=unoVer(u.ver);const o=u.order;const n=o.length;const teams=u.ver==='teams';const bad=teams&&n>0&&(n<4||n%2);
+  const wins=u.wins||{};const anyWin=o.some((p,i)=>wins[p.id||('g'+i)]);
+  return `<div class="stage">
+    <div class="uno-vhead"><div><span class="label">เวอร์ชัน</span><h3>${esc(v.name)}</h3><p class="muted small">${esc(v.desc)}</p></div><button class="btn sm" data-act="unoPick">เปลี่ยนเวอร์ชัน</button></div>
+    ${u.ver==='weird'?`<div class="field"><span>เลือก 4 สีเอง แตะกล่องเพื่อเปลี่ยนสี</span><div class="uno-wc">${(u.wc||UNO_WEIRD).map((c,i)=>`<label class="uno-wcl"><input type="color" value="${esc(c)}" data-unowc="${i}" aria-label="สีที่ ${i+1}"><span>สีที่ ${i+1}</span></label>`).join('')}</div></div>`:''}
+    <div><h3>${teams?'เรียงคนเล่นตามที่นั่ง':'คนเล่น'}</h3><p class="muted small">${teams?'แตะตามลำดับวนรอบโต๊ะ คู่หูคือคนที่นั่งตรงข้าม':'เลือกไว้เพื่อบันทึกว่าใครชนะ ไม่เลือกก็เล่นได้'} · แตะซ้ำเพื่อเอาออก</p></div>
+    <div class="pawns">${kids().map(k=>pawnBtn(k,'unoAdd',o.some(p=>p.id===k.id),'lg')).join('')}</div>
+    <div class="row2"><label class="field"><span>เพื่อนหรือแขกที่มาเล่นด้วย</span><input type="text" id="unoGuest" placeholder="ชื่อ เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="unoGuest">เพิ่มแขก</button></div></div>
+    <div class="order" aria-label="ลำดับที่นั่ง">${n?o.map((p,i)=>`<span class="item">${i+1}${playerPawn(p,'sm')}</span>`).join('<span class="muted">→</span>'):'<span class="muted small">ยังไม่ได้เลือกคนเล่น</span>'}</div>
+    ${teams&&n&&!bad?`<div class="uno-teams">${unoTeams(o).map((t,i)=>`<span><b>ทีม ${i+1}</b>${playerPawn(t[0],'sm')}${esc(playerName(t[0]))} + ${playerPawn(t[1],'sm')}${esc(playerName(t[1]))}</span>`).join('')}</div>`:''}
+    ${bad?'<p class="pending">UNO teams ต้องมีคนเล่นเป็นคู่ อย่างน้อย 4 คน</p>':''}
+    <div class="btns"><button class="btn primary big" data-act="unoStart" ${bad?'disabled':''}>เริ่มเล่น</button>${n?'<button class="btn ghost" data-act="unoClear">ล้างคนเล่น</button>':''}<button class="btn ghost" data-act="unoRules">ดูกฎ ${esc(v.name)}</button></div>
+    ${anyWin?`<div class="panel"><span class="label">ชนะในวันนี้</span><div class="scoreline" style="margin-top:8px">${o.map((p,i)=>`<span>${playerPawn(p,'sm')}${wins[p.id||('g'+i)]||0}</span>`).join('')}</div></div>`:''}
+  </div>`;
+}
+function unoWinView(u){
+  const pick=(p,i,act)=>p.id?pawnBtn(kidById(p.id)||{id:p.id,code:'?'},act,false,'lg'):`<button type="button" class="pawn lg" style="--c:${okColor(p.color)}" data-act="${act}" data-guest="${i}" aria-pressed="false">${esc(p.code)}</button>`;
+  if(u.ver==='teams')return `<div class="stage center"><h3>ทีมไหนหมดมือทั้งคู่</h3><div class="uno-teamwin">${unoTeams(u.order).map((t,i)=>`<button type="button" class="uno-tw" data-act="unoWinTeam" data-id="${i}"><b>ทีม ${i+1}</b>${playerPawn(t[0])}${playerPawn(t[1])}<span>${esc(playerName(t[0]))} + ${esc(playerName(t[1]))}</span></button>`).join('')}</div><button class="btn ghost" data-act="unoBack">กลับไปเล่นต่อ</button></div>`;
+  return `<div class="stage center"><h3>${u.ver==='dos'?'ใครหมดมือก่อน':'ใครลงไพ่ใบสุดท้าย'}</h3><div class="pawns" style="justify-content:center">${u.order.map((p,i)=>pick(p,i,'unoWin')).join('')}</div><button class="btn ghost" data-act="unoBack">กลับไปเล่นต่อ</button></div>`;
+}
+const UNO_AH='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5 19 12 6.5 20.5z" fill="currentColor"/></svg>';
+function unoPlayView(u){
+  const v=unoVer(u.ver);const pal=unoPal(u);const cur=pal.find(c=>c[0]===u.color);const dos=u.ver==='dos';
+  const bg=cur?cur[2]:(u.ver==='flip'&&u.side==='D'?'#1B1424':'#26313D');const fg=unoInk(bg);
+  const others=cur?pal.filter(c=>c[0]!==u.color):pal;const cw=dos||u.dir!==-1;
+  const keys=unoKeys(u).map(k=>{const d=UK[k];const off=k==='dosDel'&&!(u.dos&&u.dos.sel!=null&&u.dos.row[u.dos.sel]);
+    return `<button type="button" class="ukey${d.w?' w3':''}${d.t?' txt':''}${d.flip?' flip':''}" data-act="uno" data-id="${k}" ${d.aria?`aria-label="${esc(d.aria)}" title="${esc(d.aria)}"`:''} ${off?'disabled':''}>${d.l}</button>`}).join('');
+  const top=pal.length?`<div class="unox-cols${cur?'':' pick4'}">${others.map(([id,nm,c])=>`<button type="button" class="ucol" style="--k:${c}" data-act="unoColor" data-id="${id}" aria-label="เปลี่ยนเป็นสี${esc(nm)}"></button>`).join('')}</div>`
+    :dos?dosRow(u):'<div class="unox-wild" aria-hidden="true">ALL WILD</div>';
+  const hint=pal.length&&!cur?'แตะสีของไพ่ที่หงายอยู่กลางโต๊ะ':dos&&!(u.dos.row||[]).length?'ใส่ไพ่ที่เปิดอยู่กลางโต๊ะ (เริ่ม 2 ใบ)':'';
+  const log=u.log||[];
+  const count=dos?dosInfo(u):`<button type="button" class="unox-count${u.draw?'':' off'}" data-act="unoZero" aria-label="จั่ว ${u.draw||0} ใบ แตะเพื่อล้าง">
+      <b>+${u.draw||0}</b><span>${log.length>1?log.join(' + ')+' · ':''}${u.ver==='nomercy'&&u.last?'ซ้อนได้ด้วย +'+u.last+' ขึ้นไป · ':''}แตะเพื่อล้าง<span class="kb"> หรือกด Enter</span></span></button>`;
+  return `<div class="unox" style="--bg:${bg};--fg:${fg}" role="region" aria-label="${esc(v.name)} เต็มจอ">
+    <div class="unox-top">
+      <button type="button" class="ubtn" data-act="unoReset">← ออก</button>
+      <b class="unox-name"><span>${esc(v.name)}</span>${u.ver==='flip'?`<span class="unox-side">${u.side==='D'?'ด้านมืด':'ด้านสว่าง'}</span>`:''}</b>
+      <span class="unox-tools"><button type="button" class="ubtn" data-act="unoRules">กฎ</button><button type="button" class="ubtn" data-act="uno" data-id="undo" aria-label="ย้อนกลับ" title="ย้อนกลับ (Ctrl+Z)" ${(u.hist||[]).length?'':'disabled'}>↶</button><button type="button" class="ubtn" data-act="unoEnd">${u.order.length?(u.ver==='teams'?'มีทีมชนะ':'มีคนชนะ'):'รอบใหม่'}</button></span>
+    </div>
+    <div class="unox-mid">
+      ${count}
+      <div class="unox-ring ${cw?'cw':'ccw'}">
+        <i class="ah ah-t">${UNO_AH}</i><i class="ah ah-r">${UNO_AH}</i><i class="ah ah-b">${UNO_AH}</i><i class="ah ah-l">${UNO_AH}</i>
+        <div class="unox-grid">${top}<div class="unox-keys">${keys}</div></div>
+      </div>
+      <p class="unox-dir">${dos?'วนตามเข็มตลอด · ไปทางซ้ายมือ (DOS ไม่มีกลับทาง)':cw?'วนตามเข็ม · ไปทางซ้ายมือ':'วนทวนเข็ม · ไปทางขวามือ'}</p>
+      <p class="unox-msg" aria-live="polite">${esc(u.msg||hint)}</p>
+      ${dos?dosAddPanel(u):''}
+    </div>
+  </div>`;
+}
+/* DOS: แถวไพ่กลางโต๊ะ แตะใบไหนบอกว่าลงอะไรได้บ้าง */
+const DOS_N=[1,3,4,5,6,7,8,9,10];
+const dosLab=v=>v===2?'DOS':String(v);
+function dosRow(u){const d=u.dos;
+  return `<div class="dos-row">${d.row.map((c,i)=>{const col=UNO_C4.find(x=>x[0]===c.c);const bg=col?col[2]:'conic-gradient(#D63A2F 0 25%,#EDB90F 0 50%,#2E9B4E 0 75%,#2B67C9 0)';
+    return `<button type="button" class="dcard${d.sel===i?' sel':''}" style="--k:${bg};--kc:${col?unoInk(col[2]):'#fff'}" data-act="dosSel" data-id="${i}" aria-pressed="${d.sel===i}" aria-label="${col?'สี'+col[1]:'Wild'} ${esc(String(c.n))}">${esc(String(c.n))}</button>`}).join('')}
+    <button type="button" class="dcard add" data-act="dosAddOpen" aria-pressed="${!!d.add}" aria-label="เพิ่มไพ่กลางโต๊ะ">+</button></div>`;
+}
+function dosInfo(u){const d=u.dos;const s=d.sel!=null?d.row[d.sel]:null;
+  if(!s)return `<div class="dos-info"><div>แตะไพ่กลางโต๊ะ ดูว่าลงอะไรได้บ้าง</div></div>`;
+  if(s.n==='#')return `<div class="dos-info"><div><b>Wild #</b> เลือกเลขเองได้ 1–10 แล้วจับคู่เหมือนไพ่เลข · สีของการ์ดนับเป็นสีตรงได้</div></div>`;
+  const n=s.n==='DOS'?2:+s.n;const ps=[];for(let a=1;a<=n/2;a++){const b=n-a;if(b<=10)ps.push(dosLab(a)+' + '+dosLab(b))}
+  return `<div class="dos-info"><div><b>ใบเดียว</b> ${dosLab(n)}${ps.length?` · <b>2 ใบ</b> ${ps.join(' , ')}`:''}<br><span>${s.c==='any'?'DOS กลางโต๊ะ เลือกสีได้ตอนจับคู่':'ถ้าสีตรงด้วย ได้โบนัส'} · Wild # ในมือใช้แทนเลขไหนก็ได้</span></div></div>`;
+}
+function dosAddPanel(u){const d=u.dos;if(!d.add)return '';
+  return `<div class="dos-add"><div class="dos-cs">${UNO_C4.map(([id,nm,c])=>`<button type="button" style="--k:${c}" data-act="dosC" data-id="${id}" aria-pressed="${d.addC===id}" aria-label="สี${nm}"></button>`).join('')}</div>
+    <div class="dos-ns">${DOS_N.map(n=>`<button type="button" class="ubtn" data-act="dosN" data-id="${n}">${n}</button>`).join('')}<button type="button" class="ubtn" data-act="dosN" data-id="#">#</button><button type="button" class="ubtn" data-act="dosN" data-id="DOS">DOS</button></div>
+    <button type="button" class="ubtn" data-act="dosAddOpen">เสร็จ</button></div>`;
+}
+const UNO_RULES={
+  classic:['ลงไพ่ที่สี เลข หรือสัญลักษณ์ตรงกับใบบนสุด ไม่มีให้ลงก็จั่ว 1 ใบ ถ้าลงได้ลงเลย','ข้าม: คนถัดไปโดนข้าม · กลับทาง: เปลี่ยนทิศ (เล่น 2 คน = ข้าม)','+2: คนถัดไปจั่ว 2 แล้วข้าม · Wild: เลือกสีใหม่','Wild +4: ลงได้เมื่อในมือไม่มีสีที่ตรง คนถัดไปจั่ว 4 แล้วข้าม จะท้าก็ได้: ถ้าคนลงมีสีตรงจริง คนลงจั่ว 4 แทน ถ้าไม่มี คนท้าจั่ว 6','กฎทางการซ้อน +2 / +4 ไม่ได้','เหลือ 1 ใบต้องพูด UNO ถ้าโดนจับได้ก่อนคนถัดไปเล่น จั่ว 2','เริ่มจากคนทางซ้ายของคนแจก วนตามเข็ม (ไปทางซ้ายมือ)'],
+  weird:['เหมือน UNO ปกติทุกข้อ ต่างแค่ 4 สีที่ตั้งเองในหน้าตั้งค่า','ลงไพ่ที่สี เลข หรือสัญลักษณ์ตรงกับใบบนสุด','+2: คนถัดไปจั่ว 2 แล้วข้าม · Wild +4: คนถัดไปจั่ว 4 แล้วข้าม (ท้าได้แบบ UNO ปกติ)','เหลือ 1 ใบต้องพูด UNO'],
+  nomercy:['ไม่มีไพ่ลง: จั่วไปเรื่อยๆ จนได้ใบที่ลงได้ แล้วลงเลย','ซ้อนจั่ว: โดนการ์ดจั่ว ลงการ์ดจั่วที่ค่าเท่ากันหรือมากกว่าทับได้ ยอดรวมส่งต่อไป คนที่ซ้อนไม่ได้จั่วทั้งหมด','Wild Reverse +4: กลับทาง แล้วคนถัดไปในทิศใหม่จั่ว 4 · Wild +6 / +10: คนถัดไปจั่วแล้วข้าม','Wild Color Roulette: คนถัดไปเลือกสี แล้วเปิดไพ่ไปเรื่อยๆ จนเจอสีนั้น เอาทั้งหมดเข้ามือ แล้วข้าม','Discard All: ทิ้งไพ่สีเดียวกับใบนี้ทั้งหมดในมือ · Skip Everyone: ข้ามทุกคน ได้เล่นอีกตา','7 = เลือกคนสลับมือ · 0 = ทุกคนส่งไพ่ทั้งมือให้คนถัดไปตามทิศ','มือถึง 25 ใบขึ้นไป = ตกรอบ (Mercy) · ชนะ = หมดมือก่อน หรือเหลือคนสุดท้าย'],
+  flip:['ด้านสว่าง: แดง เหลือง เขียว น้ำเงิน · ด้านมืด: ชมพู ฟ้าอมเขียว ส้ม ม่วง','FLIP: พลิกกองจั่ว กองทิ้ง และไพ่ในมือทุกคน เล่นต่อด้วยใบบนสุดของด้านใหม่ (กด FLIP แล้วแตะสีของใบนั้น)','ด้านสว่าง: +1 คนถัดไปจั่ว 1 แล้วข้าม · Wild +2 คนถัดไปจั่ว 2 แล้วข้าม','ด้านมืด: +5 คนถัดไปจั่ว 5 แล้วข้าม · Skip Everyone ข้ามทุกคน ได้เล่นอีกตา · Wild Draw Color คนถัดไปจั่วจนได้สีที่เลือก แล้วข้าม','เหลือ 1 ใบต้องพูด UNO · นับแต้มเล่นถึง 500'],
+  flex:['เล่นเหมือน UNO ปกติ การ์ด Flex มี 2 ฝั่ง สีของฝั่งปกติคือสีที่เล่นต่อ','ใช้ฝั่ง flex ได้เฉพาะตอน Power Card ตัวเองเป็นสีเขียว ใช้แล้วพลิกเป็นแดง','Power Card กลับเป็นเขียวเมื่อ: แดงครบทุกคนพร้อมกัน · ลงไพ่เลขที่มีไอคอนพลิก (พลิกของตัวเอง) · มีคนลง Wild All Flip (ทุกคนพลิก)','Flex Draw Two: ทุกคนจั่ว 1 คนถัดไปยังเล่นได้ · Flex Reverse: กลับทางแล้วข้าม · Flex Skip: ข้ามทุกคน กลับมาตาเรา','Flex Wild Target Draw 2: เลือกคนจั่ว 2 · Flex Wild All Draw: ทุกคนจั่ว 2 · Flex Wild Draw Four (ฝั่ง flex): เลือกคนจั่ว 4','Wild Draw Four ฝั่งปกติ: ลงได้เมื่อไม่มีสีตรง ท้าได้ (แพ้ท้าคนท้าจั่ว 6)'],
+  allwild:['ทุกใบเป็น Wild ไม่ต้องตรงสีหรือเลข ลงใบไหนก็ได้ทุกตา','Wild +2 / +4: คนถัดไปจั่วแล้วข้าม · Wild Targeted +2: เลือกคนจั่ว 2','Wild Skip / Skip Two: ข้าม 1 / 2 คน · Wild Reverse: กลับทาง · Wild Forced Swap: เลือกคนแลกมือ','ใบแรกที่เปิดตอนเริ่มไม่ต้องทำตาม · กฎทางการซ้อนจั่วไม่ได้','เหลือ 1 ใบต้องพูด UNO'],
+  teams:['จับคู่ นั่งตรงข้ามคู่หู ก่อนเริ่มทุกคนส่งไพ่ 1 ใบให้คู่หู','คุยกันได้ แต่ห้ามบอกใบในมือ และห้ามช่วยเลือกสีตอนลง Wild','การ์ดที่มีไอคอนส่งไพ่: คนลงกับคู่หูแลกกันคนละ 1 ใบ','Wild Team Play: ข้ามไปตาคู่หู ถ้าคู่หูลงไม่ได้ คนลงจั่ว 2 · Wild Team +4: คนถัดไปจั่ว 2 แล้วข้าม คู่หูของเขาก็จั่ว 2','หมดมือแล้ว คู่หูแบ่งไพ่ให้ครึ่งนึง (เศษคู่หูเก็บไว้) ถ้าคู่หูเหลือ 1 ใบไม่ต้องแบ่ง · ระหว่างนั้นถ้าคู่หูจั่ว ต้องแบ่งให้ครึ่งนึงอีก','ทีมชนะเมื่อหมดมือทั้งคู่ · คู่หูพูด UNO แทนได้'],
+  dos:['เปิดไพ่กลางโต๊ะ 2 ใบ ลงไพ่ที่เลขตรงกับใบกลาง 1 ใบ หรือ 2 ใบที่บวกกันได้เท่าใบกลาง ไม่ต้องตรงสี จับคู่ได้ใบละครั้ง','สีตรง 1 ใบ: จบตาวางไพ่เพิ่มกลางโต๊ะ 1 ใบ · สีตรงทั้ง 2 ใบ: วางเพิ่ม 1 ใบ และทุกคนจั่ว 1','จับคู่ไม่ได้: จั่ว 1 ถ้ายังไม่ได้ วางไพ่ 1 ใบไว้กลางโต๊ะ','จบตา: ทิ้งไพ่ที่จับคู่ เติมกลางให้ครบ 2 ใบ แล้วค่อยวางโบนัส','Wild DOS = เลข 2 สีไหนก็ได้ · Wild # = เลขไหนก็ได้ (1–10) สีตามการ์ด','เหลือ 2 ใบต้องพูด DOS! ไม่งั้นจั่ว 2 · ไม่มีกลับทาง · นับแต้มเล่นถึง 200'],
+  liar:['ไพ่ที่มีวงกลมขาวที่มุม = Liar’s Card ต้องคว่ำลงแล้วบอกว่าเป็นใบอะไร จะจริงหรือโกหกก็ได้ · ไพ่ธรรมดาลงหงาย','ใครจะจับก็ได้ ก่อนคนถัดไปเริ่มตา (กด "จับโกหก!" ดูว่าใครโดน) · ไม่มีใครจับ = การ์ดที่บอกไว้ทำงานเลย','Wild Liar’s Challenge (ลงหงาย): เลือกสี ทุกคนคว่ำไพ่สีนั้นคนละ 1 ใบแล้วบอก คนลงไล่จับทีละคน','7 = เลือกคนสลับมือ · 0 = ทุกคนส่งไพ่ทั้งมือตามทิศ','ลงใบสุดท้ายแล้วโดนจับได้ว่าโกหก = ยังไม่ชนะ เอาไพ่คืน จั่ว 1','เหลือ 1 ใบต้องพูด UNO']
+};
+function unoRulesSheet(){const u=S.uno;const v=unoVer(u&&u.ver);
+  openSheet('กฎ '+esc(v.name),`<ul class="unor">${(UNO_RULES[v.id]||[]).map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
+    <p class="muted small">จอนี้ไม่บอกว่าตาใคร ใช้ช่วยจำสีกับทิศ · ปุ่มจั่วกดซ้ำได้ เลขรวมกันให้เอง แตะเลขหรือกด Enter เพื่อล้าง</p>`,
+    `<button class="btn primary" data-act="closeSheet" data-enter>เข้าใจแล้ว</button>`)}
+function unoLiarSheet(){openSheet('จับโกหก!',`<p>คนที่โดนจับเปิดไพ่ใบนั้นให้ดู</p><ul class="unor"><li><b>บอกจริง</b> → คนจับจั่ว 1</li><li><b>โกหก</b> → คนโกหกเอาไพ่คืน แล้วจั่ว 1</li><li><b>แอบเอาไพ่ธรรมดามาคว่ำ</b> → เอาคืน แล้วจั่ว 6</li><li>ถ้าเป็น 7 หรือ 0 สลับมือก่อน แล้วค่อยจั่วไพ่โทษ</li></ul><p class="muted small">ต้องจับก่อนคนถัดไปเริ่มตา</p>`,
+  `<button class="btn primary" data-act="closeSheet" data-enter>เข้าใจแล้ว</button>`)}
 function unoAct(a){
-  const u=S.uno;const n=u.order.length;u.hist=u.hist||[];
+  const u=S.uno;u.hist=u.hist||[];
   if(a==='undo'){const h=u.hist.pop();if(h)Object.assign(u,h);return}
-  u.hist.push({cur:u.cur,dir:u.dir,pending:u.pending,color:u.color,msg:u.msg});if(u.hist.length>40)u.hist.shift();
-  const step=k=>{u.cur=((u.cur+u.dir*k)%n+n)%n};const who=k=>playerName(u.order[((u.cur+u.dir*k)%n+n)%n]);
-  u.msg='';
-  if(a==='next'){step(1)}
-  else if(a==='skip'){u.msg=who(1)+' โดนข้าม';step(2)}
-  else if(a==='rev'){u.dir*=-1;if(n===2){u.msg='2 คนเล่น กลับทาง = ได้เล่นอีกตา'}else{step(1)}}
-  else if(a==='d2'||a==='d4'){const add=a==='d2'?2:4;
-    if(u.stack){u.pending=(u.pending||0)+add;step(1)}
-    else{u.msg=who(1)+' จั่ว '+add+' ใบ แล้วข้าม';step(2)}}
-  else if(a==='take'){u.msg=playerName(u.order[u.cur])+' จั่ว '+u.pending+' ใบ แล้วข้าม';u.pending=0;step(1)}
+  const d=UK[a];if(!d)return;
+  if(d.liar){unoLiarSheet();return}
+  if(d.dos==='del'){const D=u.dos;if(D.sel==null||!D.row[D.sel])return;unoSnap(u);D.row.splice(D.sel,1);D.sel=null;u.msg='';return}
+  if(d.add&&u.ver==='nomercy'&&u.draw&&d.add<(u.last||0)){toast('ซ้อนต้องใช้ +'+u.last+' ขึ้นไป · ถ้าจะเริ่มนับใหม่ แตะเลขจั่วเพื่อล้างก่อน');return}
+  unoSnap(u);u.msg=d.msg||'';
+  if(d.flip){u.side=u.side==='D'?'L':'D';u.color=null}
+  if(d.rev)u.dir=u.dir===-1?1:-1;
+  if(d.add){u.draw=(u.draw||0)+d.add;u.log=(u.log||[]).concat(d.add);u.last=d.add}
 }
+function unoZero(){const u=S.uno;if(!u||!u.draw)return;unoSnap(u);Object.assign(u,{draw:0,log:[],last:0,msg:''});persist();render()}
+/* เต็มจอ: Enter ล้างเลขจั่ว · Ctrl/⌘+Z ย้อนกลับ · ปุ่มเลขตรงกับการ์ดจั่ว · R กลับทาง · F พลิก (flip) */
+const unoOn=()=>S.tab==='tools'&&S.tool==='uno'&&S.uno&&S.uno.ver&&S.uno.phase==='play'&&$('#sheet').hidden;
+document.addEventListener('keydown',e=>{
+  if(!unoOn()||e.isComposing||e.altKey)return;
+  const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+  if(e.ctrlKey||e.metaKey){if(!e.shiftKey&&e.code==='KeyZ'){e.preventDefault();unoAct('undo');persist();render()}return}
+  if(e.key==='Enter'){e.preventDefault();unoZero();return}
+  if(e.repeat)return;
+  const ks=unoKeys(S.uno);let k=null;
+  if(e.code==='KeyR')k=ks.find(x=>UK[x].rev&&!UK[x].add&&!UK[x].msg)||null;
+  else if(e.code==='KeyF')k=ks.find(x=>UK[x].flip)||null;
+  else{const m=/^(?:Digit|Numpad)(\d)$/.exec(e.code||'');if(m){const v=+m[1]||10;k=ks.find(x=>UK[x].add===v&&!UK[x].rev)||null}}
+  if(k){e.preventDefault();unoAct(k);persist();render()}
+});
+document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.unox button'))e.preventDefault()});
+document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.unowc!=null&&S.uno))return;const a=(S.uno.wc||UNO_WEIRD).slice();a[+t.dataset.unowc]=t.value;S.uno.wc=a;persist()});
 
 /* scoreboard */
 function vScore(){
@@ -2465,18 +2685,30 @@ const ACT={
     await Store.put('boards',id,newBoard(5,5));Object.assign(S.bs,{boardId:id,phase:'board',edit:true,used:{},final:null});S.bro=true;persist();render();toast('สร้างกระดานใหม่แล้ว เริ่มตั้งหัวข้อได้เลย')},
   bsDelAsk(){S.confirm='bsdel:'+S.bs.boardId;bsSettingsForm()},
   async bsDelBoard(){const id=bsBoardNow().id;closeSheet();S.confirm=null;await Store.del('boards',id);Object.assign(S.bs,{boardId:null,phase:'setup',edit:false,used:{}});persist();render()},
+  unoVer(t){const u=S.uno;const id=t.dataset.id;if(u.ver!==id)u.wins={};u.ver=id;u.phase='setup';S.confirm=null;persist();render();window.scrollTo({top:0})},
+  unoPick(){S.uno.phase='pick';persist();render()},
+  unoRules(){unoRulesSheet()},
   unoAdd(t){const o=S.uno.order,id=t.dataset.id;const i=o.findIndex(p=>p.id===id);if(i>=0)o.splice(i,1);else o.push({id});persist();render()},
   unoGuest(){const g=guestFrom(val('unoGuest'));if(!g)return;S.uno.order.push(g);persist();render()},
   unoClear(){S.uno.order=[];persist();render()},
-  unoStart(){const u=S.uno;Object.assign(u,{phase:'play',cur:0,dir:1,pending:0,hist:[],msg:'',color:null,wins:u.wins||{}});persist();render()},
+  unoStart(){const u=S.uno;unoRound(u);Object.assign(u,{phase:'play',hist:[],wins:u.wins||{}});persist();render()},
   uno(t){unoAct(t.dataset.id);persist();render()},
-  unoColor(t){S.uno.color=t.dataset.id;persist();render()},
-  unoEnd(){S.uno.phase='win';persist();render()},
+  unoZero(){unoZero()},
+  unoColor(t){const u=S.uno;unoSnap(u);u.color=t.dataset.id;u.msg='';persist();render()},
+  unoEnd(){const u=S.uno;if(!u.order.length){unoSnap(u);const h=u.hist;unoRound(u);u.hist=h;persist();render();toast('เริ่มรอบใหม่ กดย้อนกลับได้');return}u.phase='win';persist();render()},
   unoBack(){S.uno.phase='play';persist();render()},
   async unoWin(t){const u=S.uno;let w;if(t.dataset.guest!=null){const i=+t.dataset.guest;w=u.order[i];u.wins['g'+i]=(u.wins['g'+i]||0)+1}else{w=u.order.find(p=>p.id===t.dataset.id);u.wins[w.id]=(u.wins[w.id]||0)+1}
-    u.phase='play';u.cur=0;u.dir=1;u.pending=0;u.hist=[];u.msg=playerName(w)+' ชนะรอบนี้ เริ่มรอบใหม่ได้เลย';persist();render();
-    await saveGameSession({game:'UNO',players:u.order,winners:[w],pts:w.id?{[w.id]:u.award||0}:{}});toast('บันทึกผล UNO แล้ว')},
-  unoReset(){S.uno=Object.assign({},S.uno,{phase:'setup'});persist();render()},
+    unoRound(u);u.phase='play';u.hist=[];u.msg=playerName(w)+' ชนะรอบนี้ เริ่มรอบใหม่ได้เลย';persist();render();
+    await saveGameSession({game:unoVer(u.ver).name,players:u.order,winners:[w],pts:w.id?{[w.id]:u.award||0}:{}});toast('บันทึกผล '+unoVer(u.ver).name+' แล้ว')},
+  async unoWinTeam(t){const u=S.uno;const tm=unoTeams(u.order)[+t.dataset.id];if(!tm)return;const pts={};
+    tm.forEach(p=>{const k=unoPk(u,p);u.wins[k]=(u.wins[k]||0)+1;if(p.id)pts[p.id]=u.award||0});
+    unoRound(u);u.phase='play';u.hist=[];u.msg='ทีม '+playerName(tm[0])+' + '+playerName(tm[1])+' ชนะรอบนี้';persist();render();
+    await saveGameSession({game:'UNO teams',players:u.order,winners:tm,pts});toast('บันทึกผล UNO teams แล้ว')},
+  unoReset(){S.uno.phase='pick';S.confirm=null;persist();render();window.scrollTo({top:0})},
+  dosSel(t){const d=S.uno.dos;const i=+t.dataset.id;d.sel=d.sel===i?null:i;persist();render()},
+  dosAddOpen(){const d=S.uno.dos;d.add=!d.add;persist();render()},
+  dosC(t){S.uno.dos.addC=t.dataset.id;persist();render()},
+  dosN(t){const u=S.uno;unoSnap(u);const d=u.dos;const v=t.dataset.id;d.row.push(v==='DOS'?{c:'any',n:'DOS'}:{c:d.addC||'red',n:v==='#'?'#':+v});u.msg='';persist();render()},
   scMode(t){S.score.mode=t.dataset.id;persist();render()},
   scPlayer(t){const a=S.score.players,id=t.dataset.id;const i=a.findIndex(p=>p.id===id);if(i>=0)a.splice(i,1);else a.push({id,pts:0});persist();render()},
   scGuest(){const g=guestFrom(val('scGuest'));if(!g)return;g.pts=0;S.score.players.push(g);persist();render()},
@@ -2549,19 +2781,25 @@ const ACT={
 /* Flip 7: running score per player, listed by score, several numbers per entry, x2, +15 */
 const F7_TARGETS=[100,150,200,300];
 const F7_X2=/[x×*]\s*2(?!\d)/gi;
+const F7_HALF=/[÷\/]\s*2(?!\d)/g;
+/* เลือกเวอร์ชันก่อนเข้าหน้าตั้งค่า: c = Flip 7 · v = Flip 7 vengeance (Flip 7: With a Vengeance) */
+const F7_VERS=[{id:'c',name:'Flip 7',desc:'แบบดั้งเดิม เลข 0–12 การ์ด ×2 การ์ด +2 ถึง +10 และโบนัส +15'},
+  {id:'v',name:'Flip 7 vengeance',desc:'เลข 1–13 มี The Zero, Unlucky 7, Lucky 13 การ์ดลบ −2 ถึง −10 และ ÷2 เล่นโหมด Brutal ได้'}];
+const f7VerName=f=>(F7_VERS.find(v=>v.id===f.ver)||F7_VERS[0]).name;
+const F7V_MODS=[-2,-4,-6,-8,-10];
 const f7key=p=>p.id||('g:'+p.name);
 const f7Color=p=>{const k=p.id&&kidById(p.id);return okColor(k?k.color:p.color)};
 function f7Parse(raw){
-  let s=String(raw||'').replace(/[๐-๙]/g,d=>String(d.charCodeAt(0)-0x0E50)).replace(/[−–—]/g,'-');let x2=false;
-  s=s.replace(F7_X2,()=>{x2=true;return ' '}).replace(/-\s+(?=\d)/g,'-');
+  let s=String(raw||'').replace(/[๐-๙]/g,d=>String(d.charCodeAt(0)-0x0E50)).replace(/[−–—]/g,'-');let x2=false,half=false;
+  s=s.replace(F7_HALF,()=>{half=true;return ' '}).replace(F7_X2,()=>{x2=true;return ' '}).replace(/-\s+(?=\d)/g,'-');
   const nums=(s.match(/-?\d+/g)||[]).map(Number);
-  return {nums,base:nums.reduce((a,b)=>a+b,0),x2};
+  return {nums,base:nums.reduce((a,b)=>a+b,0),x2,half};
 }
 const f7Tot=p=>(p.entries||[]).reduce((a,e)=>a+(+e.n||0),0);
 const f7Fmt=n=>(n>0?'+':n<0?'−':'')+Math.abs(n);
 function f7(){
   if(!S.flip)S.flip={phase:'setup',players:[],target:200,cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},award:2,saved:false};
-  const f=S.flip;f.draft=f.draft||{};f.x2=f.x2||{};f.b15=f.b15||{};f.mods=f.mods||{};f.hist=f.hist||[];f.target=+f.target||200;
+  const f=S.flip;f.draft=f.draft||{};f.x2=f.x2||{};f.b15=f.b15||{};f.mods=f.mods||{};f.half=f.half||{};f.zero=f.zero||{};f.hit=f.hit||{};f.hist=f.hist||[];f.target=+f.target||200;
   f.players.forEach(p=>{p.entries=p.entries||[]});if(!(f.cur>=0&&f.cur<f.players.length))f.cur=0;return f;
 }
 function f7Snap(f,label){f.hist.push({players:clone(f.players),cur:f.cur,label});if(f.hist.length>80)f.hist.shift()}
@@ -2569,7 +2807,18 @@ function f7Snap(f,label){f.hist.push({players:clone(f.players),cur:f.cur,label})
 const F7_MODS=[2,4,6,8,10];
 const f7Sum=a=>(a||[]).reduce((x,y)=>x+y,0);
 const f7Score=(base,x2,mods,b15)=>base*(x2?2:1)+f7Sum(mods)+(b15?15:0);
+/* vengeance: รวมเลข → ÷2 (ปัดลง) → ลบการ์ดลบ (ไม่ต่ำกว่า 0 ยกเว้นโหมด Brutal) → +15 ถ้า Flip 7
+   The Zero = แต้มรอบนี้เป็น 0 ถ้าไม่ได้ Flip 7 · Brutal: คนที่ Flip 7 เลือกหักคนอื่น 15 แทนได้ (hit) */
+function f7Calc(f,e){
+  if(f.ver!=='v')return f7Score(e.base,e.x2&&e.has,e.mods||[],e.b15);
+  let s;if(e.zero&&!e.b15)s=0;else{s=e.half?Math.floor(e.base/2):e.base;s+=f7Sum(e.mods);if(!f.brutal&&s<0)s=0;if(e.b15)s+=15}
+  if(e.hit&&f.brutal)s-=15;return s;
+}
+const f7Has=(f,k)=>!!(String(f.draft[k]||'').trim()||f.b15[k]||(f.mods[k]||[]).length||f.half[k]||f.zero[k]||f.hit[k]);
+function f7Draft(f,p,raw){const k=f7key(p);const r=f7Parse(raw);const v=f.ver==='v';
+  return {r,has:r.nums.length>0,x2:!v&&(r.x2||!!f.x2[k])&&r.nums.length>0,mods:(f.mods[k]||[]).slice(),b15:!!f.b15[k],half:v&&(r.half||!!f.half[k]),zero:v&&!!f.zero[k],hit:v&&!!f.brutal&&!!f.hit[k],base:r.base}}
 function f7PrevHTML(f,p){
+  if(f.ver==='v')return f7PrevV(f,p);
   const k=f7key(p);const r=f7Parse(f.draft[k]);const b15=!!f.b15[k];const mods=f.mods[k]||[];const x2=r.x2||!!f.x2[k];
   if(!r.nums.length&&!mods.length&&!b15)return x2?'×2 เปิดอยู่ พิมพ์แต้มแล้วกด Enter':'';
   const parts=[];
@@ -2580,10 +2829,27 @@ function f7PrevHTML(f,p){
   const show=parts.length>1||(x2&&r.nums.length);
   return (show?parts.join(' + ')+' = ':'')+`<b>${f7Fmt(n)}</b> → รวม ${f7Tot(p)+n}${!r.nums.length?' · กด Enter ได้เลย':''}`;
 }
-function vFlip7(){const f=f7();if(f.phase==='end')return f7EndView(f);if(f.phase==='play'&&f.players.length)return f7PlayView(f);return f7SetupView(f)}
+function f7PrevV(f,p){
+  const k=f7key(p);const e=f7Draft(f,p,f.draft[k]);const r=e.r;
+  if(!r.nums.length&&!e.mods.length&&!e.b15&&!e.half&&!e.zero&&!e.hit)return '';
+  const n=f7Calc(f,e);let ex='';
+  if(r.nums.length){const many=r.nums.length>1;ex=many?r.nums.map((x,i)=>i===0?String(x).replace('-','−'):(x<0?'− '+(-x):'+ '+x)).join(' '):String(r.base).replace('-','−');if(e.half)ex=(many?'('+ex+')':ex)+' ÷ 2'}
+  else if(e.half)ex='0 ÷ 2';
+  e.mods.forEach(m=>{ex+=(ex?' ':'')+'− '+(-m)});if(e.b15)ex+=(ex?' ':'')+'+ 15';
+  if(e.zero&&!e.b15)ex='The Zero → 0';if(e.hit)ex+=(ex?' ':'')+'− 15 โดน Flip 7';
+  const show=/[ ÷→]/.test(ex.trim());
+  return (show?ex+' = ':'')+`<b>${f7Fmt(n)}</b> → รวม ${f7Tot(p)+n}${!r.nums.length?' · กด Enter ได้เลย':''}`;
+}
+function f7PickView(f){
+  return `<div class="stage"><div><h3>เล่น Flip 7 เวอร์ชันไหน</h3><p class="muted small">ปุ่มการ์ดในหน้านับแต้มจะเปลี่ยนตามเวอร์ชัน</p></div>
+    <div class="uno-vers">${F7_VERS.map(v=>`<button type="button" class="uno-v" data-act="f7Ver" data-id="${v.id}" aria-pressed="${f.lastVer===v.id}"><b>${esc(v.name)}</b><span>${esc(v.desc)}</span></button>`).join('')}</div></div>`;
+}
+function vFlip7(){const f=f7();if(!f.ver){if(f.phase==='setup')return f7PickView(f);f.ver='c'}if(f.phase==='end')return f7EndView(f);if(f.phase==='play'&&f.players.length)return f7PlayView(f);return f7SetupView(f)}
 function f7SetupView(f){
   const o=f.players;const custom=!F7_TARGETS.includes(f.target);
   return `<div class="stage">
+    <div class="uno-vhead"><div><span class="label">เวอร์ชัน</span><h3>${esc(f7VerName(f))}</h3></div><button class="btn sm" data-act="f7PickVer">เปลี่ยนเวอร์ชัน</button></div>
+    ${f.ver==='v'?`<label class="check"><input type="checkbox" data-f7brutal ${f.brutal?'checked':''}> โหมด Brutal: แต้มติดลบได้ · ให้การ์ดลบกับคนที่แตกแล้วได้ · คนที่ Flip 7 เลือกได้ว่าจะเอา +15 หรือหักคนอื่น 15</label>`:''}
     <div><h3>เลือกคนเล่น</h3><p class="muted small">แตะเพื่อเลือก แตะซ้ำเพื่อเอาออก ระหว่างเล่นเพิ่มคนได้อีก</p></div>
     <div class="pawns">${kids().map(k=>pawnBtn(k,'f7Pick',o.some(p=>p.id===k.id),'lg')).join('')}</div>
     <div class="row2"><label class="field"><span>เพื่อนหรือแขก</span><input type="text" id="f7Guest" placeholder="ชื่อ เช่น ต้น"></label><div style="align-self:end"><button class="btn" data-act="f7Guest">เพิ่มแขก</button></div></div>
@@ -2598,34 +2864,43 @@ function f7PlayView(f){
   const hit=f.players.filter((p,i)=>tots[i]>=f.target);const lead=f.players.filter((p,i)=>tots[i]===top);
   const last=f.hist.length?f.hist[f.hist.length-1].label:'';
   return `<div class="f7">
-    <div class="f7-head"><h3>เป้าหมาย ${f.target} แต้ม</h3><div class="btns"><button class="btn sm" data-act="f7Undo" ${f.hist.length?'':'disabled'} title="${esc(last?'ย้อน: '+last:'')}">ย้อนกลับ</button><button class="btn sm" data-act="f7PlayerForm">+ เพิ่มคนเล่น</button><button class="btn sm" data-act="f7TargetForm">เปลี่ยนเป้า</button></div></div>
+    <div class="f7-head"><h3>${f.ver==='v'?'Vengeance'+(f.brutal?' · Brutal':'')+' · ':''}เป้าหมาย ${f.target} แต้ม</h3><div class="btns"><button class="btn sm" data-act="f7Undo" ${f.hist.length?'':'disabled'} title="${esc(last?'ย้อน: '+last:'')}">ย้อนกลับ</button><button class="btn sm" data-act="f7PlayerForm">+ เพิ่มคนเล่น</button><button class="btn sm" data-act="f7TargetForm">เปลี่ยนเป้า</button></div></div>
     ${hit.length?`<div class="f7-goal" role="status"><b>${esc(hit.map(playerName).join(', '))} ถึง ${f.target} แล้ว</b> · เล่นให้จบรอบนี้ แล้วกดจบเกม ตอนนี้ ${esc(lead.map(playerName).join(' & '))} นำอยู่ที่ ${top}</div>`:''}
     <div class="f7-rows">${f.players.map((p,i)=>i).sort((a,b)=>tots[b]-tots[a]||a-b).map(i=>{const p=f.players[i];const t=tots[i];const k=f7key(p);const es=p.entries;const x2=!!f.x2[k];const b15=!!f.b15[k];const mods=f.mods[k]||[];const rk=1+tots.filter(v=>v>t).length;
+      const V=f.ver==='v';const half=!!f.half[k];const zero=!!f.zero[k];const hit=!!f.hit[k];
       return `<div class="f7-row" data-row="${i}" style="--c:${f7Color(p)}">
         <button type="button" class="f7-who" data-act="f7SetTurn" data-id="${i}" aria-label="ให้เป็นตาของ ${esc(playerName(p))}">${playerPawn(p)}</button>
         <div class="f7-name"><b><span class="f7-rk ${rk===1&&t>0?'top':''}" aria-label="อันดับ ${rk}">${rk}</span>${esc(playerName(p))}${t>=f.target?'<span class="f7-tag hit">ถึงเป้า</span>':''}</b>
           <div class="f7-bar" role="img" aria-label="${t} จาก ${f.target}"><i style="width:${Math.max(0,Math.min(100,t/f.target*100)).toFixed(1)}%"></i></div>
-          <div class="f7-last">${es.length?(es.length>8?'<span class="muted small">…</span>':'')+es.slice(-8).map(e=>`<span class="f7-chip ${e.n<0?'neg':''}" title="${esc(e.raw||'')}">${f7Fmt(e.n)}${e.x2?'<em>×2</em>':''}${e.b15?'<em class="b">+15</em>':''}</span>`).join(''):'<span class="muted small">ยังไม่มีแต้ม</span>'}</div></div>
+          <div class="f7-last">${es.length?(es.length>8?'<span class="muted small">…</span>':'')+es.slice(-8).map(e=>`<span class="f7-chip ${e.n<0?'neg':''}" title="${esc(e.raw||'')}">${f7Fmt(e.n)}${e.x2?'<em>×2</em>':''}${e.half?'<em>÷2</em>':''}${e.zero?'<em>Zero</em>':''}${e.b15?'<em class="b">+15</em>':''}${e.hit?'<em>−15</em>':''}</span>`).join(''):'<span class="muted small">ยังไม่มีแต้ม</span>'}</div></div>
         <div class="f7-tot ${t<0?'neg':''}">${t}<small>เหลือ ${Math.max(0,f.target-t)}</small></div>
         <div class="f7-add">
           <input type="text" id="f7In_${i}" data-f7="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="เช่น 3 7 12 แล้วกด Enter" value="${esc(f.draft[k]||'')}" aria-label="ใส่แต้มของ ${esc(playerName(p))} หลายเลขเว้นวรรคได้">
           <button type="button" class="btn sm primary f7-go" data-act="f7AddPts" data-id="${i}">บวกแต้ม</button>
           <button type="button" class="btn sm ghost f7-go" data-act="f7Edit" data-id="${i}" ${es.length?'':'disabled'}>แก้</button>
-          <div class="f7-pad" role="group" aria-label="กดเลขแทนการพิมพ์">${Array.from({length:13},(_,n)=>`<button type="button" class="btn sm f7-key" data-act="f7Num" data-id="${i}" data-n="${n}">${n}</button>`).join('')}<button type="button" class="btn sm f7-key ghost" data-act="f7Num" data-id="${i}" data-n="del" aria-label="ลบเลขตัวท้าย">⌫</button></div>
-          <div class="f7-pad f7-special" role="group" aria-label="การ์ดพิเศษ">
+          <div class="f7-pad" role="group" aria-label="กดเลขแทนการพิมพ์">${Array.from({length:13},(_,n)=>V?n+1:n).map(n=>`<button type="button" class="btn sm f7-key" data-act="f7Num" data-id="${i}" data-n="${n}">${n}</button>`).join('')}<button type="button" class="btn sm f7-key ghost" data-act="f7Num" data-id="${i}" data-n="del" aria-label="ลบเลขตัวท้าย">⌫</button></div>
+          ${V?`<div class="f7-pad f7-special f7-v" role="group" aria-label="การ์ดพิเศษ Vengeance">
+            <button type="button" class="btn sm f7-key f7-x2" data-act="f7Zero" data-id="${i}" aria-pressed="${zero}" title="The Zero: แต้มรอบนี้เป็น 0 ถ้าไม่ได้ Flip 7">Zero</button>
+            <button type="button" class="btn sm f7-key f7-lbl" data-act="f7Num" data-id="${i}" data-n="7" title="Unlucky 7: ทิ้งเลขกับการ์ดลบที่มีทั้งหมด เหลือแค่ 7 ใบนี้">7<small>Unlucky</small></button>
+            <button type="button" class="btn sm f7-key f7-lbl" data-act="f7Num" data-id="${i}" data-n="13" title="Lucky 13: ถือ 13 ได้ 2 ใบไม่แตก">13<small>Lucky</small></button>
+            <button type="button" class="btn sm f7-key f7-x2" data-act="f7Half" data-id="${i}" aria-pressed="${half}" aria-label="การ์ด ÷2 หารครึ่งผลรวมเลข ปัดลง">÷2</button>
+            ${F7V_MODS.map(m=>`<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${mods.includes(m)}" aria-label="การ์ด ${m}">−${-m}</button>`).join('')}
+            <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15</button>
+            ${f.brutal?`<button type="button" class="btn sm f7-key f7-hit f7-wide" data-act="f7Hit" data-id="${i}" aria-pressed="${hit}" title="Brutal: คนอื่น Flip 7 แล้วเลือกหักคนนี้ 15">−15 โดน</button>`:''}
+          </div>`:`<div class="f7-pad f7-special" role="group" aria-label="การ์ดพิเศษ">
             <button type="button" class="btn sm f7-key f7-x2" data-act="f7X2" data-id="${i}" aria-pressed="${x2}" aria-label="การ์ด ×2 คูณเฉพาะเลข">×2</button>
             ${F7_MODS.map(m=>{const c=mods.filter(v=>v===m).length;return `<button type="button" class="btn sm f7-key f7-mod" data-act="f7Mod" data-id="${i}" data-n="${m}" aria-pressed="${c>0}" aria-label="การ์ด +${m}">+${m}</button>`}).join('')}
             <button type="button" class="btn sm f7-key f7-b15" data-act="f7B15" data-id="${i}" aria-pressed="${b15}" aria-label="โบนัส Flip 7 +15">+15</button>
-          </div>
+          </div>`}
           <span class="f7-prev" id="f7Prev_${i}" aria-live="polite">${f7PrevHTML(f,p)}</span>
         </div></div>`}).join('')}</div>
     <div class="btns"><button class="btn primary" data-act="f7End">จบเกม</button>${S.confirm==='f7new'?'<button class="btn dangerfill" data-act="f7New">ยืนยัน: ล้างแต้มแล้วตั้งค่าใหม่</button><button class="btn ghost" data-act="cancelAsk">ไม่ล้าง</button>':'<button class="btn ghost" data-act="ask" data-id="f7new">เริ่มเกมใหม่</button>'}</div>
-    <div class="f7-keys"><span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span><span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
+    <div class="f7-keys">${f.ver==='v'?'<span>พิมพ์หรือกดปุ่มเลข 1–13 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">รวมเลข → ÷2 ปัดลง → ลบการ์ดลบ (ไม่ต่ำกว่า 0'+(f.brutal?' ยกเว้น Brutal ติดลบได้':'')+') → +15 ถ้า Flip 7 · Zero = ได้ 0 ถ้าไม่ได้ Flip 7</span>':'<span>พิมพ์หรือกดปุ่มเลข 0–12 ใต้กล่อง</span><span><kbd>Enter</kbd> บวกแต้ม</span><span class="w">×2 คูณเฉพาะเลข ส่วนการ์ด +2 ถึง +10 และโบนัส +15 บวกทีหลัง ไม่คูณ</span>'}<span>แตะปุ่มการ์ดซ้ำเพื่อเอาออก</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> ย้อนกลับ</span></div>
   </div>`;
 }
 function f7EndView(f){
   const r=f.players.map(p=>Object.assign({},p,{pts:f7Tot(p)})).sort((a,b)=>b.pts-a.pts);const best=r.length?r[0].pts:0;const win=r.filter(p=>p.pts===best);
-  return `<div class="stage center"><span class="label">Flip 7 · เป้าหมาย ${f.target}</span>
+  return `<div class="stage center"><span class="label">${esc(f7VerName(f))} · เป้าหมาย ${f.target}</span>
     <div class="turnname">${r.length?esc(win.map(playerName).join(' & '))+' ชนะ':'จบเกม'}</div>
     ${best<f.target?`<p class="muted small">ยังไม่มีใครถึง ${f.target} นับคนที่แต้มสูงสุดตอนจบ</p>`:''}
     <div class="rank">${r.map((p,i)=>`<div><span class="no">${i+1}</span>${playerPawn(p)}<span>${esc(playerName(p))}</span><span class="v">${p.pts}</span></div>`).join('')}</div>
@@ -2635,28 +2910,33 @@ function f7EndView(f){
 function f7Paint(focusIdx){render();if(focusIdx==null)return;const el=document.getElementById('f7In_'+focusIdx);if(el){try{el.focus({preventScroll:true});const l=el.value.length;el.setSelectionRange(l,l)}catch(e){}}}
 function f7AddFor(i){
   const f=f7();const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);
-  const raw=el?el.value:(f.draft[k]||'');const r=f7Parse(raw);const b15=!!f.b15[k];const mods=(f.mods[k]||[]).slice();
-  if(!r.nums.length&&!b15&&!mods.length){toast('พิมพ์แต้มก่อน เช่น 3 7 12');if(el)el.focus();return}
-  const x2=(r.x2||!!f.x2[k])&&r.nums.length>0;const n=f7Score(r.base,x2,mods,b15);const before=f7Tot(p);
+  const raw=el?el.value:(f.draft[k]||'');const e=f7Draft(f,p,raw);const r=e.r;const {x2,b15,mods,half,zero,hit}=e;
+  if(!r.nums.length&&!b15&&!mods.length&&!half&&!zero&&!hit){toast('พิมพ์แต้มก่อน เช่น 3 7 12');if(el)el.focus();return}
+  const n=f7Calc(f,e);const before=f7Tot(p);
   f7Snap(f,f7Fmt(n)+' ให้ '+playerName(p));
-  p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,n,at:Date.now()});
-  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.lastRow=null;persist();
+  p.entries.push({id:uid(),raw:raw.replace(F7_X2,' ').replace(F7_HALF,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,half,zero,hit,n,at:Date.now()});
+  f.draft[k]='';f.x2[k]=false;f.b15[k]=false;f.mods[k]=[];f.half[k]=false;f.zero[k]=false;f.hit[k]=false;f.lastRow=null;persist();
   const a=document.activeElement;if(a&&a.blur)a.blur();render();
   const t=f7Tot(p);toast(before<f.target&&t>=f.target?`${playerName(p)} ถึง ${f.target} แล้ว! เล่นให้จบรอบนี้`:`${playerName(p)} ${f7Fmt(n)} รวม ${t}`);
 }
 function f7Step(d){const f=f7();const n=f.players.length;if(n<2)return;f.cur=((f.cur+d)%n+n)%n;persist();render()}
 function f7EditForm(i){
   const f=f7();const p=f.players[i];if(!p)return;
-  if(!S.f7e||S.f7e.i!==i)S.f7e={i,rows:p.entries.map(e=>({raw:e.raw!=null&&e.raw!==''?e.raw:String(e.base!=null?e.base:e.n),x2:!!e.x2,b15:!!e.b15,mods:(e.mods||[]).join(' '),del:false}))};
-  const d=S.f7e;const val2=row=>{const r=f7Parse(row.raw);return f7Score(r.base,(row.x2||r.x2)&&r.nums.length>0,f7Parse(row.mods).nums,row.b15)};
+  const V=f.ver==='v';
+  if(!S.f7e||S.f7e.i!==i)S.f7e={i,rows:p.entries.map(e=>({raw:e.raw!=null&&e.raw!==''?e.raw:String(e.base!=null?e.base:e.n),x2:!!e.x2,b15:!!e.b15,half:!!e.half,zero:!!e.zero,hit:!!e.hit,mods:(e.mods||[]).map(Math.abs).join(' '),del:false}))};
+  const d=S.f7e;const val2=row=>f7Calc(f,f7RowE(f,row));
   const tot=d.rows.reduce((a,row)=>a+(row.del?0:val2(row)),0);const ck='f7rm:'+i;
   openSheet('แก้แต้ม '+esc(playerName(p)),`
     <p class="small muted">แก้เลขในแต่ละครั้งได้ ใส่หลายเลขเว้นวรรค ติ๊ก ×2 เพื่อคูณ 2 ติ๊ก +15 เพื่อบวกโบนัส ช่องการ์ด + ใส่ได้หลายใบ เช่น 4 10 (×2 คูณเฉพาะเลข) · กดบันทึกแล้วยังกดย้อนกลับได้</p>
-    ${d.rows.length?d.rows.map((row,j)=>`<div class="f7-erow ${row.del?'del':''}"><span class="no">${j+1}</span><input type="text" id="f7E_${j}" value="${esc(row.raw)}" aria-label="ครั้งที่ ${j+1}" ${row.del?'disabled':''}><label class="check"><input type="checkbox" id="f7EX_${j}" ${row.x2?'checked':''} ${row.del?'disabled':''}> ×2</label><label class="check"><input type="checkbox" id="f7EB_${j}" ${row.b15?'checked':''} ${row.del?'disabled':''}> +15</label><label class="mini"><span>การ์ด +</span><input type="text" id="f7EM_${j}" value="${esc(row.mods||'')}" placeholder="เช่น 4 10" aria-label="การ์ดบวกของครั้งที่ ${j+1}" ${row.del?'disabled':''}></label><span class="v">${f7Fmt(val2(row))}</span><button type="button" class="btn sm ${row.del?'':'danger'}" data-act="f7EDel" data-id="${j}">${row.del?'เอาคืน':'ลบ'}</button></div>`).join(''):'<p class="muted">ยังไม่มีแต้ม</p>'}
+    ${V?'<p class="small muted">Vengeance: ติ๊ก ÷2 หารครึ่งผลรวมเลข · Zero = ได้ 0 ถ้าไม่ได้ Flip 7 · ช่องการ์ด − ใส่ตัวเลขเช่น 4 10 (หักออก)'+(f.brutal?' · −15 = โดนคนที่ Flip 7 หัก':'')+'</p>':''}
+    ${d.rows.length?d.rows.map((row,j)=>`<div class="f7-erow ${row.del?'del':''}"><span class="no">${j+1}</span><input type="text" id="f7E_${j}" value="${esc(row.raw)}" aria-label="ครั้งที่ ${j+1}" ${row.del?'disabled':''}>${V?`<label class="check"><input type="checkbox" id="f7EH_${j}" ${row.half?'checked':''} ${row.del?'disabled':''}> ÷2</label><label class="check"><input type="checkbox" id="f7EZ_${j}" ${row.zero?'checked':''} ${row.del?'disabled':''}> Zero</label>${f.brutal?`<label class="check"><input type="checkbox" id="f7EK_${j}" ${row.hit?'checked':''} ${row.del?'disabled':''}> −15</label>`:''}`:`<label class="check"><input type="checkbox" id="f7EX_${j}" ${row.x2?'checked':''} ${row.del?'disabled':''}> ×2</label>`}<label class="check"><input type="checkbox" id="f7EB_${j}" ${row.b15?'checked':''} ${row.del?'disabled':''}> +15</label><label class="mini"><span>การ์ด ${V?'−':'+'}</span><input type="text" id="f7EM_${j}" value="${esc(row.mods||'')}" placeholder="เช่น 4 10" aria-label="การ์ดบวกของครั้งที่ ${j+1}" ${row.del?'disabled':''}></label><span class="v">${f7Fmt(val2(row))}</span><button type="button" class="btn sm ${row.del?'':'danger'}" data-act="f7EDel" data-id="${j}">${row.del?'เอาคืน':'ลบ'}</button></div>`).join(''):'<p class="muted">ยังไม่มีแต้ม</p>'}
     <p><b style="font-family:var(--f-head);font-weight:600">รวม ${tot}</b> <span class="muted small">(ตัวเลขรวมอัปเดตตอนกดลบหรือบันทึก)</span></p>`,
     `<button class="btn primary" data-act="f7ESave">บันทึก</button><button class="btn ghost" data-act="f7ECancel">ยกเลิก</button>${S.confirm===ck?`<button class="btn dangerfill" data-act="f7Remove">ยืนยันเอา ${esc(playerName(p))} ออกจากเกม</button>`:`<button class="btn danger" data-act="f7RemoveAsk">เอาออกจากเกม</button>`}`);
 }
-function f7ESync(){const d=S.f7e;if(!d)return;d.rows.forEach((row,j)=>{const a=document.getElementById('f7E_'+j),b=document.getElementById('f7EX_'+j),c=document.getElementById('f7EB_'+j),m=document.getElementById('f7EM_'+j);if(a&&!a.disabled)row.raw=a.value;if(b&&!b.disabled)row.x2=b.checked;if(c&&!c.disabled)row.b15=c.checked;if(m&&!m.disabled)row.mods=m.value})}
+function f7ESync(){const d=S.f7e;if(!d)return;d.rows.forEach((row,j)=>{const a=document.getElementById('f7E_'+j),b=document.getElementById('f7EX_'+j),c=document.getElementById('f7EB_'+j),m=document.getElementById('f7EM_'+j),h=document.getElementById('f7EH_'+j),z=document.getElementById('f7EZ_'+j),x=document.getElementById('f7EK_'+j);if(a&&!a.disabled)row.raw=a.value;if(b&&!b.disabled)row.x2=b.checked;if(c&&!c.disabled)row.b15=c.checked;if(m&&!m.disabled)row.mods=m.value;if(h&&!h.disabled)row.half=h.checked;if(z&&!z.disabled)row.zero=z.checked;if(x&&!x.disabled)row.hit=x.checked})}
+/* แถวในหน้าแก้แต้ม → ค่าที่ใช้คำนวณ (การ์ด + ของเดิม / การ์ด − ของ vengeance) */
+function f7RowE(f,row){const r=f7Parse(row.raw);const V=f.ver==='v';const mn=f7Parse(row.mods).nums;
+  return {r,base:r.base,has:r.nums.length>0,x2:!V&&(row.x2||r.x2)&&r.nums.length>0,b15:!!row.b15,mods:V?mn.map(v=>-Math.abs(v)).filter(v=>v<0):mn.filter(v=>v>0),half:V&&(!!row.half||r.half),zero:V&&!!row.zero,hit:V&&!!f.brutal&&!!row.hit}}
 function f7PlayerForm(){
   const f=f7();const ins=new Set(f.players.filter(p=>p.id).map(p=>p.id));const out=kids().filter(k=>!ins.has(k.id));
   openSheet('เพิ่มคนเล่น',`
@@ -2679,7 +2959,15 @@ Object.assign(ACT,{
   f7Clear(){f7().players=[];persist();render()},
   f7Target(t){f7().target=+t.dataset.id;persist();render()},
   f7Start(){const f=f7();if(!f.players.length)return;const tv=parseInt(val('f7TargetIn'),10);if(tv>0)f.target=tv;
-    f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},saved:false});S.confirm=null;persist();render();window.scrollTo({top:0})},
+    f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},half:{},zero:{},hit:{},saved:false});S.confirm=null;persist();render();window.scrollTo({top:0})},
+  f7Ver(t){const f=f7();f.ver=t.dataset.id;f.lastVer=f.ver;f.phase='setup';S.confirm=null;persist();render();window.scrollTo({top:0})},
+  f7PickVer(){const f=f7();f.ver=null;persist();render()},
+  f7Half(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
+    f.half[k]=!f.half[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
+  f7Zero(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
+    f.zero[k]=!f.zero[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
+  f7Hit(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
+    f.hit[k]=!f.hit[k];f.lastRow=i;persist();f7Paint(f.draft[k]?i:null)},
   f7Turn(t){f7Step(+t.dataset.id)},
   f7SetTurn(t){const f=f7();f.cur=+t.dataset.id;persist();render()},
   f7X2(t){const f=f7();const i=+t.dataset.id;const p=f.players[i];if(!p)return;const k=f7key(p);const el=document.getElementById('f7In_'+i);if(el)f.draft[k]=el.value;
@@ -2700,9 +2988,10 @@ Object.assign(ACT,{
   f7ECancel(){S.f7e=null;S.confirm=null;closeSheet()},
   f7ESave(){f7ESync();const f=f7();const d=S.f7e;const p=d&&f.players[d.i];if(!p){closeSheet();return}
     const before=f7Tot(p);const ents=[];
-    d.rows.forEach((row,j)=>{if(row.del)return;const r=f7Parse(row.raw);const mods=f7Parse(row.mods).nums.filter(v=>v>0);if(!r.nums.length&&!row.b15&&!mods.length)return;const old=p.entries[j]||{};const x2=(row.x2||r.x2)&&r.nums.length>0;const b15=!!row.b15;
-      ents.push({id:old.id||uid(),raw:row.raw.replace(F7_X2,' ').replace(/\s+/g,' ').trim(),base:r.base,x2,b15,mods,n:f7Score(r.base,x2,mods,b15),at:old.at||Date.now()})});
-    const after=ents.reduce((a,e)=>a+e.n,0);const same=JSON.stringify(ents.map(e=>[e.raw,e.x2,e.b15,e.mods,e.n]))===JSON.stringify(p.entries.map(e=>[e.raw,!!e.x2,!!e.b15,e.mods||[],e.n]));
+    d.rows.forEach((row,j)=>{if(row.del)return;const e=f7RowE(f,row);const r=e.r;if(!r.nums.length&&!e.b15&&!e.mods.length&&!e.half&&!e.zero&&!e.hit)return;const old=p.entries[j]||{};
+      ents.push({id:old.id||uid(),raw:row.raw.replace(F7_X2,' ').replace(F7_HALF,' ').replace(/\s+/g,' ').trim(),base:r.base,x2:e.x2,b15:e.b15,mods:e.mods,half:e.half,zero:e.zero,hit:e.hit,n:f7Calc(f,e),at:old.at||Date.now()})});
+    const sig=e=>[e.raw,!!e.x2,!!e.b15,e.mods||[],!!e.half,!!e.zero,!!e.hit,e.n];
+    const after=ents.reduce((a,e)=>a+e.n,0);const same=JSON.stringify(ents.map(sig))===JSON.stringify(p.entries.map(sig));
     S.f7e=null;closeSheet();if(same){render();return}
     f7Snap(f,'แก้แต้ม '+playerName(p));p.entries=ents;persist();render();toast(`แก้แต้ม ${playerName(p)} แล้ว ${before} → ${after}`)},
   f7RemoveAsk(){f7ESync();S.confirm='f7rm:'+S.f7e.i;f7EditForm(S.f7e.i)},
@@ -2716,13 +3005,14 @@ Object.assign(ACT,{
   f7TargetSave(){const f=f7();const v=parseInt(val('f7TIn'),10)||+radio('f7T');if(!(v>0)){toast('ใส่เป้าหมายที่มากกว่า 0');return}f.target=v;persist();closeSheet();render();toast('เป้าหมายใหม่ '+v+' แต้ม')},
   f7End(){const f=f7();f.phase='end';S.confirm=null;persist();render();window.scrollTo({top:0})},
   f7Back(){f7().phase='play';persist();render()},
-  f7Again(){const f=f7();f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},saved:false});persist();render();window.scrollTo({top:0})},
-  f7New(){const f=f7();S.confirm=null;f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'setup',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},saved:false});persist();render();window.scrollTo({top:0})},
+  f7Again(){const f=f7();f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'play',cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},half:{},zero:{},hit:{},saved:false});persist();render();window.scrollTo({top:0})},
+  f7New(){const f=f7();S.confirm=null;f.players.forEach(p=>{p.entries=[]});Object.assign(f,{phase:'setup',ver:null,cur:0,hist:[],draft:{},x2:{},b15:{},mods:{},half:{},zero:{},hit:{},saved:false});persist();render();window.scrollTo({top:0})},
   async f7Save(){const f=f7();if(f.saved)return;const aw=checked('f7Award');const n=Math.max(0,Math.min(50,Math.floor(+val('f7AwardN')||0)));f.award=n;f.saved=true;persist();
     const r=f.players.map(p=>Object.assign({},p,{pts:f7Tot(p)}));const best=Math.max(...r.map(p=>p.pts));const winners=r.filter(p=>p.pts===best);
     const pts={};if(aw)winners.forEach(p=>{if(p.id)pts[p.id]=n});
-    await saveGameSession({game:'Flip 7',players:f.players,winners,pts});toast('บันทึกผลเข้าบ้านแล้ว');render()}
+    await saveGameSession({game:f7VerName(f),players:f.players,winners,pts});toast('บันทึกผลเข้าบ้านแล้ว');render()}
 });
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.f7brutal!=null&&S.flip){S.flip.brutal=t.checked;persist()}});
 /* keys: Enter adds, Ctrl+Z undoes */
 const f7On=()=>S.tab==='tools'&&S.tool==='flip7'&&S.flip&&S.flip.phase==='play'&&S.flip.players.length&&$('#sheet').hidden;
 function f7Insert(el,ch){try{const a=el.selectionStart,b=el.selectionEnd;el.setRangeText(ch,a,b,'end')}catch(e){el.value+=ch}el.dispatchEvent(new Event('input',{bubbles:true}))}
@@ -2741,7 +3031,7 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='z'||e.key==='Z'||e.code==='KeyZ')){e.preventDefault();ACT.f7Undo();return}
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==='Enter'){const r=a&&a.closest&&a.closest('[data-row]');const i=r?+r.dataset.row:S.flip.lastRow;const p=S.flip.players[i];
-    if(p&&(r||String(S.flip.draft[f7key(p)]||'').trim()||S.flip.b15[f7key(p)]||(S.flip.mods[f7key(p)]||[]).length)){e.preventDefault();f7AddFor(i)}return}
+    if(p&&(r||f7Has(f7(),f7key(p)))){e.preventDefault();f7AddFor(i)}return}
 });
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.f7-key'))e.preventDefault()});
 document.addEventListener('input',e=>{const t=e.target;if(!(t&&t.dataset&&t.dataset.f7!=null&&S.flip))return;const f=S.flip;const p=f.players[+t.dataset.f7];if(!p)return;
@@ -3540,11 +3830,11 @@ function endInfo(){
   switch(S.tool){
     case 'catan':return ctEndInfo();
     case 'bsgs':{const s=S.bs;if(!s||s.phase==='setup'||s.phase==='end')return null;return {name:'Baan Suay Game Show',note:'ไปหน้าสรุปคะแนนเลย ช่องที่ยังไม่เปิดจะไม่ได้เล่น',go:()=>ACT.bsEndNow()}}
-    case 'uno':{const u=S.uno;if(!u||u.phase!=='play')return null;return {name:'UNO',note:'ไปหน้าเลือกว่าใครลงไพ่ใบสุดท้าย',go:()=>ACT.unoEnd()}}
+    case 'uno':{const u=S.uno;if(!u||!u.ver||u.phase!=='play')return null;return {name:unoVer(u.ver).name,note:u.order.length?(u.ver==='teams'?'ไปหน้าเลือกว่าทีมไหนชนะ':'ไปหน้าเลือกว่าใครชนะรอบนี้'):'ล้างจอ เริ่มรอบใหม่',go:()=>ACT.unoEnd()}}
     case 'score':{const s=S.score;if(!s||s.phase!=='play')return null;
       if(s.mode==='coop')return {name:s.game||'เกมช่วยกัน',note:'ทีมผ่านด่านมั้ย',choices:[{label:'ผ่านด่าน',go:()=>ACT.scCoop({dataset:{id:'win'}})},{label:'ยังไม่ผ่าน',go:()=>ACT.scCoop({dataset:{id:'lose'}})}]};
       return {name:s.game||'กระดานคะแนน',note:'ไปหน้าสรุปอันดับ',go:()=>ACT.scEnd()}}
-    case 'flip7':{const f=S.flip;if(!f||f.phase!=='play'||!(f.players||[]).length)return null;return {name:'Flip 7',note:'ไปหน้าสรุปแต้ม',go:()=>ACT.f7End()}}
+    case 'flip7':{const f=S.flip;if(!f||f.phase!=='play'||!(f.players||[]).length)return null;return {name:f7VerName(f),note:'ไปหน้าสรุปแต้ม',go:()=>ACT.f7End()}}
     case 'poker':{const P=S.poker;if(!P)return null;if(P.h&&(P.phase==='hand'||P.phase==='show'))return {block:'ยังอยู่กลางมือ เล่นมือนี้ให้จบก่อนแล้วค่อยจบเกม'};
       if(P.phase!=='ready'||!(P.players||[]).length)return null;return {name:'โป๊กเกอร์',note:'ไปหน้าสรุปชิป',go:()=>ACT.pbEnd()}}
     case 'taboo':{const d=S.tb&&S.tb.room;if(!d||!['play','guess','roundEnd','end','lobby'].includes(d.status))return null;if(d.status==='lobby'&&!(d.history||[]).length)return null;
