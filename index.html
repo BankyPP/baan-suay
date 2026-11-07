@@ -1261,6 +1261,7 @@ const COLS=['kids','lessons','log','posts','games','sessions','meta','boards','x
 const Store={
   mode:'loading', d:{kids:{},lessons:{},log:{},posts:{},games:{},sessions:{},meta:{},boards:{}}, db:null,
   async init(){
+    this.t0=Date.now();setTimeout(()=>{if(this.mode==='loading')render()},12500);
     COLS.forEach(c=>this.d[c]={});
     let db=null;const cfg=window.FIREBASE_CONFIG;
     if(cfg&&cfg.apiKey&&!/ใส่/.test(cfg.apiKey)){
@@ -1494,7 +1495,8 @@ function render(){
   if(at){const l=at.offsetLeft-tb.offsetLeft,r=l+at.offsetWidth;if(l<tb.scrollLeft)tb.scrollLeft=l-16;else if(r>tb.scrollLeft+tb.clientWidth)tb.scrollLeft=r-tb.clientWidth+16}
   $('#banner').innerHTML=Store.err?`<div class="banner">${esc(Store.err)}</div>`:Store.mode==='local'?`<div class="banner">เปิดแบบเครื่องเดียว: ข้อมูลบ้านเก็บไว้ในเบราว์เซอร์ของเครื่องนี้ ใช้ “สำรองข้อมูล” ในจัดการบ้านเพื่อย้ายไปเครื่องอื่น</div>`:'';
   const v=$('#view');
-  if(Store.mode==='loading'){v.innerHTML='<div class="panel muted">กำลังเปิดประตูบ้าน…</div>';return}
+  if(Store.mode==='loading'){const slow=Store.t0&&Date.now()-Store.t0>12000;
+    v.innerHTML=slow?'<div class="panel"><p>เปิดบ้านช้ากว่าปกติ อาจเป็นเพราะอินเทอร์เน็ต</p><div class="btns"><button type="button" class="btn primary" onclick="location.reload()">ลองเปิดใหม่</button></div></div>':'<div class="panel muted">กำลังเปิดประตูบ้าน…</div>';return}
   const sx0=document.getElementById('sxStory');const sxKeep=sx0&&S.story?{k:S.story.tid+':'+S.story.part,y:sx0.scrollTop}:null;
   v.innerHTML=(VIEWS[S.tab]||vHome)();
   const sx1=document.getElementById('sxStory');if(sx1&&sxKeep&&sxKeep.k===S.story.tid+':'+S.story.part)sx1.scrollTop=sxKeep.y;
@@ -4893,7 +4895,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-08T01:05:00+07:00';
+const SITE_UPDATED='2026-11-08T01:08:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
@@ -4904,7 +4906,8 @@ const SITE_UPDATED='2026-11-08T01:05:00+07:00';
     const iso=j&&j[0]&&j[0].commit&&(j[0].commit.committer||j[0].commit.author||{}).date;if(iso)show(iso)}).catch(()=>{})}catch(e){}};
   /* the browser can keep an old copy of the page for ~10 minutes: compare with the live file and load the new one (once per new version);
      mid-quiz or while editing, a button asks first instead */
-  try{fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+  const ready=()=>new Promise(r=>{const t0=Date.now();const w=()=>{const st=window.House&&House.store;if((st&&st.mode!=='loading')||Date.now()-t0>20000)setTimeout(r,800);else setTimeout(w,300)};w()});
+  try{ready().then(()=>fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'})).then(r=>r.ok?r.text():'').then(t=>{
     const m=t.match(/const SITE_UPDATED\s*=\s*'([^']+)'/);
     if(!m||!(new Date(m[1])>new Date(SITE_UPDATED))){commitTime();return}
     const k='baanReload:'+m[1];try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}
