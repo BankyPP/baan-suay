@@ -312,6 +312,7 @@ textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
 .sx-tab.on.left{border-right-color:var(--ink)}.sx-tab.on.right{border-left-color:var(--ink)}.sx-tab.on.top{border-bottom-color:var(--ink)}.sx-tab.on.bot{border-top-color:var(--ink)}
 .sx-hint{text-align:center;margin:0}
 .sx-vocab{display:contents}
+.updbtn{position:fixed;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:60;box-shadow:var(--shadow)}
 /* phones: the story scrolls in its own box on top, every vocab tab sits in one scrollable box underneath */
 @media (max-width:700px){
   .sx-stage,.sx-stage.novocab{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden}
@@ -4887,15 +4888,25 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-08T00:58:00+07:00';
+const SITE_UPDATED='2026-11-08T01:02:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
     el.innerHTML='<span>อัปเดตเว็บล่าสุด</span> <time datetime="'+iso+'">'+t+'</time>'};
   show(SITE_UPDATED);
   if(!/github\.io$/.test(location.hostname))return;
-  try{fetch('https://api.github.com/repos/BankyPP/baan-suay/commits?path=index.html&per_page=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
-    const iso=j&&j[0]&&j[0].commit&&(j[0].commit.committer||j[0].commit.author||{}).date;if(iso)show(iso)}).catch(()=>{})}catch(e){}})();
+  const commitTime=()=>{try{fetch('https://api.github.com/repos/BankyPP/baan-suay/commits?path=index.html&per_page=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
+    const iso=j&&j[0]&&j[0].commit&&(j[0].commit.committer||j[0].commit.author||{}).date;if(iso)show(iso)}).catch(()=>{})}catch(e){}};
+  /* the browser can keep an old copy of the page for ~10 minutes: compare with the live file and load the new one (once per new version);
+     mid-quiz or while editing, a button asks first instead */
+  try{fetch(location.pathname+'?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+    const m=t.match(/const SITE_UPDATED\s*=\s*'([^']+)'/);
+    if(!m||!(new Date(m[1])>new Date(SITE_UPDATED))){commitTime();return}
+    const k='baanReload:'+m[1];try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}
+    const go=()=>location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);
+    let busy=false;try{const S0=window.House&&House.x&&House.x.S;const sh=document.getElementById('sheet');busy=!!(S0&&S0.quiz&&!S0.quiz.done)||!!(sh&&!sh.hidden)}catch(e){}
+    if(!busy){go();return}
+    const b=document.createElement('button');b.type='button';b.className='btn primary updbtn';b.textContent='มีเว็บเวอร์ชันใหม่ แตะเพื่อโหลด';b.onclick=go;document.body.appendChild(b)}).catch(()=>commitTime())}catch(e){commitTime()}})();
 /* ---------- CATAN: คู่มือกติกาในเครื่อง (ใช้ตอบแชทเมื่อไม่มี AI และส่งให้ AI เป็นแหล่งอ้างอิง) ----------
    ที่มา: คู่มือ Catan ฉบับภาษาอังกฤษพิมพ์ครั้งที่ 5 (Game Rules หน้า 2-5, Almanac หน้า 6-14, Game Overview หน้า 16) */
 const CT_KB=[
