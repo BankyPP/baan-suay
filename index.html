@@ -279,15 +279,17 @@ textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
 .sx-ttl span{font:400 .86rem/1.25 var(--f-head);color:var(--muted)}
 .sx-parts{display:flex;gap:6px;flex-wrap:wrap}
 .sx-bar .btns{margin-left:auto}
-.sx-stage{display:grid;grid-template-columns:minmax(130px,210px) minmax(0,800px) minmax(130px,210px);grid-template-rows:auto minmax(0,1fr) auto;
-  grid-template-areas:"top top top" "left story right" "bot bot bot";justify-content:center;gap:10px 14px;min-height:0}
-.sx-stage.novocab{grid-template-columns:minmax(0,840px);grid-template-areas:"top" "story" "bot"}
+.sx-stage{display:grid;grid-template-columns:minmax(0,860px) minmax(170px,250px);grid-template-rows:minmax(0,1fr);
+  grid-template-areas:"story right";justify-content:center;gap:10px 14px;min-height:0}
+.sx-stage.side-left{grid-template-columns:minmax(170px,250px) minmax(0,860px);grid-template-areas:"left story"}
+.sx-stage.novocab{grid-template-columns:minmax(0,840px);grid-template-areas:"story"}
 .sx-rail{display:flex;gap:8px;min-height:0;padding:3px}
 .sx-rail:empty{display:none}
 .sx-top{grid-area:top;flex-wrap:wrap;justify-content:center}
 .sx-bot{grid-area:bot;flex-wrap:wrap;justify-content:center}
-.sx-left{grid-area:left;flex-direction:column;overflow:auto;align-items:stretch}
-.sx-right{grid-area:right;flex-direction:column;overflow:auto;align-items:stretch}
+.sx-left{grid-area:left;flex-direction:column;overflow:auto;overscroll-behavior:contain;align-items:stretch}
+.sx-right{grid-area:right;flex-direction:column;overflow:auto;overscroll-behavior:contain;align-items:stretch}
+.sx-rail .sx-tab{flex:none}
 .sx-story{grid-area:story;overflow:auto;overscroll-behavior:contain;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
   padding:clamp(18px,3vw,34px) clamp(18px,4vw,46px);font:400 clamp(1.08rem,1.5vw,1.24rem)/1.9 var(--f-body)}
 .sx-story p{margin:0 0 1em;hyphens:none}
@@ -328,6 +330,7 @@ textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
   .sx-tab,.sx-tab.top,.sx-tab.bot{min-width:0;flex:1 1 130px;border:1px solid var(--line);border-left:4px solid var(--star)}
   .sx-tab.on,.sx-tab.on.top,.sx-tab.on.bot,.sx-tab.on.left,.sx-tab.on.right{border-color:var(--ink);border-left-color:var(--ink)}
   .sx-bar .btns{margin-left:0}
+  .sx-sidebtn{display:none}
 }
 
 .btn.eye svg{width:16px;height:16px;flex:none}
@@ -1847,9 +1850,8 @@ function vStory(l){
   const st=S.story;const tp=l.topics||[];const ti=tp.findIndex(t=>t.tid===st.tid);const t=tp[ti];if(!t){S.story=null;return ''}
   const ps=sxParts(t.story);if(!ps.length){S.story=null;return ''}
   const pi=Math.max(0,Math.min(ps.length-1,st.part||0));st.part=pi;const p=ps[pi];const V=p.vocab;
-  /* tabs go clockwise round the page: top row, right column, bottom row, left column */
-  const n=V.length;const nTop=n>=6?Math.round(n*.2):0,nBot=n>=6?Math.round(n*.2):0;const side=n-nTop-nBot;const nR=Math.ceil(side/2);
-  const idx=V.map((_,i)=>i);const top=idx.slice(0,nTop),right=idx.slice(nTop,nTop+nR),bot=idx.slice(nTop+nR,nTop+nR+nBot),left=idx.slice(nTop+nR+nBot);
+  /* every vocab tab sits in one vertical column beside the story; the side (left/right) is remembered on this device */
+  const n=V.length;const side=sxSideGet();const idx=V.map((_,i)=>i);
   const tab=(i,sd)=>`<button type="button" class="sx-tab ${sd}" data-act="sxTab" data-id="${i}" aria-expanded="false"><b>${esc(V[i].w)}</b><span class="m">${V[i].m?esc(V[i].m):'<i class="muted">ยังไม่ได้ใส่ความหมาย</i>'}</span></button>`;
   const rail=(arr,sd)=>`<div class="sx-rail sx-${sd}">${arr.map(i=>tab(i,sd)).join('')}</div>`;
   const sets=topicSets(l,t).filter(x=>setOpen(l,x)&&scopeCount(l,x));
@@ -1862,8 +1864,8 @@ function vStory(l){
       ${ckTs.length>1?`<div class="sx-parts">${ckTs.map((x,j)=>`<button type="button" class="chip" data-act="sxPick" data-id="${esc(x.tid)}" aria-pressed="${x.tid===t.tid}">${esc(x.name||'Story '+(tp.indexOf(x)+1))}</button>`).join('')}</div>`:''}
       <div class="sx-ttl"><b>${esc(name)}</b>${p.title?`<span>${esc(p.title)}</span>`:''}</div>
       ${ps.length>1?`<div class="sx-parts">${ps.map((x,j)=>`<button type="button" class="chip" data-act="sxPart" data-id="${j}" aria-pressed="${j===pi}">Part ${j+1}</button>`).join('')}</div>`:''}
-      <div class="btns">${n?`<button type="button" class="btn sm ${st.all?'primary':''}" data-act="sxAll" aria-pressed="${!!st.all}">${st.all?'ซ่อนความหมาย':'โชว์ความหมายทุกคำ'}</button>`:''}${S.bro&&!qz?`<button type="button" class="btn sm ghost" data-act="lessonForm" data-id="${esc(l.id)}">แก้เรื่องนี้</button>`:''}</div></div>
-    <div class="sx-stage ${n?'':'novocab'}">
+      <div class="btns">${n?`<button type="button" class="btn sm ghost sx-sidebtn" data-act="sxSide">${sxSideLbl(side)}</button>`:''}${n?`<button type="button" class="btn sm ${st.all?'primary':''}" data-act="sxAll" aria-pressed="${!!st.all}">${st.all?'ซ่อนความหมาย':'โชว์ความหมายทุกคำ'}</button>`:''}${S.bro&&!qz?`<button type="button" class="btn sm ghost" data-act="lessonForm" data-id="${esc(l.id)}">แก้เรื่องนี้</button>`:''}</div></div>
+    <div class="sx-stage side-${side} ${n?'':'novocab'}">
       <article class="sx-story" id="sxStory" lang="en">
         ${(()=>{const own=/^part\b/i.test(p.title);const h=(ps.length>1&&!own?'Part '+(pi+1):'')+(ps.length>1&&!own&&p.title?' · ':'')+p.title;return h?`<h3 class="sx-ph">${esc(h)}</h3>`:''})()}
         ${sxMark(p.text,V)||'<p class="muted">ยังไม่มีเนื้อเรื่องใน part นี้</p>'}
@@ -1875,11 +1877,13 @@ function vStory(l){
               return ok?`<button type="button" class="btn primary" data-act="sxQuiz" data-id="${esc(x)}">${nm}</button>`:`<button type="button" class="btn" disabled>${nm} <small>· ยังไม่เปิด</small></button>`}).join('')}
             <button type="button" class="btn sm ghost" data-act="sxQuizPick">ยกเลิก</button></div>`}</div></div>
       </article>
-      <div class="sx-vocab">${rail(top,'top')}${rail(right,'right')}${rail(bot,'bot')}${rail(left,'left')}</div>
+      <div class="sx-vocab">${rail(idx,side)}</div>
     </div>
     ${n?'<p class="sx-hint muted small">แตะคำศัพท์รอบจอเพื่อดูความหมาย คำนั้นในเรื่องจะไฮไลต์ · แตะคำที่ขีดเส้นใต้ในเรื่องก็ได้</p>':''}
   </div>`;
 }
+function sxSideGet(){return LS.get('sxSide','right')==='left'?'left':'right'}
+const sxSideLbl=sd=>sd==='left'?'ย้ายคำศัพท์ไปขวา →':'← ย้ายคำศัพท์ไปซ้าย';
 function sxHL(i,on,from){
   const box=document.querySelector('.storyx');if(!box)return;
   box.querySelectorAll('.vw.hl').forEach(e=>e.classList.remove('hl'));box.querySelectorAll('.sx-tab.on').forEach(e=>e.classList.remove('on'));
@@ -2978,6 +2982,11 @@ const ACT={
   sxPart(t){if(!S.story)return;S.story.part=+t.dataset.id;render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxAll(){if(!S.story)return;S.story.all=!S.story.all;const x=document.querySelector('.storyx');if(x)x.classList.toggle('all',S.story.all);const b=document.querySelector('.storyx [data-act="sxAll"]');
     if(b){b.classList.toggle('primary',S.story.all);b.setAttribute('aria-pressed',S.story.all);b.textContent=S.story.all?'ซ่อนความหมาย':'โชว์ความหมายทุกคำ'}},
+  sxSide(){const sd=sxSideGet()==='left'?'right':'left';LS.set('sxSide',sd);const x=document.querySelector('.storyx');if(!x)return;
+    const st=x.querySelector('.sx-stage');if(st){st.classList.remove('side-left','side-right');st.classList.add('side-'+sd)}
+    x.querySelectorAll('.sx-rail').forEach(r=>{r.classList.remove('sx-left','sx-right');r.classList.add('sx-'+sd)});
+    x.querySelectorAll('.sx-tab').forEach(b=>{b.classList.remove('left','right');b.classList.add(sd)});
+    const b=x.querySelector('[data-act="sxSide"]');if(b)b.textContent=sxSideLbl(sd)},
   sxTab(t){const i=t.dataset.id;const open=sxOpenTab(i);sxHL(i,open,'tab')},
   sxWord(t){const i=t.dataset.id;const was=t.classList.contains('hl');sxOpenTab(i,!was);sxHL(i,!was,'word')},
   sxQuiz(t){const l=Store.d.lessons[S.learn.open];if(!l)return;S.story=null;S.learn.scope={lid:l.id,sc:t.dataset.id};qset().pick='new';render();
