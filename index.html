@@ -269,6 +269,31 @@ textarea.grow{min-height:46px;resize:vertical;overflow:hidden}
 textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
 /* story reader */
 .sxlock body{overflow:hidden}
+.sec-l{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;min-width:0}
+.vl-open svg{flex:none}
+.vlx{position:fixed;inset:0;z-index:30;background:var(--paper);display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:12px;
+  padding:max(10px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.vl-filters{display:grid;gap:8px;width:100%;max-width:900px;justify-self:center}
+.vl-frow{display:grid;grid-template-columns:4.6em minmax(0,1fr);align-items:start;gap:10px}.vl-frow>.label{margin:0;padding-top:10px}
+.vl-frow .chip b{font-weight:600}
+.vl-box{overflow:auto;overscroll-behavior:contain;padding-bottom:max(18px,env(safe-area-inset-bottom,0px))}
+.vl-in{max-width:900px;margin:0 auto;display:grid;gap:8px}
+.vl-sum code{font-size:.85em}
+.vl-letter{position:sticky;top:0;z-index:1;background:var(--paper);margin:6px 0 0;padding:6px 2px;font:600 1.15rem/1.2 var(--f-head);border-bottom:1px solid var(--line)}
+.vl-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.vl-row{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;display:grid;gap:4px;min-width:0}
+.vl-w{display:flex;align-items:baseline;gap:6px 8px;flex-wrap:wrap}
+.vl-w b{font:700 1.14rem/1.3 var(--f-body)}
+.vl-forms{font:400 .92rem/1.3 var(--f-body);color:var(--muted)}
+.vl-pos{font:500 .74rem/1 var(--f-head);padding:4px 7px;border-radius:6px;background:color-mix(in srgb,var(--star) 22%,var(--surface));color:var(--ink);align-self:center;white-space:nowrap}
+.vl-src{margin-left:auto;font:500 .72rem/1 var(--f-head);padding:5px 8px;border-radius:6px;background:var(--sunk);color:var(--muted);align-self:center;white-space:nowrap}
+.vl-m{font:400 1rem/1.5 var(--f-body)}
+.vl-ex{margin:2px 0 0;padding-left:10px;border-left:3px solid var(--line);font:italic 400 .97rem/1.6 var(--f-body);color:var(--muted)}
+.vl-ex mark{background:color-mix(in srgb,var(--star) 30%,transparent);color:var(--ink);font-style:normal;font-weight:700;border-radius:4px;padding:0 2px}
+.vl-ex.none{font-style:normal;font-size:.88rem;border-left-style:dashed}
+.vl-more summary{cursor:pointer;font:500 .84rem/1.4 var(--f-head);color:var(--muted);margin-top:2px}
+.vl-more .vl-ex{margin-top:6px}
+.vl-empty{text-align:center;padding:30px 0}
 .parkrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0}.parkrow>span:not(.pawn){flex:1;min-width:10em}
 .clockset .pick{margin-bottom:6px}
 .storyx{position:fixed;inset:0;z-index:30;background:var(--paper);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;
@@ -1554,9 +1579,11 @@ function render(){
   if(Store.mode==='loading'){const slow=Store.t0&&Date.now()-Store.t0>12000;
     v.innerHTML=slow?'<div class="panel"><p>เปิดบ้านช้ากว่าปกติ อาจเป็นเพราะอินเทอร์เน็ต</p><div class="btns"><button type="button" class="btn primary" onclick="location.reload()">ลองเปิดใหม่</button></div></div>':'<div class="panel muted">กำลังเปิดประตูบ้าน…</div>';return}
   const sx0=document.getElementById('sxStory');const sxKeep=sx0&&S.story?{k:S.story.tid+':'+S.story.part,y:sx0.scrollTop}:null;
+  const vl0=document.getElementById('vlBox');const vlKeep=vl0?{k:vl0.dataset.k,y:vl0.scrollTop}:null;
   v.innerHTML=(VIEWS[S.tab]||vHome)();
+  const vl1=document.getElementById('vlBox');if(vl1&&vlKeep&&vlKeep.k===vl1.dataset.k)vl1.scrollTop=vlKeep.y;
   const sx1=document.getElementById('sxStory');if(sx1&&sxKeep&&sxKeep.k===S.story.tid+':'+S.story.part)sx1.scrollTop=sxKeep.y;
-  document.documentElement.classList.toggle('sxlock',!!sx1);
+  document.documentElement.classList.toggle('sxlock',!!sx1||!!vl1);
   if(S.tab==='words')waAfter();
   if(S.tab==='tools'&&S.tool==='timer')paintTimer();
   try{ctAfter()}catch(e){}
@@ -1812,7 +1839,7 @@ function vLesson(l){
     <h2 class="ltitle">${esc(l.title)}</h2>
   </section>
   <section class="sec">
-    <div class="sec-head"><h3 class="label">${story?'เรื่องในบทนี้'+(tp.length?' · '+tp.length+' เรื่อง':''):'หัวข้อในบทนี้'+(tp.length?' · '+tp.length+' หัวข้อ':'')}</h3>${tp.length?'<span class="muted small">ดาว = ความยาก (สูงสุด 5)</span>':''}</div>
+    <div class="sec-head"><div class="sec-l"><h3 class="label">${story?'เรื่องในบทนี้'+(tp.length?' · '+tp.length+' เรื่อง':''):'หัวข้อในบทนี้'+(tp.length?' · '+tp.length+' หัวข้อ':'')}</h3>${story&&vlCount(l)?`<button type="button" class="btn sm vl-open" data-act="vlOpen"><svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16"><path d="M4 5h16M4 10h16M4 15h10M4 20h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 15.5l2.2 4.5M21.4 15.5L19.2 20M17.6 18.6h3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>คำศัพท์ทั้งหมด · ${vlCount(l)} คำ</button>`:''}</div>${tp.length?'<span class="muted small">ดาว = ความยาก (สูงสุด 5)</span>':''}</div>
     ${tp.length?`<ol class="topics">${items}</ol>`
     :`<div class="empty"><b>ยังไม่มีหัวข้อ</b><p>ใส่หัวข้อ จุดประสงค์ และดาวความยากของแต่ละหัวข้อ</p>${S.bro?`<button class="btn primary" data-act="lessonForm" data-id="${esc(l.id)}">เพิ่มหัวข้อ</button>`:'<p class="small">ให้พี่เปิดโหมดพี่แล้วกดแก้ไขบทเรียน</p>'}</div>`}
   </section>
@@ -1835,7 +1862,7 @@ function vLesson(l){
     <div class="qgroup"><span class="label">เวลา (พี่ตั้งไว้)</span><p class="muted small">${setHint}</p></div>
     <div class="btns"><button class="btn primary big" data-act="startQuiz" data-id="${esc(l.id)}" ${sel&&(n||parked()[sel+'|'+l.id+'|'+sc])?'':'disabled'}>${!sel?'เลือกคนทำควิซก่อน':parked()[sel+'|'+l.id+'|'+sc]?'ทำต่อ '+esc(scopeName(l,sc))+' ที่พักไว้ ของ '+esc(kidById(sel).code):!n?'ชุดนี้ยังไม่มีโจทย์':'เริ่ม '+esc(scopeName(l,sc))+' · '+modeName(mode)+(pick!=='all'&&P.cnt.old?' · '+pickName(pick):'')+' '+n+' ข้อ ของ '+esc(kidById(sel).code)}</button></div>`
     :`<p class="muted">${(l.questions||[]).length&&!S.bro?'ยังไม่มีควิซที่เปิดให้ทำ รอพี่เปิดชุดข้อสอบก่อน':'บทนี้ยังไม่มีโจทย์'+(S.bro?' กดแก้ไขควิซเพื่อเพิ่มโจทย์ MCQ หรือ MEQ แล้วเลือกว่าอยู่ชุดไหน':'')}</p>`}
-  </div></section>${story&&S.story&&S.story.lid===l.id?vStory(l):''}`;
+  </div></section>${story&&S.story&&S.story.lid===l.id?vStory(l):''}${story&&S.vl&&S.vl.lid===l.id&&!S.story?vVocab(l):''}`;
 }
 
 /* ---------- story reader: the story in the middle, that part's vocabulary as tabs around the screen ----------
@@ -1843,7 +1870,32 @@ function vLesson(l){
      === Part 1: title        starts a part (no === line = the whole story is one part)
      story text, blank line between paragraphs, **bold** *italic* work
      ---                      after this line: that part's vocabulary
-     word = ความหมาย          one per line · other forms with / e.g.  run / ran / running = วิ่ง */
+     word = ความหมาย          one per line · other forms with / e.g.  run / ran / running = วิ่ง
+     part of speech (optional) after the word or before the meaning:  kitten (n.) = ลูกแมว  ·  kitten = (n.) ลูกแมว  ·  run (v./n.) = วิ่ง */
+/* part of speech: key, short label, English, Thai, and every spelling accepted (dots and spaces ignored) */
+const POS_T=[
+  ['n','n.','noun','คำนาม',['n','noun','น','นาม','คำนาม']],
+  ['v','v.','verb','คำกริยา',['v','verb','vt','vi','ก','กริยา','คำกริยา']],
+  ['adj','adj.','adjective','คำคุณศัพท์',['adj','adjective','ว','คุณศัพท์','คำคุณศัพท์']],
+  ['adv','adv.','adverb','คำกริยาวิเศษณ์',['adv','adverb','กว','กริยาวิเศษณ์','คำกริยาวิเศษณ์']],
+  ['prep','prep.','preposition','คำบุพบท',['prep','preposition','บ','บุพบท','คำบุพบท']],
+  ['pron','pron.','pronoun','คำสรรพนาม',['pron','pronoun','ส','สรรพนาม','คำสรรพนาม']],
+  ['conj','conj.','conjunction','คำสันธาน',['conj','conjunction','สัน','สันธาน','คำสันธาน']],
+  ['interj','interj.','interjection','คำอุทาน',['interj','int','interjection','อ','อุทาน','คำอุทาน']],
+  ['det','det.','determiner','คำนำหน้านาม',['det','determiner','article','art']],
+  ['phrv','phr. v.','phrasal verb','กริยาวลี',['phrv','phrasalverb','pv','กริยาวลี']],
+  ['phr','phr.','phrase','วลี',['phr','phrase','วลี']],
+  ['idiom','idiom','idiom','สำนวน',['idiom','idm','สำนวน']]];
+const POS_BY={};POS_T.forEach(r=>r[4].forEach(a=>POS_BY[a]=r[0]));
+const posRow=k=>POS_T.find(r=>r[0]===k);
+/* "n./v." "n, v" "phr. v." → ['n','v'] · null if any piece is not a part of speech */
+function posParse(str){const bits=String(str||'').split(/\s*(?:[,/&;]|\bor\b|หรือ)\s*/).filter(x=>x.trim());if(!bits.length)return null;
+  const out=[];for(const b of bits){const k=POS_BY[b.toLowerCase().replace(/[.\s]/g,'')];if(!k)return null;if(!out.includes(k))out.push(k)}return out}
+/* a part of speech in ( ) or [ ] at the end of the word side */
+function posCut(t){const m=String(t).match(/^(.*?)\s*[(\[]([^()\[\]]+)[)\]]\s*$/);const ps=m&&m[1].trim()?posParse(m[2]):null;return ps?{t:m[1].trim(),pos:ps}:{t:String(t).trim(),pos:[]}}
+/* a part of speech at the start of the meaning: "(n.) ลูกแมว" "[n] ลูกแมว" "n. ลูกแมว" "adj./adv. เร็ว" */
+function posLead(m){let x=String(m).match(/^[(\[]([^()\[\]]+)[)\]]\s*(.*)$/);let ps=x?posParse(x[1]):null;if(ps)return{t:x[2].trim(),pos:ps};
+  x=String(m).match(/^((?:phr\.\s?v|[A-Za-z]{1,6})\.(?:\s*[,/]\s*(?:phr\.\s?v|[A-Za-z]{1,6})\.)*)\s+(.+)$/);ps=x?posParse(x[1]):null;return ps?{t:x[2].trim(),pos:ps}:{t:String(m).trim(),pos:[]}}
 function sxParts(src){
   const out=[];let cur=null;const push=()=>{if(cur&&(cur.text.trim()||cur.vocab.length||cur.title))out.push(cur)};
   const lines=String(src||'').replace(/\r/g,'').split('\n');let inV=false;
@@ -1852,9 +1904,11 @@ function sxParts(src){
     if(!cur)cur={title:'',text:'',vocab:[]};
     if(/^\s*-{3,}\s*(vocab\w*|คำศัพท์)?\s*$/i.test(ln)){inV=true;return}
     if(inV){const s=ln.trim();if(!s)return;const ix=s.search(/\s[=:–-]\s|\s*=\s*/);
-      if(ix<0){cur.vocab.push({forms:[s],w:s,m:''});return}
-      const mm=s.match(/^(.*?)\s*(?:=|\s[:–-]\s)\s*(.*)$/);const forms=(mm?mm[1]:s).split('/').map(x=>x.trim()).filter(Boolean);
-      if(forms.length)cur.vocab.push({forms,w:forms[0],m:mm?mm[2].trim():''});return}
+      if(ix<0){const a=posCut(s);cur.vocab.push({forms:[a.t],w:a.t,m:'',mt:'',pos:a.pos});return}
+      const mm=s.match(/^(.*?)\s*(?:=|\s[:–-]\s)\s*(.*)$/);const L=posCut(mm?mm[1]:s);let pos=L.pos.slice();
+      const forms=L.t.split('/').map(x=>{const c=posCut(x.trim());c.pos.forEach(k=>{if(!pos.includes(k))pos.push(k)});return c.t}).filter(Boolean);
+      const m=mm?mm[2].trim():'';const R=posLead(m);R.pos.forEach(k=>{if(!pos.includes(k))pos.push(k)});
+      if(forms.length)cur.vocab.push({forms,w:forms[0],m,mt:R.t,pos});return}
     cur.text+=(cur.text?'\n':'')+ln});
   push();return out}
 const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
@@ -1867,6 +1921,56 @@ function sxMark(text,vocab){
     if(re)h=h.replace(re,(...a)=>{const pre=a[1];let k=-1;for(let j=0;j<fs.length;j++){if(a[3+j]!=null){k=j;break}}const suf=a[3+fs.length]||'';
       return k<0?a[0]:`${pre}<span class="vw" data-act="sxWord" data-id="${fs[k].i}" role="button" tabindex="0">${a[2]}${suf}</span>`});
     return `<p>${inline(h).replace(/\n/g,'<br>')}</p>`}).join('')}
+/* ---------- all vocabulary of a story lesson: A–Z, filter by story and part of speech, example sentences from the story ---------- */
+function sxSents(text){const out=[];
+  String(text||'').replace(/\r/g,'').split(/\n\s*\n/).forEach(pg=>{const t=pg.replace(/\*\*\*|\*\*|__|\*/g,'').replace(/\s+/g,' ').trim();if(!t)return;
+    const bits=t.match(/[^.!?…]+(?:[.!?…]+["”’')\]]*|$)/g)||[t];let acc='';
+    bits.forEach(b=>{acc+=b;if(/\b(?:Mr|Mrs|Ms|Dr|St|Jr|Sr|Mt|vs|etc|e\.g|i\.e)\.\s*$/i.test(acc))return;if(acc.trim())out.push(acc.trim());acc=''});if(acc.trim())out.push(acc.trim())});
+  return out}
+/* forms of a word as they can appear in the story (adds -ing without e, y→ie, doubled last letter) */
+function vlRe(forms){const alt=[];forms.forEach(f=>{f=f.trim();if(!f)return;alt.push(f);if(/^[a-z]+$/i.test(f)){
+    if(/[^aeiou]e$/i.test(f))alt.push(f.slice(0,-1));if(/[^aeiou]y$/i.test(f))alt.push(f.slice(0,-1)+'ie');if(/[aeiou][bdgklmnprt]$/i.test(f)&&f.length<=6)alt.push(f+f.slice(-1))}});
+  alt.sort((a,b)=>b.length-a.length);if(!alt.length)return null;
+  return new RegExp('(^|[^A-Za-z\'’])('+alt.map(x=>reEsc(x).replace(/\s+/g,'\\s+')).join('|')+')((?:e?s|e?d|ing|\'s|’s)?)(?![A-Za-z])','gi')}
+function vlMark(sent,re){re.lastIndex=0;let h='',at=0,m;while((m=re.exec(sent))){const st=m.index+m[1].length,en=m.index+m[0].length;h+=esc(sent.slice(at,st))+'<mark>'+esc(sent.slice(st,en))+'</mark>';at=en;if(m[0]==='')re.lastIndex++}return h+esc(sent.slice(at))}
+function vlEntries(l){const out=[];(l.topics||[]).forEach((t,ti)=>{const ps=sxParts(t.story);const ss=ps.map(p=>sxSents(p.text));
+  ps.forEach((p,pi)=>p.vocab.forEach(v=>{const re=vlRe(v.forms);const ex=[];
+    if(re)[pi,...ps.map((_,j)=>j).filter(j=>j!==pi)].forEach(j=>ss[j].forEach(x=>{re.lastIndex=0;if(re.test(x)&&!ex.some(e=>e.s===x))ex.push({s:x,h:vlMark(x,re)})}));
+    out.push({v,ti,tid:t.tid,sn:t.name||'Story '+(ti+1),pi,np:ps.length,ex})}))});
+  const key=e=>e.v.w.toLowerCase().replace(/^[^a-z0-9]+/,'');
+  return out.sort((a,b)=>key(a).localeCompare(key(b),'en',{sensitivity:'base',numeric:true})||a.ti-b.ti||a.pi-b.pi)}
+const vlCount=l=>(l.topics||[]).reduce((a,t)=>a+sxParts(t.story).reduce((b,p)=>b+p.vocab.length,0),0);
+function vVocab(l){
+  const F=S.vl;const all=vlEntries(l);const tp=l.topics||[];
+  const stIds=tp.map((t,i)=>({t,i,n:all.filter(e=>e.ti===i).length})).filter(x=>x.n);
+  F.st=F.st.filter(id=>stIds.some(x=>x.t.tid===id));
+  const bySt=all.filter(e=>!F.st.length||F.st.includes(e.tid));
+  const pk=e=>e.v.pos&&e.v.pos.length?e.v.pos:['none'];
+  const posIds=POS_T.map(r=>r[0]).concat('none').map(k=>({k,n:bySt.filter(e=>pk(e).includes(k)).length})).filter(x=>x.n||F.pos.includes(x.k));
+  const list=bySt.filter(e=>!F.pos.length||pk(e).some(k=>F.pos.includes(k)));
+  const noPos=all.filter(e=>!(e.v.pos&&e.v.pos.length)).length;
+  let rows='',last=null;
+  list.forEach(e=>{const L=/^[a-z]/i.test(e.v.w.replace(/^[^a-z0-9]+/i,''))?e.v.w.replace(/^[^a-z0-9]+/i,'')[0].toUpperCase():'#';
+    if(L!==last){rows+=`${last!==null?'</ul>':''}<h3 class="vl-letter">${L}</h3><ul class="vl-list">`;last=L}
+    const m=e.v.mt!=null?e.v.mt:e.v.m;const more=e.ex.slice(1);
+    rows+=`<li class="vl-row"><div class="vl-w"><b lang="en">${esc(e.v.w)}</b>${e.v.forms.length>1?`<span class="vl-forms" lang="en">${e.v.forms.slice(1).map(esc).join(' · ')}</span>`:''}
+      ${(e.v.pos||[]).map(k=>{const r=posRow(k);return `<span class="vl-pos" title="${esc(r[2]+' · '+r[3])}">${esc(r[1])}</span>`}).join('')}
+      <span class="vl-src">${esc(e.sn)}${e.np>1?' · Part '+(e.pi+1):''}</span></div>
+      <div class="vl-m">${m?esc(m):'<i class="muted">ยังไม่ได้ใส่ความหมาย</i>'}</div>
+      ${e.ex.length?`<p class="vl-ex" lang="en">${e.ex[0].h}</p>${more.length?`<details class="vl-more"><summary>ประโยคอื่นในเรื่องอีก ${more.length} ประโยค</summary>${more.map(x=>`<p class="vl-ex" lang="en">${x.h}</p>`).join('')}</details>`:''}`:'<p class="vl-ex none">ไม่พบคำนี้ในเนื้อเรื่อง</p>'}</li>`});
+  if(last!==null)rows+='</ul>';
+  const chip=(act,id,on,html,n)=>`<button type="button" class="chip" data-act="${act}" data-id="${esc(id)}" aria-pressed="${on}">${html}${n!=null?`<span class="n">${n}</span>`:''}</button>`;
+  return `<div class="vlx" role="dialog" aria-modal="true" aria-label="คำศัพท์ทั้งหมด ${esc(l.title)}">
+    <div class="sx-bar"><button type="button" class="btn sm" data-act="vlClose">← กลับ</button>
+      <div class="sx-ttl"><b>คำศัพท์ทั้งหมด</b><span>${esc(l.title)} · ${all.length} คำ · เรียงตาม A–Z</span></div></div>
+    <div class="vl-filters">
+      <div class="vl-frow"><span class="label">เรื่อง</span><div class="chips">${chip('vlSt','',!F.st.length,'ทุกเรื่อง',all.length)}${stIds.map(x=>chip('vlSt',x.t.tid,F.st.includes(x.t.tid),esc(x.t.name||'Story '+(x.i+1)),x.n)).join('')}</div></div>
+      <div class="vl-frow"><span class="label">ชนิดคำ</span><div class="chips">${chip('vlPos','',!F.pos.length,'ทุกชนิด',bySt.length)}${posIds.map(x=>{const r=posRow(x.k);return chip('vlPos',x.k,F.pos.includes(x.k),r?`<b>${esc(r[1])}</b>&nbsp;${esc(r[3])}`:'ไม่ระบุ',x.n)}).join('')}</div></div>
+    </div>
+    <div class="vl-box" id="vlBox" data-k="${esc(F.st.join(',')+'|'+F.pos.join(','))}"><div class="vl-in">
+      <p class="muted small vl-sum">แสดง ${list.length} จาก ${all.length} คำ${S.bro&&noPos?` · ยังไม่ได้ใส่ชนิดคำ ${noPos} คำ — ใส่ได้ในแก้ไขบทเรียน เช่น <code>kitten (n.) = ลูกแมว</code>`:''}</p>
+      ${rows||'<p class="muted vl-empty">ไม่มีคำที่ตรงกับตัวกรองนี้</p>'}</div></div>
+  </div>`}
 /* a story quiz can open its story on top (timer keeps running); closing returns to the same question */
 const sxInQuiz=()=>{const q=S.quiz;return !!(q&&!q.done&&q.phase==='answer'&&isStory(Store.d.lessons[q.lessonId]))};
 const sxScopeTid=sc=>isCk(sc)?sc.slice(CK.length):String(sc||'').endsWith(VS)?sc.slice(0,-VS.length):sc;
@@ -2799,7 +2903,7 @@ ${d.part!=='quiz'?`
       <div class="trow"><span class="small muted">ความยาก</span>${starPick(i,t.stars)}<div class="btns" style="margin-left:auto"><button class="btn sm ghost" data-act="tUp" data-id="${i}" ${i?'':'disabled'}>เลื่อนขึ้น</button><button class="btn sm ghost" data-act="tDown" data-id="${i}" ${i<d.topics.length-1?'':'disabled'}>เลื่อนลง</button><button class="btn sm danger" data-act="tDel" data-id="${i}">ลบหัวข้อ</button></div></div>
       <textarea id="t${i}_goals" style="min-height:96px" placeholder="จุดประสงค์ บรรทัดละ 1 ข้อ เช่น&#10;หาเลขออกซิเดชันของธาตุในสารประกอบได้&#10;บอกได้ว่าสารใดเป็นตัวรีดิวซ์และตัวออกซิไดซ์" aria-label="จุดประสงค์ของหัวข้อ ${i+1}">${esc(t.goals)}</textarea>
       ${d.story?(()=>{const ps=sxParts(t.story);const nv=ps.reduce((a,p)=>a+p.vocab.length,0);return `<label class="field"><span>เนื้อเรื่องและคำศัพท์${ps.length?' · '+ps.length+' part · คำศัพท์ '+nv+' คำ':''}</span><textarea class="grow sxsrc" id="t${i}_story" rows="${Math.max(8,Math.min(30,rowsOf(t.story)))}" lang="en" spellcheck="false" placeholder="=== Part 1: The Lost Kitten&#10;Once upon a time, a little kitten got lost in the rain.&#10;&#10;She looked for her mother everywhere.&#10;---&#10;kitten = ลูกแมว&#10;lost = หลงทาง&#10;look / looked / looking for = ตามหา&#10;&#10;=== Part 2&#10;..." aria-label="เนื้อเรื่องและคำศัพท์ของเรื่อง ${i+1}">${esc(t.story)}</textarea>
-      <small class="muted">=== เริ่ม part ใหม่ (ใส่ชื่อ part ต่อท้ายได้ ไม่ใส่ === เลย = ทั้งเรื่องเป็น part เดียว) · เว้นบรรทัดระหว่างย่อหน้า · หลังบรรทัด --- คือคำศัพท์ของ part นั้น บรรทัดละคำ คำ = ความหมาย · คำที่มีหลายรูปใส่ / คั่น เช่น run / ran = วิ่ง</small></label>`})():''}
+      <small class="muted">=== เริ่ม part ใหม่ (ใส่ชื่อ part ต่อท้ายได้ ไม่ใส่ === เลย = ทั้งเรื่องเป็น part เดียว) · เว้นบรรทัดระหว่างย่อหน้า · หลังบรรทัด --- คือคำศัพท์ของ part นั้น บรรทัดละคำ คำ = ความหมาย · คำที่มีหลายรูปใส่ / คั่น เช่น run / ran = วิ่ง · ใส่ชนิดคำในวงเล็บได้ เช่น kitten (n.) = ลูกแมว หรือ fast (adj./adv.) = เร็ว</small></label>`})():''}
     </fieldset>`).join('')}
     <div class="btns"><button class="btn" data-act="tAdd">เพิ่มหัวข้อ</button></div>
     <details ${plain(d.content)?'open':''}><summary class="label" style="cursor:pointer">เนื้อหาเพิ่มเติม (ไม่ใส่ก็ได้)</summary>
@@ -2990,8 +3094,13 @@ const ACT={
   /* learn */
   subj(t){S.learn.subj=t.dataset.id;render()},
   lkid(t){S.learn.kid=S.learn.kid===t.dataset.id?'all':t.dataset.id;render()},
-  openLesson(t){S.learn.open=t.dataset.id;S.story=null;S.confirm=null;render();window.scrollTo({top:0})},
-  closeLesson(){S.learn.open=null;S.story=null;render()},
+  openLesson(t){S.learn.open=t.dataset.id;S.story=null;S.vl=null;S.confirm=null;render();window.scrollTo({top:0})},
+  closeLesson(){S.learn.open=null;S.story=null;S.vl=null;render()},
+  /* all-vocabulary list */
+  vlOpen(){if(!S.learn.open)return;S.vl={lid:S.learn.open,st:[],pos:[]};render()},
+  vlClose(){S.vl=null;render()},
+  vlSt(t){if(!S.vl)return;const id=t.dataset.id;S.vl.st=!id?[]:S.vl.st.includes(id)?S.vl.st.filter(x=>x!==id):S.vl.st.concat(id);render()},
+  vlPos(t){if(!S.vl)return;const id=t.dataset.id;S.vl.pos=!id?[]:S.vl.pos.includes(id)?S.vl.pos.filter(x=>x!==id):S.vl.pos.concat(id);render()},
   /* story reader */
   async ckToggle(t){const l=Store.d.lessons[S.learn.open];if(!l||!S.bro)return;const tid=t.dataset.id;const c=new Set(l.checks||[]);
     if(c.has(tid)){if(scopeCount(l,CK+tid)){toast('ชุดนี้มีโจทย์อยู่ ย้ายหรือลบโจทย์ก่อน');return}c.delete(tid);await Store.put('lessons',l.id,Object.assign({},l,{checks:[...c]}));toast('เอา '+CK_NAME+' ออกแล้ว')}
@@ -4964,7 +5073,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-14T21:59:00+07:00';
+const SITE_UPDATED='2026-11-14T22:11:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
