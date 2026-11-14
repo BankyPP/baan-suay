@@ -289,7 +289,7 @@ textarea.sxsrc{font-family:var(--f-body);line-height:1.6}
 .vl-src{margin-left:auto;font:500 .72rem/1 var(--f-head);padding:5px 8px;border-radius:6px;background:var(--sunk);color:var(--muted);align-self:center;white-space:nowrap}
 .vl-m{font:400 1rem/1.5 var(--f-body)}
 .vl-ex{margin:2px 0 0;padding-left:10px;border-left:3px solid var(--line);font:italic 400 .97rem/1.6 var(--f-body);color:var(--muted)}
-.vl-ex mark{background:color-mix(in srgb,var(--star) 30%,transparent);color:var(--ink);font-style:normal;font-weight:700;border-radius:4px;padding:0 2px}
+.vl-ex mark{background:none;color:var(--ink);font-style:normal;font-weight:700}
 .vl-ex.none{font-style:normal;font-size:.88rem;border-left-style:dashed}
 .vl-more summary{cursor:pointer;font:500 .84rem/1.4 var(--f-head);color:var(--muted);margin-top:2px}
 .vl-more .vl-ex{margin-top:6px}
@@ -5073,7 +5073,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-14T22:11:00+07:00';
+const SITE_UPDATED='2026-11-14T22:40:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}
