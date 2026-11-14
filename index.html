@@ -1180,6 +1180,8 @@ small.over{color:var(--bad)!important;font-weight:700}
 <script>
 /* one-time story drop-ins for the English Stories lesson: each fills that story box only if it is still empty, never overwrites */
 window.STORY_PATCH = [{"key": "story1-blue-collar", "index": 0, "name": "The Dog with the Blue Collar", "story": "=== Part 1\nEvery Saturday evening, Ton and his sister Mali go to the night market near their house. Ton is fourteen. Mali is eleven. They always buy the same things: grilled chicken for Ton, mango sticky rice for Mali, and a big bottle of cold water to share.\n\nTonight the market is very busy. There are people everywhere. It smells like grilled pork everywhere. Music is playing from a small speaker at a phone shop.\n\n\"Stay close to me,\" Ton says. \"I don't want to lose you.\"\n\n\"I'm not a baby,\" Mali answers. But she holds his shirt anyway.\n\nThey walk past a stall that sells cheap toys. Then Mali stops. \"Ton, look!\"\n\nUnder a table, there is a small brown dog. It is shaking. It has short legs, big ears and a blue collar around its neck.\n\n\"Is it hurt?\" Ton asks.\n\nMali kneels down slowly. \"Hello, little one,\" she says softly. \"Are you lost?\"\n\nThe dog looks at her with big black eyes. Then it walks out and smells her hand. Its tail starts to move.\n\n\"It likes you,\" Ton says.\n\n\"Everyone likes me,\" Mali says, and smiles.\n---\nnight market = ตลาดกลางคืน\ngrilled = ย่าง\nbusy = คนเยอะ คึกคัก\nstall = แผงขายของ\nshake / shaking = สั่น\ncollar = ปลอกคอ\nkneel / kneels = คุกเข่า\nlost = หลงทาง\ntail = หาง\n=== Part 2\nTon looks at the blue collar. There is something on it: a small piece of paper, folded many times and tied with string.\n\n\"There's a note,\" he says.\n\n\"Open it!\" Mali says.\n\nTon unties the string carefully. The paper is old and a little wet. He opens it under the light of a food stall. There are only a few words, written in pencil:\n\n*If you find Lucky, please take her home. Follow the yellow doors.*\n\n\"Who is Lucky?\" Mali asks.\n\nTon points at the dog. \"I think *she* is Lucky.\"\n\nLucky barks.\n\n\"But where is home?\" Mali asks. \"And what are the yellow doors?\"\n\nTon thinks for a moment. He looks around the market. Most of the shops have metal doors. They are grey or green. None of them are yellow.\n\nA woman at the noodle stall is watching them. She is old and wears a big straw hat.\n\n\"That dog comes here every Saturday,\" she says. \"Always alone. She sits under my table and waits.\"\n\n\"Waits for what?\" Ton asks.\n\nThe woman shrugs. \"I don't know. I give her some pork sometimes.\"\n\nMali picks Lucky up. The dog is light and warm. \"We have to help her, Ton.\"\n\nTon checks the time on his phone. It is almost eight o'clock. Mum wants them home by nine.\n\n\"One hour,\" he says. \"We look for one hour. Then we go home and tell Mum.\"\n\n\"Deal,\" says Mali.\n\nThey thank the woman and walk to the end of the market. The street there is quiet and dark. The music is far behind them now.\n\nThen Lucky jumps out of Mali's arms. She runs a few steps, stops, and looks back at them.\n\n\"She wants us to follow her,\" Mali says.\n\nTon takes a deep breath. \"Okay, Lucky,\" he says. \"Go.\"\n\nAt the corner of the street, under a broken streetlight, there is a small door. It is painted bright yellow.\n---\nfold / folded = พับ\nnote = ข้อความสั้นๆ โน้ต\nuntie / unties = แก้ (เชือก ปม)\ncarefully = อย่างระมัดระวัง\nbark / barks = เห่า\nshrug / shrugs = ยักไหล่\ndeal = ตกลง\nfollow = ตาม\ntake a deep breath / takes a deep breath = หายใจเข้าลึกๆ\nstreetlight = ไฟถนน"}];
+/* one-time quiz-set replacements for the English Stories lesson: each removes every question of that story's set (rc = Reading Comprehension, v = Vocabularies) and puts these in, once */
+window.QSET_PATCH = [{"key": "story1-rc-template-1", "index": 0, "set": "rc", "questions": [{"q": "What is the purpose of the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "[Recall]", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "What is true according to the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "[Recall]", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "What is true about … from the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "What can be assumed based on the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "[Recall]", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "Which statement is false according to the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "[Recall]", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "What is most likely false based on the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "What is most likely to happen next after the story?", "choices": ["X", "X", "X", "X"], "answer": 0}, {"q": "What is the main idea of the story?", "choices": ["X", "X", "X", "X"], "answer": 0}]}];
 </script>
 <!-- ===== ตั้งค่า Firebase: วาง firebaseConfig ของบ้านแทนค่าในวงเล็บปีกกาด้านล่าง ===== -->
 <script>
@@ -1319,6 +1321,7 @@ const Store={
     changed();
     try{await this.maybeSeed()}catch(e){}
     try{await this.maybeStories()}catch(e){}
+    try{await this.maybeQSets()}catch(e){}
   },
   /* login: everyone is signed in anonymously; brother mode needs a Google account on the allowed list (meta/admins) */
   user:null, admin:false, ownerClaim:false,
@@ -1336,7 +1339,7 @@ const Store={
     if(this.isGoogle){try{if(localStorage.getItem('house6.gate-trusted')==null&&!gateR())markTrusted()}catch(e){}} /* ล็อกอิน Google ในเว็บนี้ไว้ก่อนมี gate = ล็อกอินเครื่องนี้แล้ว */
     if(!this.admin)S.bro=false;else if(LS.get('bro',false))S.bro=true;
     changed();
-    if(this.admin){try{await this.maybeSeed()}catch(e){}try{await this.maybeStories()}catch(e){}}
+    if(this.admin){try{await this.maybeSeed()}catch(e){}try{await this.maybeStories()}catch(e){}try{await this.maybeQSets()}catch(e){}}
   },
   checkAdmin(){if(this.kind!=='firebase')return;if(!this.user){this.admin=false;S.bro=false;return}const ok=this.isGoogle&&(this.ownerClaim||this.admins().includes(this.user.uid));this.admin=ok;if(!ok)S.bro=false},
   /* window.STORY_PATCH: fill an empty story box of the English Stories lesson once (creates the lesson if there is none); a box that already has text is left alone */
@@ -1360,6 +1363,27 @@ const Store={
     await this.put('meta','storyPatches',{done:[...done],at:Date.now()});
     if(changedL)toast('เพิ่มเรื่องใหม่ใน English Stories แล้ว');
     if(skipped.length)toast('Story '+skipped.join(', ')+' มีเนื้อเรื่องอยู่แล้ว เลยไม่ได้ใส่ทับ');
+  },
+  /* window.QSET_PATCH: replace one quiz set of a story in the English Stories lesson once (index = story number - 1); waits until that story exists */
+  async maybeQSets(){
+    const P=window.QSET_PATCH;if(!P||!P.length)return;if(this.kind==='firebase'&&!this.admin)return;
+    const shared=this.mode==='shared';
+    let flag=shared?await this.db.collection('meta').doc('qsetPatches').get():null;
+    flag=shared?(flag.exists?flag.data():null):(this.d.meta.qsetPatches||null);
+    const done=new Set((flag&&flag.done)||[]);const todo=P.filter(p=>p&&p.key&&!done.has(p.key));if(!todo.length)return;
+    let all;if(shared){const q=await this.db.collection('lessons').get();all=q.docs.map(x=>Object.assign({},x.data(),{id:x.id}))}else all=Object.values(this.d.lessons||{});
+    const l=all.filter(isStory).sort((a,b)=>(a.at||0)-(b.at||0))[0];if(!l)return;
+    const id=l.id,body=JSON.parse(JSON.stringify(l));delete body.id;body.questions=body.questions||[];
+    const now=Date.now(),names=[];let changedL=false;
+    todo.forEach(p=>{const i=Math.max(0,+p.index||0),t=(body.topics||[])[i];if(!t||!t.tid)return;
+      const sc=p.set==='v'?t.tid+VS:t.tid;
+      body.questions=body.questions.filter(q=>q.topic!==sc);
+      (p.questions||[]).forEach(x=>body.questions.push({type:'mcq',topic:sc,q:x.q,choices:x.choices.slice(),answer:x.answer||0,explain:x.explain||'',qid:'q'+uid(),born:now}));
+      done.add(p.key);changedL=true;names.push('Story '+(i+1)+' · '+(p.set==='v'?SX_V:SX_R))});
+    if(!changedL)return;
+    await this.put('lessons',id,body);
+    await this.put('meta','qsetPatches',{done:[...done],at:Date.now()});
+    toast('ใส่โจทย์ใหม่แทนของเดิมแล้ว: '+names.join(', '));
   },
   /* a fresh copy of the website starts with the house's starter data (window.HOUSE_SEED), once */
   async maybeSeed(){
