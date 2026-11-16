@@ -258,6 +258,7 @@ textarea.grow{min-height:46px;resize:vertical;overflow:hidden}
 .qsettings{display:grid;gap:12px;background:var(--sunk);border-style:dashed}
 .chip.hidchip{border-style:dashed;opacity:.75}
 .tfoot.hid>.muted{text-decoration:line-through}
+.sx-go.hid>.muted{text-decoration:line-through}
 .tfoot .btn.eye{margin-left:auto}
 .tfoot .btn.eye+.btn{margin-left:0}
 .tfl{font:600 .9rem/1.25 var(--f-head);min-width:11.5em}
@@ -1674,6 +1675,11 @@ const VS='~v';
 const SX_R='Reading Comprehension',SX_V='Vocabularies';
 const isStory=l=>!!l&&(l.story===true||(l.story==null&&/^english stories$/i.test(String(l.title||'').trim())));
 const topicSets=(l,t)=>!t.tid?[]:isStory(l)?[t.tid,t.tid+VS]:[t.tid];
+/* the story text itself can be hidden from the kids too (key tid + '~s'), separately from its two quiz sets; a hidden story can't be read anywhere, even from inside its quiz */
+const SSX='~s';
+const sxShown=(l,tid)=>S.bro||!setHidden(l,tid+SSX);
+/* story a kid may open from inside a quiz: its own story, or for a Vocab Checkpoint the latest shown story up to it */
+function sxQuizTid(l,sc){const tid=sxScopeTid(sc);if(!isCk(sc))return sxShown(l,tid)?tid:null;let last=null;for(const x of l.topics||[]){if(sxShown(l,x.tid)&&sxParts(x.story).some(p=>p.text.trim()))last=x.tid;if(x.tid===tid)break}return last}
 /* story lessons have no Midterm/Final: a Vocab Checkpoint can sit after any story (l.checks = story tids) and tests the vocabulary of every story up to it */
 const CK='ck:',CK_NAME='Vocab Checkpoint';
 const isCk=sc=>typeof sc==='string'&&sc.startsWith(CK);
@@ -1684,7 +1690,7 @@ const ckNo=(l,sc)=>ckList(l).indexOf(sc)+1;
 function vocabUpTo(topics,tid){const out=[];for(const t of topics||[]){sxParts(t.story).forEach(p=>p.vocab.forEach(v=>out.push(v)));if(t.tid===tid)break}return out}
 const lessonScopes=l=>isStory(l)?(l.topics||[]).flatMap(t=>[...topicSets(l,t),...(t.tid&&(l.checks||[]).includes(t.tid)?[CK+t.tid]:[])]):[...(l.topics||[]).flatMap(t=>topicSets(l,t)),'mid','final'];
 const openQCount=(l,mode)=>{const keep=new Set();lessonScopes(l).forEach(sc=>{if(setOpen(l,sc))qsOf(l,mode,sc).forEach(i=>keep.add(i))});return keep.size};
-function scopeName(l,sc){if(!sc||sc==='final')return 'Final';if(sc==='mid')return 'Midterm';if(isCk(sc))return CK_NAME+' '+(ckNo(l,sc)||'');const v=sc.endsWith(VS);const base=v?sc.slice(0,-VS.length):sc;const i=(l.topics||[]).findIndex(t=>t.tid===base);
+function scopeName(l,sc){if(!sc||sc==='final')return 'Final';if(String(sc).endsWith(SSX)){const b=sc.slice(0,-SSX.length);const i=(l.topics||[]).findIndex(t=>t.tid===b);return i<0?'เรื่อง':'เรื่อง '+((l.topics[i].name)||'Story '+(i+1))}if(sc==='mid')return 'Midterm';if(isCk(sc))return CK_NAME+' '+(ckNo(l,sc)||'');const v=sc.endsWith(VS);const base=v?sc.slice(0,-VS.length):sc;const i=(l.topics||[]).findIndex(t=>t.tid===base);
   if(isStory(l)&&i>=0){const t=l.topics[i];return (t.name||'Story '+(i+1))+' · '+(v?SX_V:SX_R)}
   return i<0?'หัวข้อ':'หัวข้อ '+(i+1)}
 function curScope(l){const s0=S.learn.scope;let sc=s0&&s0.lid===l.id?s0.sc:null;
@@ -1795,8 +1801,9 @@ function vLesson(l){
   const segN=(m,tot)=>pick==='all'?`${tot} ข้อ`:`${pickName(pick)} ${P.per(m)} ข้อ`;
   const doneIn=s=>{const ids=new Set(logs().filter(e=>e.kind==='quiz'&&e.lessonId===l.id&&(e.scope||'final')===s).map(e=>e.kid));return kids().filter(k=>ids.has(k.id))};
   const story=isStory(l);
+  const eyeBtn=(s,hid,what)=>S.bro?`<button class="btn sm ghost eye ${hid?'off':''}" data-act="toggleSet" data-id="${esc(s)}" aria-pressed="${!hid}" title="${hid?'แตะเพื่อเปิดให้น้องเห็น':'แตะเพื่อซ่อนจากน้อง'}">${hid?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>ซ่อนจากน้อง':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>น้องเห็น'+what}</button>`:'';
   const foot=(s,lab)=>{const a=qsOf(l,'mcq',s).length,b=qsOf(l,'meq',s).length;const hid=setHidden(l,s);const L=lab?`<b class="tfl">${esc(lab)}</b>`:'';
-    const eye=S.bro?`<button class="btn sm ghost eye ${hid?'off':''}" data-act="toggleSet" data-id="${esc(s)}" aria-pressed="${!hid}" title="${hid?'แตะเพื่อเปิดให้น้องเห็น':'แตะเพื่อซ่อนจากน้อง'}">${hid?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>ซ่อนจากน้อง':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>น้องเห็นควิซนี้'}</button>`:'';
+    const eye=eyeBtn(s,hid,'ควิซนี้');
     const ed=S.bro?`<button class="btn sm ghost" data-act="quizForm" data-id="${esc(l.id)}" data-set="${esc(s)}">${a||b?'แก้โจทย์':'เพิ่มโจทย์'}</button>`:'';
     if(!a&&!b)return S.bro?`<div class="tfoot ${hid?'hid':''}">${L}<span class="muted small">ยังไม่มีโจทย์</span>${eye}${ed}</div>`:L?`<div class="tfoot">${L}<span class="muted small">ยังไม่มีโจทย์</span></div>`:'';
     const dn=doneIn(s);
@@ -1805,11 +1812,12 @@ function vLesson(l){
   const examCard=(s,label,sub,extra)=>`<li class="topic exam ${isCk(s)?'ck':s}"><span class="tno">${s==='mid'?'M':isCk(s)?'V'+ckNo(l,s):'F'}</span><div class="topic-head"><h3>${label}</h3><span class="muted small">${sub}</span></div>${extra||''}${foot(s)||'<p class="muted small">ยังไม่มีโจทย์ในชุดนี้</p>'}</li>`;
   let items='';
   tp.forEach((t,i)=>{const gs=(t.goals||[]).filter(g=>String(g).trim());
-    if(story){const ps=sxParts(t.story);const nv=ps.reduce((a,p)=>a+p.vocab.length,0);const has=ps.some(p=>p.text.trim());
+    if(story){const ps=sxParts(t.story);const nv=ps.reduce((a,p)=>a+p.vocab.length,0);const has0=ps.some(p=>p.text.trim());const shid=!!t.tid&&setHidden(l,t.tid+SSX);const has=has0&&(S.bro||!shid);
       items+=`<li class="topic sxt"><span class="tno">${i+1}</span>
       <div class="topic-head"><h3>${has?`<button type="button" class="tlink" data-act="sxOpen" data-id="${esc(t.tid)}">${esc(t.name||'Story '+(i+1))}</button>`:esc(t.name||'Story '+(i+1))}</h3>${stars(t.stars)}</div>
       ${gs.length?`<div class="goalwrap"><span class="label">จุดประสงค์ ต้องรู้ / ทำได้</span><ul class="goals">${gs.map(g=>`<li>${inline(esc(g))}</li>`).join('')}</ul></div>`:''}
-      <div class="sx-go">${has?`<button type="button" class="btn primary" data-act="sxOpen" data-id="${esc(t.tid)}"><svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path d="M3 5.5C5.5 4.3 8.7 4.2 12 6c3.3-1.8 6.5-1.7 9-.5V19c-2.5-1.2-5.7-1.1-9 .7-3.3-1.8-6.5-1.9-9-.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 6v13.7" stroke="currentColor" stroke-width="2"/></svg>อ่านเรื่อง</button><span class="muted small">${ps.length>1?ps.length+' parts · ':''}คำศัพท์ ${nv} คำ</span>`
+      <div class="sx-go ${S.bro&&shid?'hid':''}">${has?`<button type="button" class="btn primary" data-act="sxOpen" data-id="${esc(t.tid)}"><svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path d="M3 5.5C5.5 4.3 8.7 4.2 12 6c3.3-1.8 6.5-1.7 9-.5V19c-2.5-1.2-5.7-1.1-9 .7-3.3-1.8-6.5-1.9-9-.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 6v13.7" stroke="currentColor" stroke-width="2"/></svg>อ่านเรื่อง</button><span class="muted small">${ps.length>1?ps.length+' parts · ':''}คำศัพท์ ${nv} คำ</span>${t.tid?eyeBtn(t.tid+SSX,shid,'เรื่องนี้'):''}`
+        :has0?'<span class="muted small">เรื่องนี้ยังไม่เปิดให้อ่าน</span>'
         :S.bro?`<button type="button" class="btn" data-act="lessonForm" data-id="${esc(l.id)}">ใส่เนื้อเรื่อง</button><span class="muted small">ยังไม่มีเนื้อเรื่อง</span>`:'<span class="muted small">ยังไม่มีเนื้อเรื่อง</span>'}</div>
       ${t.tid?foot(t.tid,SX_R)+foot(t.tid+VS,SX_V):''}</li>`;
       if((l.checks||[]).includes(t.tid)){const c=CK+t.tid;const vs=vocabUpTo(tp,t.tid);const nq=scopeCount(l,c);
@@ -1933,13 +1941,13 @@ function vlRe(forms){const alt=[];forms.forEach(f=>{f=f.trim();if(!f)return;alt.
   alt.sort((a,b)=>b.length-a.length);if(!alt.length)return null;
   return new RegExp('(^|[^A-Za-z\'’])('+alt.map(x=>reEsc(x).replace(/\s+/g,'\\s+')).join('|')+')((?:e?s|e?d|ing|\'s|’s)?)(?![A-Za-z])','gi')}
 function vlMark(sent,re){re.lastIndex=0;let h='',at=0,m;while((m=re.exec(sent))){const st=m.index+m[1].length,en=m.index+m[0].length;h+=esc(sent.slice(at,st))+'<mark>'+esc(sent.slice(st,en))+'</mark>';at=en;if(m[0]==='')re.lastIndex++}return h+esc(sent.slice(at))}
-function vlEntries(l){const out=[];(l.topics||[]).forEach((t,ti)=>{const ps=sxParts(t.story);const ss=ps.map(p=>sxSents(p.text));
+function vlEntries(l){const out=[];(l.topics||[]).forEach((t,ti)=>{if(!sxShown(l,t.tid))return;const ps=sxParts(t.story);const ss=ps.map(p=>sxSents(p.text));
   ps.forEach((p,pi)=>p.vocab.forEach(v=>{const re=vlRe(v.forms);const ex=[];
     if(re)[pi,...ps.map((_,j)=>j).filter(j=>j!==pi)].forEach(j=>ss[j].forEach(x=>{re.lastIndex=0;if(re.test(x)&&!ex.some(e=>e.s===x))ex.push({s:x,h:vlMark(x,re)})}));
     out.push({v,ti,tid:t.tid,sn:t.name||'Story '+(ti+1),pi,np:ps.length,ex})}))});
   const key=e=>e.v.w.toLowerCase().replace(/^[^a-z0-9]+/,'');
   return out.sort((a,b)=>key(a).localeCompare(key(b),'en',{sensitivity:'base',numeric:true})||a.ti-b.ti||a.pi-b.pi)}
-const vlCount=l=>(l.topics||[]).reduce((a,t)=>a+sxParts(t.story).reduce((b,p)=>b+p.vocab.length,0),0);
+const vlCount=l=>(l.topics||[]).filter(t=>sxShown(l,t.tid)).reduce((a,t)=>a+sxParts(t.story).reduce((b,p)=>b+p.vocab.length,0),0);
 function vVocab(l){
   const F=S.vl;const all=vlEntries(l);const tp=l.topics||[];
   const stIds=tp.map((t,i)=>({t,i,n:all.filter(e=>e.ti===i).length})).filter(x=>x.n);
@@ -1975,7 +1983,7 @@ function vVocab(l){
 const sxInQuiz=()=>{const q=S.quiz;return !!(q&&!q.done&&q.phase==='answer'&&isStory(Store.d.lessons[q.lessonId]))};
 const sxScopeTid=sc=>isCk(sc)?sc.slice(CK.length):String(sc||'').endsWith(VS)?sc.slice(0,-VS.length):sc;
 function vStory(l){
-  const st=S.story;const tp=l.topics||[];const ti=tp.findIndex(t=>t.tid===st.tid);const t=tp[ti];if(!t){S.story=null;return ''}
+  const st=S.story;const tp=l.topics||[];const ti=tp.findIndex(t=>t.tid===st.tid);const t=tp[ti];if(!t||!sxShown(l,t.tid)){S.story=null;return ''}
   const ps=sxParts(t.story);if(!ps.length){S.story=null;return ''}
   const pi=Math.max(0,Math.min(ps.length-1,st.part||0));st.part=pi;const p=ps[pi];const V=p.vocab;
   /* every vocab tab sits in one vertical column beside the story; the side (left/right) is remembered on this device */
@@ -1984,7 +1992,7 @@ function vStory(l){
   const rail=(arr,sd)=>`<div class="sx-rail sx-${sd}">${arr.map(i=>tab(i,sd)).join('')}</div>`;
   const sets=topicSets(l,t).filter(x=>setOpen(l,x)&&scopeCount(l,x));
   const name=t.name||'Story '+(ti+1);const qz=!!st.inQuiz;
-  const ckTs=qz&&st.ck?(()=>{const o=[];for(const x of tp){o.push(x);if(x.tid===st.ck)break}return o.filter(x=>sxParts(x.story).some(pp=>pp.text.trim()))})():[];
+  const ckTs=qz&&st.ck?(()=>{const o=[];for(const x of tp){o.push(x);if(x.tid===st.ck)break}return o.filter(x=>sxShown(l,x.tid)&&sxParts(x.story).some(pp=>pp.text.trim()))})():[];
   const q=S.quiz;const qEnd=qz&&q?(q.timer==='q'?(q.ans[q.i].locked?null:q.qEnd):q.timer==='set'?q.setEnd:null):null;
   const qClk=qz&&q&&q.timer!=='none'?`<span class="clock" id="sxClock" aria-label="เวลาที่เหลือในควิซ">${qEnd?fmtTime((qEnd-(q.pauseAt!=null?q.pauseAt:quizNow()))/1000):'—'}</span>`:'';
   return `<div class="storyx ${st.all?'all':''}" role="dialog" aria-modal="true" aria-label="${esc(name)}">
@@ -2112,7 +2120,7 @@ function vQuiz(){
   const sub=prac&&nRev===n?'':`<div class="qsubmit">${q.confirm?`<div class="banner">ยังไม่ได้ตอบ ${left} ข้อ ${prac?'จบเลยไหม':'ส่งเลยไหม'} ข้อที่ไม่ได้ตอบจะนับเป็น 0</div><div class="btns"><button class="btn primary" data-act="qSubmit">ยืนยัน${endWord}</button><button class="btn ghost" data-act="qSubmitCancel">กลับไปทำต่อ</button></div>`
       :`<button class="btn ${!prac&&q.i+1===n?'primary big':''}" data-act="qSubmitAsk">${endWord}${prac?' ดูผล':''}</button><span class="muted small">${left?'ยังไม่ได้ตอบ '+left+' ข้อ':'ตอบครบทุกข้อแล้ว'}</span>`}</div>`;
   return `<section class="quiz">
-    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}${isStory(l)?'<button class="btn sm" data-act="sxQuizOpen" style="white-space:nowrap">อ่านเรื่อง</button>':''}<button class="btn sm" data-act="qHold">พัก</button><button class="btn sm ghost" data-act="endQuiz" title="เก็บไว้ทำต่อทีหลัง">ออก</button></div>
+    <div class="qtop">${pawn(k)}<div class="bar"><i style="width:${(prog/n*100).toFixed(1)}%"></i></div><span class="label">${esc(scopeName(l,q.scope))} · ${prac?'ตรวจแล้ว':'ตอบแล้ว'} ${prog}/${n}</span>${clock}${isStory(l)&&sxQuizTid(l,q.scope)?'<button class="btn sm" data-act="sxQuizOpen" style="white-space:nowrap">อ่านเรื่อง</button>':''}<button class="btn sm" data-act="qHold">พัก</button><button class="btn sm ghost" data-act="endQuiz" title="เก็บไว้ทำต่อทีหลัง">ออก</button></div>
     <nav class="qmap" aria-label="เลือกข้อ">${q.order.map((_,p)=>`<button type="button" class="${p===q.i?'cur':''} ${isAnswered(q,p)?'done':''} ${q.ans[p].locked?'lock':''} ${mark(p)}" data-act="qGo" data-id="${p}" aria-label="ข้อ ${p+1}${isAnswered(q,p)?' ตอบแล้ว':''}" ${p===q.i?'aria-current="true"':''}>${p+1}</button>`).join('')}</nav>
     <div class="chips"><span class="tag">ข้อ ${q.i+1}/${n}</span>${isE?`<span class="tag">MEQ · เต็ม ${qMax(it)} คะแนน</span>`:`<span class="tag">MCQ · 1 คะแนน</span>`}${lock?`<span class="tag">${a.timeout?'หมดเวลาข้อนี้':rev?'ตรวจแล้ว':'ล็อกแล้ว'}</span>`:''}${rev&&q.timer==='set'&&nx>=0?'<span class="tag">เวลาหยุดระหว่างอ่านเฉลย</span>':''}</div>
     <div class="qtext">${md(it.q)}</div>${body}
@@ -2869,7 +2877,7 @@ function lessonForm(id,part,qf){
       :{type:'mcq',topic:q.topic||'',q:q.q||'',choices:(q.choices||['','','','']).slice(),answer:q.answer||0,explain:q.explain||'',key:'',max:2,qid:qKey(q),born:+q.born||0}):[],
     example:l?!!l.example:false,clock:Object.assign({},CLOCK_DEF,(l&&l.clock)||{})};
   /* new quiz sets start hidden from the kids until the brother opens them */
-  S.draft.hidden=l?(l.hidden||[]).slice():['mid','final',...S.draft.topics.flatMap(t=>[t.tid,t.tid+VS])];
+  S.draft.hidden=l?(l.hidden||[]).slice():['mid','final',...S.draft.topics.flatMap(t=>[t.tid,t.tid+VS,t.tid+SSX])];
   S.draft.part=part==='quiz'&&l?'quiz':'lesson';S.draft.qf=qf||'all';
   paintLessonForm();
 }
@@ -2915,7 +2923,7 @@ ${d.part!=='quiz'?`
       ${d.story?`<div class="field"><span>${CK_NAME} อยู่หลังเรื่องไหน · เลือกได้หลายจุด ชื่อเรียง 1, 2, 3 ให้เอง</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_ck" data-change="lfCk" ${draftCk(d).includes(t.tid)?'checked':''}><span>หลัง ${esc(t.name||'Story '+(i+1))}</span></label>`).join('')}</div>
       <small>แต่ละ Checkpoint ออกคำศัพท์ของทุกเรื่องตั้งแต่เรื่องแรกจนถึงเรื่องนั้น ทำแบบข้อสอบ ส่งทีเดียวแล้วค่อยเฉลย</small></div>`:`<label class="field"><span>Midterm อยู่ตรงไหน</span><select id="lfMid"><option value="">ไม่มี Midterm</option>${d.topics.map((t,i)=>`<option value="${esc(t.tid)}" ${d.midAfter===t.tid?'selected':''}>หลังหัวข้อ ${i+1}${i+1<d.topics.length?' (ก่อนหัวข้อ '+(i+2)+')':''}${t.name?' · '+esc(t.name):''}</option>`).join('')}</select>
       <small>โจทย์ Midterm และ Final เป็นชุดของตัวเอง ตั้งในช่อง "อยู่ในชุด" ของแต่ละข้อ ไม่ดึงโจทย์จากหัวข้อมารวม</small></label>`}
-      <div class="field"><span>น้องเห็นชุดไหนบ้าง · แตะเพื่อสลับ (สีเข้ม = น้องเห็น · สีขาว = ซ่อนไว้)</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}><span>${d.story?esc(t.name||'Story '+(i+1))+' · Reading':'หัวข้อ '+(i+1)}</span></label>${d.story?`<label class="opt"><input type="checkbox" id="t${i}_showv" ${d.hidden.includes(t.tid+VS)?'':'checked'}><span>${esc(t.name||'Story '+(i+1))} · Vocab</span></label>`:''}${d.story&&draftCk(d).includes(t.tid)?`<label class="opt"><input type="checkbox" id="t${i}_showc" ${d.hidden.includes(CK+t.tid)?'':'checked'}><span>${CK_NAME} ${draftCk(d).indexOf(t.tid)+1}</span></label>`:''}`).join('')}${d.story?'':`<label class="opt"><input type="checkbox" id="lfShowMid" ${d.hidden.includes('mid')?'':'checked'}><span>Midterm</span></label><label class="opt"><input type="checkbox" id="lfShowFin" ${d.hidden.includes('final')?'':'checked'}><span>Final</span></label>`}</div></div>
+      <div class="field"><span>น้องเห็นชุดไหนบ้าง · แตะเพื่อสลับ (สีเข้ม = น้องเห็น · สีขาว = ซ่อนไว้)</span><div class="pick">${d.topics.map((t,i)=>`<label class="opt"><input type="checkbox" id="t${i}_show" ${d.hidden.includes(t.tid)?'':'checked'}><span>${d.story?esc(t.name||'Story '+(i+1))+' · Reading':'หัวข้อ '+(i+1)}</span></label>${d.story?`<label class="opt"><input type="checkbox" id="t${i}_shows" ${d.hidden.includes(t.tid+SSX)?'':'checked'}><span>${esc(t.name||'Story '+(i+1))} · เนื้อเรื่อง</span></label>`:''}${d.story?`<label class="opt"><input type="checkbox" id="t${i}_showv" ${d.hidden.includes(t.tid+VS)?'':'checked'}><span>${esc(t.name||'Story '+(i+1))} · Vocab</span></label>`:''}${d.story&&draftCk(d).includes(t.tid)?`<label class="opt"><input type="checkbox" id="t${i}_showc" ${d.hidden.includes(CK+t.tid)?'':'checked'}><span>${CK_NAME} ${draftCk(d).indexOf(t.tid)+1}</span></label>`:''}`).join('')}${d.story?'':`<label class="opt"><input type="checkbox" id="lfShowMid" ${d.hidden.includes('mid')?'':'checked'}><span>Midterm</span></label><label class="opt"><input type="checkbox" id="lfShowFin" ${d.hidden.includes('final')?'':'checked'}><span>Final</span></label>`}</div></div>
     </div>
     <h3>โจทย์ · MCQ ${nm} ข้อ · MEQ ${ne} ข้อ</h3>
     ${qfBar(d)}
@@ -2943,7 +2951,7 @@ function syncDraft(){
   const d=S.draft;if(!d)return;
   d.subject=val('lfSubj')||d.subject;if(document.getElementById('lfTitle'))d.title=val('lfTitle');if($('#sheetCard input[name="lfLv"]'))d.levels=radios('lfLv');const mid=document.getElementById('lfMid');if(mid)d.midAfter=mid.value;const bt=document.getElementById('bulkTopic');if(bt)d.bulkTopic=bt.value;const ct=document.getElementById('lfContent');if(ct)d.content=ct.value;
   const hs=new Set(d.hidden||[]);const flag=(id,key)=>{const e=document.getElementById(id);if(e){if(e.checked)hs.delete(key);else hs.add(key)}};
-  flag('lfShowMid','mid');flag('lfShowFin','final');d.topics.forEach((t,i)=>{flag('t'+i+'_show',t.tid);flag('t'+i+'_showv',t.tid+VS);flag('t'+i+'_showc',CK+t.tid)});
+  flag('lfShowMid','mid');flag('lfShowFin','final');d.topics.forEach((t,i)=>{flag('t'+i+'_show',t.tid);flag('t'+i+'_showv',t.tid+VS);flag('t'+i+'_shows',t.tid+SSX);flag('t'+i+'_showc',CK+t.tid)});
   if(document.getElementById('t0_ck')){const was=new Set(d.checks||[]);d.checks=d.topics.filter((t,i)=>{const e=document.getElementById('t'+i+'_ck');return e?e.checked:was.has(t.tid)}).map(t=>t.tid);d.checks.forEach(x=>{if(!was.has(x))hs.add(CK+x)})}
   d.hidden=[...hs];const sb=document.getElementById('lfStory');if(sb)d.story=sb.checked;
   if($('#sheetCard input[name="lfClk"]')){const c=Object.assign({},CLOCK_DEF,d.clock||{});c.kind=radio('lfClk')||c.kind;const pr=radio('lfClkPer');if(pr)c.per=pr;
@@ -2982,7 +2990,7 @@ async function saveLesson(){
   if(!d.title){toast('ใส่ชื่อบทก่อนบันทึก');return}
   const topics=d.topics.filter(t=>t.name.trim()||t.goals.trim()||(t.story||'').trim()).map(t=>({tid:t.tid,name:t.name.trim(),stars:t.stars||0,goals:t.goals.split('\n').map(s=>s.replace(/^\s*[-•]\s*/,'').trim()).filter(Boolean),story:(t.story||'').replace(/\s+$/,'')}));
   const checks=topics.filter(t=>(d.checks||[]).includes(t.tid)).map(t=>t.tid);
-  const tids=topics.flatMap(t=>d.story?[t.tid,t.tid+VS,...(checks.includes(t.tid)?[CK+t.tid]:[])]:[t.tid]);const okTopic=x=>x==='mid'||x==='final'||tids.includes(x)?x:'final';
+  const tids=topics.flatMap(t=>d.story?[t.tid,t.tid+VS,...(checks.includes(t.tid)?[CK+t.tid]:[])]:[t.tid]);const sxKeys=d.story?topics.map(t=>t.tid+SSX):[];const okTopic=x=>x==='mid'||x==='final'||tids.includes(x)?x:'final';
   if(d.story&&d.questions.some(q=>q.q.trim()&&!tids.includes(q.topic))){toast('มีโจทย์อยู่ในชุดที่เอาออกไปแล้ว เปลี่ยน "อยู่ในชุด" ของโจทย์นั้นก่อน');return}
   /* each question keeps a key and the time it was added, so the site knows which ones each kid has already done */
   const seen=new Set(),now=Date.now();
@@ -2995,7 +3003,7 @@ async function saveLesson(){
   if(bad){toast('มี MCQ ที่ตัวเลือกไม่ครบ หรือยังไม่ได้เลือกคำตอบที่ถูก');return}
   const id=d.id||uid();const old=d.id&&Store.d.lessons[d.id];
   const ck0=Object.assign({},CLOCK_DEF,d.clock||{});if(ck0.per==='story'&&!d.story)ck0.per='set';
-  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,story:!!d.story,clock:ck0,checks,topics,midAfter:topics.some(t=>t.tid===d.midAfter)?d.midAfter:'',hidden:(d.hidden||[]).filter(x=>x==='mid'||x==='final'||tids.includes(x)),content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
+  await Store.put('lessons',id,{subject:d.subject,title:d.title,levels:d.levels,story:!!d.story,clock:ck0,checks,topics,midAfter:topics.some(t=>t.tid===d.midAfter)?d.midAfter:'',hidden:(d.hidden||[]).filter(x=>x==='mid'||x==='final'||tids.includes(x)||sxKeys.includes(x)),content:d.content,questions:qs,example:d.example&&!!old,at:old&&old.at||Date.now()});
   closeSheet();S.learn.open=id;toast('บันทึกบทเรียนแล้ว');render();
 }
 
@@ -3106,11 +3114,11 @@ const ACT={
     if(c.has(tid)){if(scopeCount(l,CK+tid)){toast('ชุดนี้มีโจทย์อยู่ ย้ายหรือลบโจทย์ก่อน');return}c.delete(tid);await Store.put('lessons',l.id,Object.assign({},l,{checks:[...c]}));toast('เอา '+CK_NAME+' ออกแล้ว')}
     else{c.add(tid);const h=new Set(l.hidden||[]);h.add(CK+tid);const nl=Object.assign({},l,{checks:[...c],hidden:[...h]});await Store.put('lessons',l.id,nl);toast('เพิ่ม '+scopeName(nl,CK+tid)+' แล้ว · ยังซ่อนจากน้องอยู่')}
     render()},
-  sxOpen(t){if(!S.learn.open)return;S.story={lid:S.learn.open,tid:t.dataset.id,part:0,all:S.story&&S.story.all};render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
+  sxOpen(t){if(!S.learn.open)return;const l0=Store.d.lessons[S.learn.open];if(!l0||!sxShown(l0,t.dataset.id))return;S.story={lid:S.learn.open,tid:t.dataset.id,part:0,all:S.story&&S.story.all};render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxQuizPick(){if(!S.story)return;S.story.pick=!S.story.pick;render();const b=document.getElementById('sxStory');if(b&&S.story.pick)b.scrollTop=b.scrollHeight},
   sxClose(){const back=S.story&&S.story.inQuiz;S.story=null;render();if(back)window.scrollTo({top:0})},
   sxQuizOpen(){const q=S.quiz;if(!sxInQuiz())return;const b=document.getElementById('meqAns');if(b&&q.ans[q.i])q.ans[q.i].text=b.value;
-    const tid=sxScopeTid(q.scope);S.story={lid:q.lessonId,tid,part:0,all:false,inQuiz:true,ck:isCk(q.scope)?tid:null};render();const x=document.getElementById('sxStory');if(x)x.scrollTop=0},
+    const ql=Store.d.lessons[q.lessonId];const tid=ql&&sxQuizTid(ql,q.scope);if(!tid)return;S.story={lid:q.lessonId,tid,part:0,all:false,inQuiz:true,ck:isCk(q.scope)?sxScopeTid(q.scope):null};render();const x=document.getElementById('sxStory');if(x)x.scrollTop=0},
   sxPick(t){if(!S.story)return;S.story.tid=t.dataset.id;S.story.part=0;render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxPart(t){if(!S.story)return;S.story.part=+t.dataset.id;render();const b=document.getElementById('sxStory');if(b)b.scrollTop=0},
   sxAll(){if(!S.story)return;S.story.all=!S.story.all;const x=document.querySelector('.storyx');if(x)x.classList.toggle('all',S.story.all);const b=document.querySelector('.storyx [data-act="sxAll"]');
@@ -3156,7 +3164,7 @@ const ACT={
     S.confirm=null;parkDrop(t.dataset.id);toast('ทิ้งควิซที่พักไว้แล้ว');render()},
   lessonForm(t){lessonForm(t.dataset.id||null)},
   async delLesson(t){await Store.del('lessons',t.dataset.id);S.learn.open=null;S.confirm=null;toast('ลบบทเรียนแล้ว');render()},
-  tAdd(){syncDraft();const t=blankT();S.draft.topics.push(t);S.draft.hidden=(S.draft.hidden||[]).concat(t.tid,t.tid+VS);paintLessonForm()},
+  tAdd(){syncDraft();const t=blankT();S.draft.topics.push(t);S.draft.hidden=(S.draft.hidden||[]).concat(t.tid,t.tid+VS,t.tid+SSX);paintLessonForm()},
   tDel(t){syncDraft();S.draft.topics.splice(+t.dataset.id,1);paintLessonForm()},
   tUp(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;[a[i-1],a[i]]=[a[i],a[i-1]];paintLessonForm()},
   tDown(t){syncDraft();const i=+t.dataset.id,a=S.draft.topics;if(i>=a.length-1)return;[a[i+1],a[i]]=[a[i],a[i+1]];paintLessonForm()},
