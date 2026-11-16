@@ -5909,7 +5909,12 @@ if(gateBlocks())gateScreen(()=>Store.init());else Store.init();
   document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")check(0);});
   addEventListener("focus",function(){check(0);});
   addEventListener("pageshow",function(e){if(e.persisted)check(1);});
-  setInterval(function(){if(document.visibilityState==="visible")check(1);},15*60000);
+  /* 16 Nov 2026: while the page stays open on screen, also look every minute — a light HEAD request (headers only, no page download):
+     a newer Last-Modified = the site was redeployed → bar right away, not only after leaving and coming back */
+  var tick=0;
+  setInterval(function(){if(old||base===null||document.visibilityState!=="visible")return;
+    if(++tick%15===0){check(1);return;}
+    fetch(url+"?st="+Date.now(),{method:"HEAD",cache:"no-store"}).then(function(r){var lm=lmOf(r);if(r.ok&&lm&&baseLM&&lm>baseLM)bar();}).catch(function(){});},60000);
 })();
 </script>
 </body>
