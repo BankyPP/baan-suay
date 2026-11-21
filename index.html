@@ -3424,7 +3424,7 @@ function guestFrom(name){const n=name.trim();if(!n)return null;return {name:n,co
 /* ---------- พื้นฐานคณิตศาสตร์ (21 Nov 2026) ----------
    slides live in math/ (deck.json + bg/ + fonts/ + mathdeck.js), converted from the brother's Canva file BM02.
    The course is one lesson (fixed id) whose topics are the chapters; until the brother saves it, the site shows a built-in copy.
-   Baan Suay only — the classroom site never gets it. Slide edits (brother mode) save to Firestore collection "mathdeck". */
+   Baan Suay only — the classroom site never gets it. No editing on the web: changes come as new pages from the brother's Canva file. */
 const BM_ID='bm02-math';
 const BM_CH=[['c0','Introduction to Course','แนะนำคอร์ส'],['c1','Basic Mathematic Operations','การดำเนินการพื้นฐาน'],['c2','Numbers & Number Theory','จำนวนและทฤษฎีจำนวน'],['c3','Fractions, Ratio, Decimals & Percent','เศษส่วน อัตราส่วน ทศนิยม ร้อยละ'],
   ['c4','Statistics & Probability','สถิติและความน่าจะเป็น'],['c5','Geometry (1D)','เรขาคณิต 1 มิติ'],['c6','Geometry (2D)','เรขาคณิต 2 มิติ'],['c7','Geometry (3D)','เรขาคณิต 3 มิติ'],['c8','Graphs','กราฟ'],
@@ -3448,7 +3448,7 @@ let deckJs=null;
 function deckLoad(){if(window.MathDeck)return Promise.resolve();if(deckJs)return deckJs;
   deckJs=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='math/mathdeck.js?v='+encodeURIComponent(SITE_UPDATED);sc.onload=ok;sc.onerror=()=>{deckJs=null;no()};document.head.appendChild(sc)});return deckJs}
 async function deckOpen(ch){try{await deckLoad()}catch(e){toast('โหลดสไลด์ไม่ได้ ลองใหม่อีกครั้ง');return}
-  window.MathDeck.open({ch:ch||null,base:'math/',col:'mathdeck',updated:SITE_UPDATED,db:Store.kind==='firebase'?Store.db:null,canEdit:()=>!!S.bro&&(Store.kind!=='firebase'||Store.admin),toast})}
+  window.MathDeck.open({ch:ch||null,base:'math/',updated:SITE_UPDATED,toast})}
 /* ควิซรวมบท form: new one after a topic, or edit one (also Midterm/Final coverage) */
 function gqForm(sc,after){const l=Store.d.lessons[S.learn.open];if(!l||!S.bro)return;const tp=l.topics||[];
   const g=isGq(sc)?gqOf(l,sc):null;const isMF=sc==='mid'||sc==='final';
@@ -5517,7 +5517,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* footer: when the website itself was last updated (stamped at each release) */
-const SITE_UPDATED='2026-11-21T23:20:00+07:00';
+const SITE_UPDATED='2026-11-21T23:40:00+07:00';
 /* the stamp (real time of the release, never ahead) is only a fallback: the live site always shows GitHub's last commit time of index.html */
 (function(){const el=document.getElementById('siteFoot');if(!el)return;
   const show=iso=>{const d=new Date(iso);if(isNaN(d))return;let t;try{t=d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'})+' เวลา '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})+' น.'}catch(e){t=iso}

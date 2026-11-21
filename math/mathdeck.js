@@ -1,4 +1,4 @@
-/* พื้นฐานคณิตศาสตร์ — slide viewer / presenter / editor for Baan Suay
+/* พื้นฐานคณิตศาสตร์ — slide viewer / presenter for Baan Suay (editor code is switched off: canEdit is always false)
    deck.json  = slides converted from the brother's Canva file (background image + editable text on a 1440×810 page)
    Firestore  = the brother's edits: doc "order" (chapters + slide order) and one doc per edited/new slide
    window.MathDeck.open({ch, sid, base, canEdit, db, col, toast, onClose}) */
@@ -125,7 +125,6 @@ function maxStep(sl){let m=0;(sl&&sl.els||[]).forEach(e=>{if(+e.st>m)m=+e.st});r
 async function load(){
   if(!BASE){const r=await fetch(O.base+'deck.json',{cache:'no-cache'});BASE=await r.json()}
   D={ch:clone(BASE.ch),s:{}};Object.keys(BASE.s).forEach(k=>D.s[k]=BASE.s[k]);
-  applyLocal();
 }
 /* edits: firestore collection (or localStorage when the site runs without Firebase) */
 const LSK='house6.mathdeck';
@@ -520,7 +519,7 @@ function close(){endText();if(st.dirty.size||st.orderDirty)flush();
   try{O.onClose&&O.onClose()}catch(e){}}
 
 async function open(opts){
-  O=Object.assign({base:'math/',col:'mathdeck',canEdit:()=>false,db:null},opts||{});
+  O=Object.assign({base:'math/'},opts||{},{canEdit:()=>false,db:null});  /* editing on the web was removed 21 Nov 2026: changes come as new pages from Canva */
   css(O.base);if(ROOT)close();
   shell();fit();
   ROOT.querySelector('.md-slide').innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#eff5fb;color:#001a47;font:500 34px Kanit,sans-serif">กำลังโหลดสไลด์…</div>';
@@ -528,7 +527,7 @@ async function open(opts){
   st.i=0;st.step=0;
   if(O.sid){const ix=flat().findIndex(x=>x.sid===O.sid);if(ix>=0)st.i=ix}
   else if(O.ch){const ci=chOf(O.ch);const ix=flat().findIndex(x=>x.ci===ci);if(ix>=0)st.i=ix}
-  listen();paint(true);ROOT.focus()}
+  paint(true);ROOT.focus()}
 
 /* chapters list for the classroom (names come from the deck so renaming in the editor shows up there too) */
 async function chapters(base){if(!BASE){const r=await fetch((base||'math/')+'deck.json',{cache:'no-cache'});BASE=await r.json()}return BASE.ch.map(c=>({id:c.id,no:c.no,name:c.name,th:c.th,n:c.sl.length}))}
