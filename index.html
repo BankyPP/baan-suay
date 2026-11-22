@@ -2390,7 +2390,7 @@ function vQuiz(){
   const ps=partsOf(l,q.scope);const pix=ps.length?q.order.map((_,p)=>partIx(ps,qItem(q,p))):[];const pc=ps.length?pix[q.i]:-1;const part=pc>=0?ps[pc]:null;
   const nx=prac?nextOpen(q):-1;const needScore=isE&&rev&&q.scores[q.i]==null;
   const nav=prac?`<div class="qnav"><button class="btn big" data-act="qPrev" ${q.i?'':'disabled'}>← ข้อก่อน</button>${!rev?`<button class="btn big primary" id="qCheckBtn" data-act="qCheck" ${ansd?'':'disabled'}>ตรวจคำตอบ</button>`:nx>=0?`<button class="btn big primary" data-act="qGo" data-id="${nx}" ${needScore?'disabled':''}>ข้อต่อไป →</button>`:`<button class="btn big primary" data-act="qSubmit" ${needScore?'disabled':''}>ดูผล</button>`}</div>
-    ${!rev?`<div class="btns">${!ansd?'<button class="btn sm ghost" data-act="qCheck">ไม่รู้ ดูเฉลยเลย</button>':''}${nx>=0&&nx!==q.i?`<button class="btn sm ghost" data-act="qGo" data-id="${nx}">ข้ามไปก่อน</button>`:''}</div>`:needScore?'<p class="muted small">ให้คะแนนข้อนี้ก่อน แล้วค่อยไปข้อต่อไป</p>':''}`
+    ${!rev?`<div class="btns">${nx>=0&&nx!==q.i?`<button class="btn sm ghost" data-act="qGo" data-id="${nx}">ข้ามไปก่อน</button>`:''}</div>`:needScore?'<p class="muted small">ให้คะแนนข้อนี้ก่อน แล้วค่อยไปข้อต่อไป</p>':''}`
     :`<div class="qnav"><button class="btn big" data-act="qPrev" ${q.i?'':'disabled'}>← ข้อก่อน</button>${q.i+1<n?'<button class="btn big primary" data-act="qNext">ข้อต่อไป →</button>':''}</div>`;
   const endWord=prac?'จบชุดนี้':'ส่งข้อสอบ';
   const sub=prac&&nRev===n?'':`<div class="qsubmit">${q.confirm?`<div class="banner">ยังไม่ได้ตอบ ${left} ข้อ ${prac?'จบเลยไหม':'ส่งเลยไหม'} ข้อที่ไม่ได้ตอบจะนับเป็น 0</div><div class="btns"><button class="btn primary" data-act="qSubmit">ยืนยัน${endWord}</button><button class="btn ghost" data-act="qSubmitCancel">กลับไปทำต่อ</button></div>`
@@ -3606,7 +3606,7 @@ const ACT={
   qSubmitCancel(){const q=S.quiz;q.confirm=false;render()},
   qSubmit(){quizSubmit()},
   gradeScore(t){const q=S.quiz;q.scores[q.gList[q.gi]]=+t.dataset.id;render()},
-  qCheck(){const q=S.quiz;if(!q||!q.practice||q.phase!=='answer')return;quizReveal(q,q.i);q.confirm=false;render()},
+  qCheck(){const q=S.quiz;if(!q||!q.practice||q.phase!=='answer')return;const mb=document.getElementById('meqAns');if(mb&&q.ans[q.i])q.ans[q.i].text=mb.value;if(!isTouched(q,q.i))return;quizReveal(q,q.i);q.confirm=false;render()},
   pScore(t){const q=S.quiz;if(!q||!q.ans[q.i]||!q.ans[q.i].revealed)return;q.scores[q.i]=+t.dataset.id;render()},
   qsPick(t){qset().pick=t.dataset.id;render()},
   gradePrev(){const q=S.quiz;if(q.gi>0){q.gi--;render();window.scrollTo({top:0})}},
