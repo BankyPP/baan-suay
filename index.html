@@ -4985,6 +4985,14 @@ document.addEventListener('change',e=>{
   if(c==='f7Target'){const v=parseInt(e.target.value,10);if(v>0){f7().target=v;persist();render()}}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
+/* quiz: keyboard ← → moves to the previous / next question (not while typing an answer) */
+document.addEventListener('keydown',e=>{
+  if(!(e.key==='ArrowRight'||e.key==='ArrowLeft')||e.metaKey||e.ctrlKey||e.altKey||e.shiftKey||e.isComposing)return;
+  const q=S.quiz;if(!q||q.done||q.phase!=='answer'||!$('#sheet').hidden||!document.querySelector('.quiz .qmap')||document.querySelector('.storyx'))return;
+  const a=document.activeElement;if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;
+  const p=q.i+(e.key==='ArrowRight'?1:-1);if(p<0||p>=q.order.length)return;
+  e.preventDefault();quizGo(p);
+});
 document.addEventListener('keydown',e=>{if(!S.story||!document.querySelector('.storyx')||!$('#sheet').hidden||e.metaKey||e.ctrlKey||e.altKey||e.isComposing)return;
   const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
   if((e.key==='Enter'||e.key===' ')&&a&&a.classList&&a.classList.contains('vw')){e.preventDefault();ACT.sxWord(a);return}
